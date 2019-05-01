@@ -61,8 +61,7 @@
 		return d;
 	}
 
-	function scrolly(element, top_){
-	    
+	function scrolly_supported(){
 	    var browser_support = false;
 
 	    try{
@@ -70,13 +69,16 @@
 	    }
 	    catch(e){
 	        browser_support = false;
-	    }
+	    }   
+	    
+	    return browser_support;
+	}
 
+	function scrolly(element, top_){
+	    
 	    var sticky_el = d3.select(element);
 	    
-	    if(browser_support){
-	        sticky_el.style("position", "sticky").style("top", arguments.length > 1 && top_ != null ? (top_+"px") : "0px");
-	    }
+	    sticky_el.style("position", "sticky").style("top", arguments.length > 1 && top_ != null ? (top_+"px") : "0px");
 
 	    // Credit: This module was inspired by Russell Goldenberg's enter-view module [License: https://github.com/russellgoldenberg/enter-view/blob/master/LICENSE]
 
@@ -108,41 +110,47 @@
 	            var en = box.top < px_threshold;
 	            var ex = box.bottom < px_threshold;
 
+	            var has_stepped;
+
 	            //share of element that is over (above) the threshold
 	            try{
 	                if(h == 0){throw new Error("Zero height")}                var proportion = (px_threshold - box.top) / h;
-	                o.has_stepped = proportion > 1 ? 1 : (proportion < 0 ? 0 : proportion);
+	                has_stepped = proportion > 1 ? 1 : (proportion < 0 ? 0 : proportion);
 	            }
 	            catch(e){
-	                o.has_stepped = 0;
+	                has_stepped = 0;
 	            }
 
 	            //case 1: enter for the first time
 	            //case 2: exit, or scrolling back up
 	            if(en && !o.has_entered){
-	                o.enter();
-	                o.step(o.has_stepped);
+	                o.enter.call(o.el);
+	                o.step.call(o.el, has_stepped);
 	                o.has_entered = true;
 	            }
 	            else if(!en && o.has_entered){
-	                o.has_stepped = 0;
-	                o.step(o.has_stepped);
-	                o.exit();
+	                has_stepped = 0;
+	                o.step.call(o.el, has_stepped);
+	                o.exit.call(o.el);
 	            }
 
 	            //case 3 (stepping): in view
+	            //not mutually exclusive
 	            if(en && !ex){
-	                o.step(o.has_stepped);
+	                o.step.call(o.el, has_stepped);
 	            }
 
-	            //case 4 (last step): scrolling past, run last step to finishou out any transition
+	            //case 4 (last step): scrolling past, run last step to finish out any transition
+	            //not mutually exclusive
 	            if(ex && o.has_stepped != 1){
-	                o.has_stepped = 1;
-	                o.step(o.has_stepped);
+	                has_stepped = 1;
+	                o.step.call(o.el, has_stepped);
 	            }
 
 	            //record this so enter() and exit() can be refired
 	            o.has_entered = en;
+
+	            o.has_stepped = has_stepped;
 
 	        });
 
@@ -209,6 +217,123 @@
 	    
 	}
 
+	//static method
+	scrolly.supported = scrolly_supported;
+
+	// the setup function must take two arguments: setup(container, view_num)
+	// if setup is called with both arguments, it should draw the requested view (view_num) of the graphic, running setup first. 
+	// typically, drawing the view completely means running then enter() and then the step(1) method, if present (after first running setup), but this is left up to the design of setup().
+	// if called without view_num, then the return of setup is an array of objects:
+	//   [{text:_, enter:_, step:_, exit:_}]
+	//   calling enter, step, or exit will alter the view of the graphic to match text
+	// 
+	// the first form is used to handle instances when scrollytelling is not supported by the browser (every view should be drawn)
+	// the second form is used to handle scrollytelling 
+
+	function sequence(container, setup, num_views){
+	    
+	    var wrap = d3.select(container).append("div");
+	    
+	    var views;
+
+	    if(scrolly.supported()){
+	        var sticky = wrap.append("div"); 
+	        var scr = scrolly(sticky.node(), 140);
+	        views = wrap.selectAll("p").data(setup(sticky.node())).enter().append("p")
+	                    .style("min-height","75vh").style("max-width","700px").style("margin","0px auto")
+	                    .style("position","relative").style("z-index","1000").style("background-color","rgba(0,0,0,0.1)")
+	                    .html(function(d){return d.text});
+
+	        views.each(function(d){            
+	            var fns = {};
+	            fns.enter = d.hasOwnProperty("enter") ? d.enter : null;
+	            fns.step = d.hasOwnProperty("step") ? d.step : null;
+	            fns.exit = d.hasOwnProperty("exit") ? d.exit : null;
+	    
+	            scr.marker(this, fns, 0.4);
+	          });
+	    }
+	    else{
+	        //draw all views using form setup(container, view_num)
+	        views = wrap.selectAll("div").data(d3.range(0,num_views)).enter().append("div");
+	        views.each(function(d,i){
+	            setup(this, d);
+	        });
+	    }
+
+	}
+
+	function seq0(container, i){
+	    //one time setup
+	    var wrap = d3.select(container);
+
+	    wrap.style("min-height","400px").style("min-width","300px").style("margin","0px auto")
+	        .style("background-color","red").style("opacity","0").style("z-index","0");
+
+	    var views = [
+	        {
+	            text:"Lorem ipsum 0",
+	            enter:function(){
+	                wrap.style("opacity","1");
+	            },
+	            step:function(s){
+	                
+	            },
+	            exit:function(){
+
+	            }
+	        },
+
+	        {
+	            text:"Lorem ipsum 1",
+	            enter:function(){
+
+	            },
+	            step:function(s){
+
+	            },
+	            exit:function(){
+
+	            }
+	        },
+
+	        {
+	            text:"Lorem ipsum 2",
+	            enter:function(){
+
+	            },
+	            step:function(s){
+
+	            },
+	            exit:function(){
+
+	            }
+	        },
+
+	        {
+	            text:"Lorem ipsum",
+	            enter:function(){
+
+	            },
+	            step:function(s){
+	                wrap.style("opacity", s >=1 ? "0" : "1");
+	                console.log(s);
+	            },
+	            exit:function(){
+	                
+	            }
+	        }
+	    ];
+
+	    //static, non-scrollytelling
+	    if(arguments.length > 1){
+	        views[i].enter.call(wrap.append("p").html(views[i].text).node());
+	    }
+
+	    return views;
+
+	}
+
 	//main function
 	function main(){
 
@@ -216,36 +341,21 @@
 	  var wrap = d3.select(container);
 	  var compat = degradation(container);
 
-	  var sticky = wrap.append("div").style("min-height","400px").style("border","1px solid pink");
-	  sticky.append("p").text("FIXED").style("text-align","center");
+	  var dims = {w:0, h:0};
+	  
+	  function get_dims(){
+	    dims.w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+	    dims.h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+	  }
+	  get_dims();
 
-	  var texts = wrap.selectAll("p.text-overlay").data(d3.range(0,25)).enter().append("p")
-	                  .text(Math.random()).style("min-height","100vh");
+	  window.addEventListener("resize", get_dims);
 
 	  //browser degradation
 	  if(compat.browser()){
-	    var scr = scrolly(sticky.node(), 140);
 
-	    if(scr.supported()){
-	      texts.each(function(){
-	        var thiz = d3.select(this).style("color", d3.interpolateRainbow(0)).style("font-size","18px");
-	        
-	        var fns = {
-	          enter: function(){
-	            thiz.transition().style("font-weight","bold").duration(1000);
-	          },
-	          step: function(s){
-	            thiz.style("color", d3.interpolateRainbow(s)).text(Math.round(s * 1000)/10 + "%");
-	          },
-	          exit: function(){
-	            thiz.transition().style("font-weight","normal").duration(1000);
-	          }
-	        };
-
-	        scr.marker(this, fns, 0.25);
-	      });
-	    }
-
+	    sequence(container, seq0, 4);
+	    sequence(container, seq0, 4);
 
 	  }
 
