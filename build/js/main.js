@@ -2,6 +2,8 @@ import degradation from "../../../js-modules/degradation.js";
 
 import sequence from "./sequence.js";
 import seq0 from "./seq0.js";
+import seq1 from "./seq1.js";
+import seq3 from "./seq3.js";
 
 //main function
 function main(){
@@ -22,10 +24,9 @@ function main(){
 
   //browser degradation
   if(compat.browser()){
-
     sequence(container, seq0, 4);
-    sequence(container, seq0, 4);
-
+    sequence(container, seq1, 2);
+    sequence(container, seq3, 2);
   }
 
 

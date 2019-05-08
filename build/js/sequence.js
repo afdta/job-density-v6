@@ -12,17 +12,16 @@ import scrolly from "../../../js-modules/d3-scrolly.js";
 
 export default function sequence(container, setup, num_views){
     
-    var wrap = d3.select(container).append("div");
+    var wrap = d3.select(container).append("div").style("margin-bottom","50vh");
     
     var views;
 
     if(scrolly.supported()){
         var sticky = wrap.append("div"); 
-        var scr = scrolly(sticky.node(), 140);
-        views = wrap.selectAll("p").data(setup(sticky.node())).enter().append("p")
-                    .style("min-height","75vh").style("max-width","700px").style("margin","0px auto")
-                    .style("position","relative").style("z-index","1000").style("background-color","rgba(0,0,0,0.1)")
-                    .html(function(d){return d.text});
+        var scr = scrolly(sticky.node(), 110);
+        views = wrap.selectAll("div.scrolling-panel").data(setup(sticky.node())).enter().append("div").classed("scrolling-panel",true);
+                
+        views.selectAll("p").data(function(d){return d.text}).enter().append("p").html(function(d){return d});
 
         views.each(function(d){            
             var fns = {};
@@ -30,12 +29,12 @@ export default function sequence(container, setup, num_views){
             fns.step = d.hasOwnProperty("step") ? d.step : null;
             fns.exit = d.hasOwnProperty("exit") ? d.exit : null;
     
-            scr.marker(this, fns, 0.4);
+            scr.marker(this, fns, 0.15);
           })
     }
     else{
         //draw all views using form setup(container, view_num)
-        views = wrap.selectAll("div").data(d3.range(0,num_views)).enter().append("div");
+        views = wrap.selectAll("div.static-panel").data(d3.range(0,num_views)).enter().append("div").classed("static-panel",true);
         views.each(function(d,i){
             setup(this, d);
         });

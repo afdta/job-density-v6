@@ -1,4 +1,4 @@
-function on_resize(callback){
+function on_resize(callback, init){
     var viewport = {};
 
     function set_dims(){
@@ -8,6 +8,11 @@ function on_resize(callback){
 
     //initialize dimensions
     set_dims();
+
+    //run callback right away
+    if(arguments.length > 1 && !!init){
+        callback.call(viewport);
+    }
 
     window.addEventListener("resize", function(){
         set_dims();

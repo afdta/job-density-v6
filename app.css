@@ -1,3 +1,69 @@
 *{
     transition: opacity 500ms;
 }
+
+div{
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    box-sizing:border-box;
+}
+
+div.scrolling-panel{
+    min-height:90vh;
+    max-width:500px;
+    margin:0px auto;
+    padding:100px 15px;
+    position:relative;
+    z-index:1000;
+}
+
+div.scrolling-panel > p{
+    padding:10px 15px;
+    line-height:1.7em;
+    background-color:rgba(0,0,0,0.15);
+    background-color:#ffffff;
+    border-width:1px;
+    border-style:solid;
+    border-color:#aaaaaa;
+    display:inline-block;
+    border-radius:3px;
+    text-shadow: 0px 0px 4px #ffffff;
+    font-size:1rem;
+}
+
+div.scrolling-panel > p > span{
+
+}
+
+.chart-view{
+    min-height:400px;
+    min-width:300px;
+    margin:0px auto;
+    opacity:0.25;
+    z-index:0;
+}
+
+.sticky-el{
+    padding:15px;
+}
+
+.sticky-chart-title{
+    max-width:800px;
+    padding:24px 0px 5px 0px;
+    margin:0px auto;
+}
+
+.sticky-chart-title > *{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.axis-group path, .axis-group line{
+    stroke:#aaaaaa;
+    shape-rendering: crispEdges;
+}
+
+.axis-group text{
+    fill:#555555;
+    font-size:15px;
+}
