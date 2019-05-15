@@ -3052,105 +3052,105 @@ var sector_data =
       "expected": 0.22615
     }
   ],
-  "19430": [
+  "19380": [
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "00",
       "actual": -0.08979,
       "expected": 0.03751
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "22",
       "actual": -0.69718,
       "expected": -0.14335
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "23",
       "actual": -0.31968,
       "expected": -0.19994
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "31",
       "actual": -0.4851,
       "expected": -0.32622
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "42",
       "actual": -0.22608,
       "expected": -0.05101
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "44",
       "actual": -0.10202,
       "expected": -0.07341
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "48",
       "actual": -0.4516,
       "expected": 0.0771
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "51",
       "actual": -0.14575,
       "expected": -0.01036
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "52",
       "actual": 0.15538,
       "expected": 0.09313
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "53",
       "actual": -0.3333,
       "expected": -0.0926
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "54",
       "actual": -0.09255,
       "expected": 0.16223
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "55",
       "actual": -0.64394,
       "expected": -0.17913
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "61",
       "actual": 7.73966,
       "expected": 0.40827
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "62",
       "actual": -0.05372,
       "expected": 0.26001
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "71",
       "actual": -0.05021,
       "expected": 0.05721
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "72",
       "actual": 0.009,
       "expected": 0.1108
     },
     {
-      "cbsa": 19430,
+      "cbsa": 19380,
       "naics": "81",
       "actual": -0.35373,
       "expected": -0.08762
@@ -10334,6 +10334,95 @@ var sector_data =
   ]
 }
 ;
+var sector_counts = 
+[
+  {
+    "naics": "00",
+    "p": 48,
+    "ge": 16
+  },
+  {
+    "naics": "22",
+    "p": 31,
+    "ge": 35
+  },
+  {
+    "naics": "23",
+    "p": 29,
+    "ge": 32
+  },
+  {
+    "naics": "31",
+    "p": 12,
+    "ge": 18
+  },
+  {
+    "naics": "42",
+    "p": 30,
+    "ge": 16
+  },
+  {
+    "naics": "44",
+    "p": 23,
+    "ge": 11
+  },
+  {
+    "naics": "48",
+    "p": 29,
+    "ge": 16
+  },
+  {
+    "naics": "51",
+    "p": 17,
+    "ge": 21
+  },
+  {
+    "naics": "52",
+    "p": 29,
+    "ge": 25
+  },
+  {
+    "naics": "53",
+    "p": 35,
+    "ge": 24
+  },
+  {
+    "naics": "54",
+    "p": 58,
+    "ge": 18
+  },
+  {
+    "naics": "55",
+    "p": 61,
+    "ge": 39
+  },
+  {
+    "naics": "61",
+    "p": 68,
+    "ge": 21
+  },
+  {
+    "naics": "62",
+    "p": 72,
+    "ge": 21
+  },
+  {
+    "naics": "71",
+    "p": 60,
+    "ge": 38
+  },
+  {
+    "naics": "72",
+    "p": 70,
+    "ge": 18
+  },
+  {
+    "naics": "81",
+    "p": 17,
+    "ge": 12
+  }
+]
+;
 var sector_names = 
 {
     "00": "Total",
@@ -10357,5 +10446,490 @@ var sector_names =
     "81": "Local Services"
   }
 ;
-export {seq0data, sector_data, sector_names}
+var naics00 = 
+{
+  "10420": {
+      "actual": -0.21292,
+      "expected": 0.15659
+    },
+  "10580": {
+      "actual": 0.43341,
+      "expected": 0.21229
+    },
+  "10740": {
+      "actual": -0.21248,
+      "expected": 0.12925
+    },
+  "10900": {
+      "actual": 0.04818,
+      "expected": 0.21257
+    },
+  "12060": {
+      "actual": 0.19815,
+      "expected": 0.24761
+    },
+  "12260": {
+      "actual": -0.00191,
+      "expected": 0.17845
+    },
+  "12420": {
+      "actual": 0.39553,
+      "expected": 0.55652
+    },
+  "12540": {
+      "actual": 0.04182,
+      "expected": 0.28047
+    },
+  "12580": {
+      "actual": -0.01017,
+      "expected": 0.17854
+    },
+  "12940": {
+      "actual": -0.04436,
+      "expected": 0.197
+    },
+  "13820": {
+      "actual": -0.15149,
+      "expected": 0.04696
+    },
+  "14260": {
+      "actual": 0.21377,
+      "expected": 0.32051
+    },
+  "14860": {
+      "actual": -0.06212,
+      "expected": 0.06938
+    },
+  "15380": {
+      "actual": -0.12852,
+      "expected": 0.16317
+    },
+  "15980": {
+      "actual": -0.31102,
+      "expected": 0.01014
+    },
+  "16700": {
+      "actual": 0.02588,
+      "expected": 0.24754
+    },
+  "16740": {
+      "actual": 0.44242,
+      "expected": 0.49257
+    },
+  "16860": {
+      "actual": -0.26323,
+      "expected": -0.0125
+    },
+  "16980": {
+      "actual": 0.20434,
+      "expected": 0.14028
+    },
+  "17140": {
+      "actual": 0.07408,
+      "expected": 0.1763
+    },
+  "17460": {
+      "actual": 0.29741,
+      "expected": 0.03136
+    },
+  "17820": {
+      "actual": -0.05474,
+      "expected": 0.08237
+    },
+  "17900": {
+      "actual": -0.13207,
+      "expected": 0.13509
+    },
+  "18140": {
+      "actual": 0.30288,
+      "expected": 0.32325
+    },
+  "19100": {
+      "actual": 0.01006,
+      "expected": 0.2858
+    },
+  "19380": {
+      "actual": -0.08979,
+      "expected": 0.03751
+    },
+  "19660": {
+      "actual": -0.00021,
+      "expected": 0.21545
+    },
+  "19740": {
+      "actual": 0.10985,
+      "expected": 0.30312
+    },
+  "19780": {
+      "actual": -0.15818,
+      "expected": 0.17071
+    },
+  "19820": {
+      "actual": 0.02204,
+      "expected": 0.10532
+    },
+  "21340": {
+      "actual": -0.13147,
+      "expected": 0.16072
+    },
+  "23420": {
+      "actual": 0.3513,
+      "expected": 0.4036
+    },
+  "24340": {
+      "actual": -0.2791,
+      "expected": 0.15338
+    },
+  "24660": {
+      "actual": 0.00282,
+      "expected": 0.09431
+    },
+  "24860": {
+      "actual": 0.23806,
+      "expected": 0.18881
+    },
+  "25420": {
+      "actual": 0.10415,
+      "expected": 0.33289
+    },
+  "25540": {
+      "actual": 0.18427,
+      "expected": 0.16272
+    },
+  "26420": {
+      "actual": 0.15529,
+      "expected": 0.39664
+    },
+  "26900": {
+      "actual": 0.41505,
+      "expected": 0.19592
+    },
+  "27140": {
+      "actual": -0.10943,
+      "expected": 0.15398
+    },
+  "27260": {
+      "actual": 0.16981,
+      "expected": 0.1984
+    },
+  "28140": {
+      "actual": -0.00704,
+      "expected": 0.15757
+    },
+  "28940": {
+      "actual": -0.1163,
+      "expected": 0.1368
+    },
+  "29460": {
+      "actual": -0.00888,
+      "expected": 0.24922
+    },
+  "29820": {
+      "actual": 0.34455,
+      "expected": 0.2192
+    },
+  "30780": {
+      "actual": -0.16346,
+      "expected": 0.10099
+    },
+  "31080": {
+      "actual": 0.14937,
+      "expected": 0.20619
+    },
+  "31140": {
+      "actual": -0.0272,
+      "expected": 0.15373
+    },
+  "32580": {
+      "actual": 0.00186,
+      "expected": 0.39466
+    },
+  "32820": {
+      "actual": -0.04061,
+      "expected": 0.08147
+    },
+  "33100": {
+      "actual": 0.11156,
+      "expected": 0.19153
+    },
+  "33460": {
+      "actual": 0.08258,
+      "expected": 0.03223
+    },
+  "34980": {
+      "actual": 0.4176,
+      "expected": 0.3428
+    },
+  "35300": {
+      "actual": -0.32638,
+      "expected": 0.13295
+    },
+  "35380": {
+      "actual": -0.19194,
+      "expected": -0.01096
+    },
+  "35620": {
+      "actual": 0.41943,
+      "expected": 0.19631
+    },
+  "35840": {
+      "actual": -0.13948,
+      "expected": 0.16081
+    },
+  "36260": {
+      "actual": 0.10285,
+      "expected": 0.25978
+    },
+  "36420": {
+      "actual": 0.04007,
+      "expected": 0.25003
+    },
+  "36540": {
+      "actual": -0.00216,
+      "expected": 0.15005
+    },
+  "36740": {
+      "actual": 0.05565,
+      "expected": 0.26154
+    },
+  "37100": {
+      "actual": 0.50514,
+      "expected": 0.09079
+    },
+  "37340": {
+      "actual": -0.08732,
+      "expected": 0.08084
+    },
+  "37980": {
+      "actual": 0.23984,
+      "expected": 0.17902
+    },
+  "38060": {
+      "actual": -0.00264,
+      "expected": 0.22479
+    },
+  "38300": {
+      "actual": -0.06894,
+      "expected": 0.24142
+    },
+  "38900": {
+      "actual": 0.22409,
+      "expected": 0.29255
+    },
+  "39300": {
+      "actual": -0.05505,
+      "expected": 0.12179
+    },
+  "39340": {
+      "actual": 0.30718,
+      "expected": 0.41139
+    },
+  "39580": {
+      "actual": 0.11922,
+      "expected": 0.40817
+    },
+  "40060": {
+      "actual": 0.19948,
+      "expected": 0.20134
+    },
+  "40140": {
+      "actual": -0.01685,
+      "expected": 0.34264
+    },
+  "40380": {
+      "actual": -0.3795,
+      "expected": 0.00952
+    },
+  "40900": {
+      "actual": -0.44308,
+      "expected": -0.02279
+    },
+  "41180": {
+      "actual": -0.08023,
+      "expected": 0.17404
+    },
+  "41620": {
+      "actual": 0.05589,
+      "expected": 0.24236
+    },
+  "41700": {
+      "actual": 0.06241,
+      "expected": 0.37429
+    },
+  "41740": {
+      "actual": -0.02631,
+      "expected": 0.15017
+    },
+  "41860": {
+      "actual": 0.63606,
+      "expected": 0.33812
+    },
+  "41940": {
+      "actual": 0.45572,
+      "expected": 0.28238
+    },
+  "42540": {
+      "actual": -0.30743,
+      "expected": 0.09225
+    },
+  "42660": {
+      "actual": 0.28913,
+      "expected": 0.09869
+    },
+  "44060": {
+      "actual": 0.06702,
+      "expected": 0.12499
+    },
+  "44700": {
+      "actual": -0.28082,
+      "expected": 0.0123
+    },
+  "45060": {
+      "actual": -0.17817,
+      "expected": 0.0047
+    },
+  "45300": {
+      "actual": 0.15708,
+      "expected": 0.20068
+    },
+  "45780": {
+      "actual": -0.19085,
+      "expected": 0.01561
+    },
+  "46060": {
+      "actual": -0.24872,
+      "expected": 0.09489
+    },
+  "46140": {
+      "actual": -0.05748,
+      "expected": 0.16378
+    },
+  "46520": {
+      "actual": 0.55552,
+      "expected": 0.10445
+    },
+  "47260": {
+      "actual": 0.00172,
+      "expected": 0.02033
+    },
+  "48620": {
+      "actual": -0.20476,
+      "expected": 0.0484
+    },
+  "49180": {
+      "actual": -0.19709,
+      "expected": 0.16035
+    },
+  "49660": {
+      "actual": -0.53765,
+      "expected": -0.09084
+    },
+  "99999": {
+      "actual": 0.29534,
+      "expected": 0.19896
+    }
+}
+;
+var metro_names = 
+{
+    "10420": "Akron, OH",
+    "10580": "Albany, NY",
+    "10740": "Albuquerque, NM",
+    "10900": "Allentown, PA-NJ",
+    "12060": "Atlanta, GA",
+    "12260": "Augusta, GA-SC",
+    "12420": "Austin, TX",
+    "12540": "Bakersfield, CA",
+    "12580": "Baltimore, MD",
+    "12940": "Baton Rouge, LA",
+    "13820": "Birmingham, AL",
+    "14260": "Boise City, ID",
+    "14860": "Bridgeport, CT",
+    "15380": "Buffalo, NY",
+    "15980": "Cape Coral, FL",
+    "16700": "Charleston, SC",
+    "16740": "Charlotte, NC-SC",
+    "16860": "Chattanooga, TN-GA",
+    "16980": "Chicago, IL-IN-WI",
+    "17140": "Cincinnati, OH-KY-IN",
+    "17460": "Cleveland, OH",
+    "17820": "Colorado Springs, CO",
+    "17900": "Columbia, SC",
+    "18140": "Columbus, OH",
+    "19100": "Dallas, TX",
+    "19380": "Dayton, OH",
+    "19660": "Deltona, FL",
+    "19740": "Denver, CO",
+    "19780": "Des Moines, IA",
+    "19820": "Detroit, MI",
+    "21340": "El Paso, TX",
+    "23420": "Fresno, CA",
+    "24340": "Grand Rapids, MI",
+    "24660": "Greensboro, NC",
+    "24860": "Greenville, SC",
+    "25420": "Harrisburg, PA",
+    "25540": "Hartford, CT",
+    "26420": "Houston, TX",
+    "26900": "Indianapolis, IN",
+    "27140": "Jackson, MS",
+    "27260": "Jacksonville, FL",
+    "28140": "Kansas City, MO-KS",
+    "28940": "Knoxville, TN",
+    "29460": "Lakeland, FL",
+    "29820": "Las Vegas, NV",
+    "30780": "Little Rock, AR",
+    "31080": "Los Angeles, CA",
+    "31140": "Louisville, KY-IN",
+    "32580": "McAllen, TX",
+    "32820": "Memphis, TN-MS-AR",
+    "33100": "Miami, FL",
+    "33460": "Minneapolis, MN-WI",
+    "34980": "Nashville, TN",
+    "35300": "New Haven, CT",
+    "35380": "New Orleans, LA",
+    "35620": "New York, NY-NJ-PA",
+    "35840": "North Port, FL",
+    "36260": "Ogden, UT",
+    "36420": "Oklahoma City, OK",
+    "36540": "Omaha, NE-IA",
+    "36740": "Orlando, FL",
+    "37100": "Oxnard, CA",
+    "37340": "Palm Bay, FL",
+    "37980": "Philadelphia, PA-NJ-DE-MD",
+    "38060": "Phoenix, AZ",
+    "38300": "Pittsburgh, PA",
+    "38900": "Portland, OR-WA",
+    "39300": "Providence, RI-MA",
+    "39340": "Provo, UT",
+    "39580": "Raleigh, NC",
+    "40060": "Richmond, VA",
+    "40140": "Riverside, CA",
+    "40380": "Rochester, NY",
+    "40900": "Sacramento, CA",
+    "41180": "St. Louis, MO-IL",
+    "41620": "Salt Lake City, UT",
+    "41700": "San Antonio, TX",
+    "41740": "San Diego, CA",
+    "41860": "San Francisco, CA",
+    "41940": "San Jose, CA",
+    "42540": "Scranton, PA",
+    "42660": "Seattle, WA",
+    "44060": "Spokane, WA",
+    "44700": "Stockton, CA",
+    "45060": "Syracuse, NY",
+    "45300": "Tampa, FL",
+    "45780": "Toledo, OH",
+    "46060": "Tucson, AZ",
+    "46140": "Tulsa, OK",
+    "46520": "Urban Honolulu, HI",
+    "47260": "Virginia Beach, VA-NC",
+    "48620": "Wichita, KS",
+    "49180": "Winston, NC",
+    "49660": "Youngstown, OH-PA",
+    "99997": "All other 90 metro areas",
+    "99998": "Extremely dense 4 metro areas",
+    "99999": "U.S. 94 metro areas"
+  }
+;
+export {seq0data, sector_data, sector_counts, sector_names, naics00, metro_names}
 ;

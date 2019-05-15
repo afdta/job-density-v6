@@ -9,6 +9,7 @@ export default function seq0(container, i){
     //one time setup
     var wrap = d3.select(container).classed("chart-view",true);
 
+    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
     wrap.append("div").classed("sticky-chart-title",true).append("p").html("Metropolitan America saw a large increase in job density from 2004 to 2015");
 
     var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
@@ -17,6 +18,10 @@ export default function seq0(container, i){
     var g_x_axis = svg.append("g").classed("axis-group",true);
     var g_back = svg.append("g");
     var g_trend = svg.append("g");
+    var g_anno = svg.append("g");
+
+    var t_ = g_anno.selectAll("g.text-group").data([["94 metro areas"], ["New York", "Chicago", "San Francisco", "Seattle"], ["Other 90"]]).enter().append("g").classed("text-group",true).style("opacity","0");
+    var ts_ = t_.selectAll("text").data(function(d){return d}).enter().append("text").attr("y", function(d,i){return i*16}).text(function(d){return d}).style("font-size","15px").attr("dy","8");
 
     var lines = g_trend.selectAll("path").data(["99999", "99998", "99997"])
                        .enter().append("path")
@@ -45,7 +50,7 @@ export default function seq0(container, i){
     var axis_x = d3.axisBottom(scale_x).tickValues([2005, 2010, 2015]).tickFormat(function(v){return v});
 
     var aspect = 1/2;
-    var padding = {top:20, right:25, bottom: 40, left: 60 }
+    var padding = {top:20, right:125, bottom: 40, left: 60 }
 
     function redraw(){
         var w = this.w < 320 ? 320 : (this.w > 750 ? 750 : this.w);
@@ -59,7 +64,11 @@ export default function seq0(container, i){
         scale_x.range([padding.left, w - padding.right]);
         scale_y.range([h - padding.bottom, 0 + padding.top]);
 
-        console.log(scale_y.ticks(4));
+        t_.attr("transform", function(d,i){
+            var v = (i == 0 ? 0.3 : (i == 1 ? 0.42 : 0.1));
+            var y = scale_y(v);
+            return "translate(" + (w-padding.right+3) + ", " + y + ")";
+        });
 
         var grid_lines_ = g_back.selectAll("line").data(scale_y.ticks(4));
         grid_lines_.exit().remove();
@@ -72,7 +81,7 @@ export default function seq0(container, i){
 
         great_recession.attr("x", scale_x(2007)).attr("y", padding.top)
                        .attr("width", scale_x(2009) - scale_x(2007))
-                       .attr("height", h - padding.top - padding.bottom + 5);
+                       .attr("height", h - padding.top - padding.bottom);
 
         axis_x(g_x_axis);
         axis_y(g_y_axis);
@@ -87,19 +96,24 @@ export default function seq0(container, i){
     //set extent
 
     //redraw
+    function show_text(j){t_.filter(function(d,i){return i==j}).style("opacity",1);}
+    function hide_text(j){t_.filter(function(d,i){return i==j}).style("opacity",0);}
 
 
     var views = [
         {
             text:["The perceived job density of all 94 large metro areas taken together increased nearly 30 percent, indicating job growth was highly concentrated in dense urban areas from 2004 to 2015."],
             enter:function(){
-                wrap.style("opacity",1);
+                wrap.style("opacity","1");
                 line_all.style("opacity", 1);
-                console.log("enter blue");
+                show_text(0);
+                //console.log("enter blue");
             },
             exit:function(){
+                wrap.style("opacity",null);
                 line_all.style("opacity", 0);
-                console.log("exit blue");
+                hide_text(0);
+                //console.log("exit blue");
             }
         },
 
@@ -108,47 +122,61 @@ export default function seq0(container, i){
             enter:function(){
                 wrap.style("opacity",1);
                 great_recession.style("opacity",1);
-                console.log("enter recession highlight");
+                //console.log("enter recession highlight");
             },
             exit:function(){
                 great_recession.style("opacity",0);
-                console.log("exit recession highlight");
+                //console.log("exit recession highlight");
             }
         },
 
         {
-            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle. These four metro areas saw an even greater increase in job density, accounting for about 90 percent of the increase in job density seen among all 94 large metro areas during this period."],
+            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle."],
             enter:function(){
                 wrap.style("opacity",1);
                 line_4.style("opacity", 1);
-                console.log("enter yellow");
+                show_text(1);
+                //console.log("enter yellow");
             },
             exit:function(){
                 line_4.style("opacity", 0);
-                console.log("exit yellow");
+                hide_text(1);
+                //console.log("exit yellow");
             }
         },
 
         {
-            text:["In contrast to job density trends in the four extremely dense metro areas, job density in the other 90 large metro areas increased only 9 percent on average.","However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
+            text:["In contrast, job density in the other 90 large metro areas increased only 9 percent on average. However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
             enter:function(){
                 wrap.style("opacity",1);
                 line_other.style("opacity", 1);
-                console.log("enter green");
+                show_text(2);
+                //console.log("enter green");
             },
             step:function(s){
 
             },
             exit:function(){
                 line_other.style("opacity", 0);
-                console.log("exit green");
+                hide_text(2);
+                //console.log("exit green");
             }
         }
     ]
 
     //static, non-scrollytelling
     if(arguments.length > 1){
-        views[i].enter.call(wrap.append("p").html(views[i].text).node());
+        panel_number.style("display","block");
+        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+        var j = -1;
+        while(++j <= i){
+            if(views[j].hasOwnProperty("enter")){
+                views[j].enter.call(p);
+            }
+            if(views[j].hasOwnProperty("step")){
+                views[j].step.call(p, 1);
+            }
+        }
     }
 
     return views;

@@ -10,15 +10,19 @@ import scrolly from "../../../js-modules/d3-scrolly.js";
 // the first form is used to handle instances when scrollytelling is not supported by the browser (every view should be drawn)
 // the second form is used to handle scrollytelling 
 
-export default function sequence(container, setup, num_views){
+export default function sequence(container, setup, num_views, threshold){
     
-    var wrap = d3.select(container).append("div").style("margin-bottom","50vh");
+    var wrap = d3.select(container).append("div").style("margin-bottom","40vh");
     
     var views;
 
+    if(threshold == null){
+        threshold = 0.15;
+    }
+
     if(scrolly.supported()){
         var sticky = wrap.append("div"); 
-        var scr = scrolly(sticky.node(), 110);
+        var scr = scrolly(sticky.node(), 90);
         views = wrap.selectAll("div.scrolling-panel").data(setup(sticky.node())).enter().append("div").classed("scrolling-panel",true);
                 
         views.selectAll("p").data(function(d){return d.text}).enter().append("p").html(function(d){return d});
@@ -29,13 +33,14 @@ export default function sequence(container, setup, num_views){
             fns.step = d.hasOwnProperty("step") ? d.step : null;
             fns.exit = d.hasOwnProperty("exit") ? d.exit : null;
     
-            scr.marker(this, fns, 0.15);
+            scr.marker(this, fns, threshold);
           })
     }
     else{
+        wrap.style("margin-bottom", null);
         //draw all views using form setup(container, view_num)
         views = wrap.selectAll("div.static-panel").data(d3.range(0,num_views)).enter().append("div").classed("static-panel",true);
-        views.each(function(d,i){
+        views.each(function(d){
             setup(this, d);
         });
     }

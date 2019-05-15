@@ -1,11 +1,20 @@
 *{
     transition: opacity 500ms;
-}
-
-div{
     -moz-box-sizing:border-box;
     -webkit-box-sizing:border-box;
     box-sizing:border-box;
+}
+
+div.static-panel{
+    margin-bottom:100px;
+    margin-bottom:30vh;
+}
+
+p.panel-number{
+    font-style:italic;
+    font-size:0.875rem;
+    color:#555555;
+    margin:0em;
 }
 
 div.scrolling-panel{
@@ -15,6 +24,7 @@ div.scrolling-panel{
     padding:100px 15px;
     position:relative;
     z-index:1000;
+    pointer-events:none;
 }
 
 div.scrolling-panel > p{
@@ -35,13 +45,33 @@ div.scrolling-panel > p > span{
 
 }
 
+.meta-tag{
+    background-color:#555555;
+    padding:4px 6px;
+    border-radius:6px;
+    color:#ffffff;
+}
+
 .chart-view{
     min-height:400px;
     min-width:300px;
+    max-width:800px;
     margin:0px auto;
-    opacity:0.25;
+    opacity:0.4;
     z-index:0;
+    border-top:1px solid #aaaaaa;
 }
+
+.chart-view.big-chart{
+    max-width:900px;
+}
+
+.chart-view .chart-view-caption{
+    font-style:italic;
+    margin:1em;
+    line-height:1.7em;
+}
+
 
 .sticky-el{
     padding:15px;
@@ -49,13 +79,14 @@ div.scrolling-panel > p > span{
 
 .sticky-chart-title{
     max-width:800px;
-    padding:24px 0px 5px 0px;
+    padding:5px 0px 5px 0px;
     margin:0px auto;
 }
 
 .sticky-chart-title > *{
     font-size:24px;
     font-weight:bold;
+    margin:0px;
 }
 
 .axis-group path, .axis-group line{
@@ -66,4 +97,35 @@ div.scrolling-panel > p > span{
 .axis-group text{
     fill:#555555;
     font-size:15px;
+}
+
+.expected-density-change:before{
+    content:"";
+    display:inline-block;
+    width:10px;
+    height:10px;
+    margin-right:3px;
+    border:2px solid #053769;
+    border-radius:5px;
+    background-color:#ffffff;
+    box-sizing:border-box;
+}
+
+.actual-density-change:before{
+    content:"";
+    display:inline-block;
+    width:10px;
+    height:10px;
+    margin-right:3px;
+    border:2px solid #053769;
+    border-radius:5px;
+    background-color:#053769;
+    box-sizing:border-box;
+}
+
+.legend{
+    float:right;
+    display:inline-block;
+    border-top:1px solid #aaaaaa;
+    line-height:1.7em;
 }

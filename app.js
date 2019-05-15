@@ -61,6 +61,18 @@
 		return d;
 	}
 
+	// Notes:
+	// enter, exit, step occur in dom order which should not result in any unexpected behavior (enter() on element 2 is called after the enter() on element 1, etc.)
+	// but, depending on how fast the user scrolls back (reversing) up the page, multiple exit events could fire in the same scroll event
+	// in this instance, the exit event for content/views further down the page may fire last (as discussed below, each exit() also fires a step(0))
+	// e.g. in a page structure with views A >> B >> C >> D, quickly scolling up the page may fire exit events in this order: C(), D(), A(), B().
+	// in other words, be careful about what you rely on exit() events to do. the preference is for the exit event to simply "reverse" 
+	// the enter event though this may not always be practical. when not practical, you can use the step event to indicate the "active" view.
+	// note the special case: when the user exits a view (reverses out of) step(0) is called. this is relevant because B_step() may be called after A_step()
+	// when vew A is really in view (because view B has exited and B_step(0) is called). this means that a view should not be considered active when the 
+	// has_stepped proportion is 0. likewise, you could argue that cases when the has_stepped proportion == 1 should be ignored, but this is less of a 
+	// practical issue because the step() functions for subsequent active views will be called. it is exiting behavior that can be problematic
+
 	function scrolly_supported(){
 	    var browser_support = false;
 
@@ -246,15 +258,19 @@
 	// the first form is used to handle instances when scrollytelling is not supported by the browser (every view should be drawn)
 	// the second form is used to handle scrollytelling 
 
-	function sequence(container, setup, num_views){
+	function sequence(container, setup, num_views, threshold){
 	    
-	    var wrap = d3.select(container).append("div").style("margin-bottom","50vh");
+	    var wrap = d3.select(container).append("div").style("margin-bottom","40vh");
 	    
 	    var views;
 
+	    if(threshold == null){
+	        threshold = 0.15;
+	    }
+
 	    if(scrolly.supported()){
 	        var sticky = wrap.append("div"); 
-	        var scr = scrolly(sticky.node(), 110);
+	        var scr = scrolly(sticky.node(), 90);
 	        views = wrap.selectAll("div.scrolling-panel").data(setup(sticky.node())).enter().append("div").classed("scrolling-panel",true);
 	                
 	        views.selectAll("p").data(function(d){return d.text}).enter().append("p").html(function(d){return d});
@@ -265,13 +281,14 @@
 	            fns.step = d.hasOwnProperty("step") ? d.step : null;
 	            fns.exit = d.hasOwnProperty("exit") ? d.exit : null;
 	    
-	            scr.marker(this, fns, 0.15);
+	            scr.marker(this, fns, threshold);
 	          });
 	    }
 	    else{
+	        wrap.style("margin-bottom", null);
 	        //draw all views using form setup(container, view_num)
 	        views = wrap.selectAll("div.static-panel").data(d3.range(0,num_views)).enter().append("div").classed("static-panel",true);
-	        views.each(function(d,i){
+	        views.each(function(d){
 	            setup(this, d);
 	        });
 	    }
@@ -3354,105 +3371,105 @@
 	      "expected": 0.22615
 	    }
 	  ],
-	  "19430": [
+	  "19380": [
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "00",
 	      "actual": -0.08979,
 	      "expected": 0.03751
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "22",
 	      "actual": -0.69718,
 	      "expected": -0.14335
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "23",
 	      "actual": -0.31968,
 	      "expected": -0.19994
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "31",
 	      "actual": -0.4851,
 	      "expected": -0.32622
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "42",
 	      "actual": -0.22608,
 	      "expected": -0.05101
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "44",
 	      "actual": -0.10202,
 	      "expected": -0.07341
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "48",
 	      "actual": -0.4516,
 	      "expected": 0.0771
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "51",
 	      "actual": -0.14575,
 	      "expected": -0.01036
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "52",
 	      "actual": 0.15538,
 	      "expected": 0.09313
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "53",
 	      "actual": -0.3333,
 	      "expected": -0.0926
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "54",
 	      "actual": -0.09255,
 	      "expected": 0.16223
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "55",
 	      "actual": -0.64394,
 	      "expected": -0.17913
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "61",
 	      "actual": 7.73966,
 	      "expected": 0.40827
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "62",
 	      "actual": -0.05372,
 	      "expected": 0.26001
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "71",
 	      "actual": -0.05021,
 	      "expected": 0.05721
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "72",
 	      "actual": 0.009,
 	      "expected": 0.1108
 	    },
 	    {
-	      "cbsa": 19430,
+	      "cbsa": 19380,
 	      "naics": "81",
 	      "actual": -0.35373,
 	      "expected": -0.08762
@@ -10636,6 +10653,603 @@
 	  ]
 	}
 	;
+	var sector_counts = 
+	[
+	  {
+	    "naics": "00",
+	    "p": 48,
+	    "ge": 16
+	  },
+	  {
+	    "naics": "22",
+	    "p": 31,
+	    "ge": 35
+	  },
+	  {
+	    "naics": "23",
+	    "p": 29,
+	    "ge": 32
+	  },
+	  {
+	    "naics": "31",
+	    "p": 12,
+	    "ge": 18
+	  },
+	  {
+	    "naics": "42",
+	    "p": 30,
+	    "ge": 16
+	  },
+	  {
+	    "naics": "44",
+	    "p": 23,
+	    "ge": 11
+	  },
+	  {
+	    "naics": "48",
+	    "p": 29,
+	    "ge": 16
+	  },
+	  {
+	    "naics": "51",
+	    "p": 17,
+	    "ge": 21
+	  },
+	  {
+	    "naics": "52",
+	    "p": 29,
+	    "ge": 25
+	  },
+	  {
+	    "naics": "53",
+	    "p": 35,
+	    "ge": 24
+	  },
+	  {
+	    "naics": "54",
+	    "p": 58,
+	    "ge": 18
+	  },
+	  {
+	    "naics": "55",
+	    "p": 61,
+	    "ge": 39
+	  },
+	  {
+	    "naics": "61",
+	    "p": 68,
+	    "ge": 21
+	  },
+	  {
+	    "naics": "62",
+	    "p": 72,
+	    "ge": 21
+	  },
+	  {
+	    "naics": "71",
+	    "p": 60,
+	    "ge": 38
+	  },
+	  {
+	    "naics": "72",
+	    "p": 70,
+	    "ge": 18
+	  },
+	  {
+	    "naics": "81",
+	    "p": 17,
+	    "ge": 12
+	  }
+	]
+	;
+	var sector_names = 
+	{
+	    "00": "Total",
+	    "11": "Agriculture",
+	    "21": "Mining",
+	    "22": "Utilities",
+	    "23": "Construction",
+	    "31": "Manufacturing",
+	    "42": "Wholesale",
+	    "44": "Retail",
+	    "48": "Logistics",
+	    "51": "Information",
+	    "52": "Finance",
+	    "53": "Real Estate",
+	    "54": "Professional",
+	    "55": "Headquarters",
+	    "61": "Education",
+	    "62": "Health Care",
+	    "71": "Arts/Entertainment",
+	    "72": "Hospitality",
+	    "81": "Local Services"
+	  }
+	;
+	var naics00 = 
+	{
+	  "10420": {
+	      "actual": -0.21292,
+	      "expected": 0.15659
+	    },
+	  "10580": {
+	      "actual": 0.43341,
+	      "expected": 0.21229
+	    },
+	  "10740": {
+	      "actual": -0.21248,
+	      "expected": 0.12925
+	    },
+	  "10900": {
+	      "actual": 0.04818,
+	      "expected": 0.21257
+	    },
+	  "12060": {
+	      "actual": 0.19815,
+	      "expected": 0.24761
+	    },
+	  "12260": {
+	      "actual": -0.00191,
+	      "expected": 0.17845
+	    },
+	  "12420": {
+	      "actual": 0.39553,
+	      "expected": 0.55652
+	    },
+	  "12540": {
+	      "actual": 0.04182,
+	      "expected": 0.28047
+	    },
+	  "12580": {
+	      "actual": -0.01017,
+	      "expected": 0.17854
+	    },
+	  "12940": {
+	      "actual": -0.04436,
+	      "expected": 0.197
+	    },
+	  "13820": {
+	      "actual": -0.15149,
+	      "expected": 0.04696
+	    },
+	  "14260": {
+	      "actual": 0.21377,
+	      "expected": 0.32051
+	    },
+	  "14860": {
+	      "actual": -0.06212,
+	      "expected": 0.06938
+	    },
+	  "15380": {
+	      "actual": -0.12852,
+	      "expected": 0.16317
+	    },
+	  "15980": {
+	      "actual": -0.31102,
+	      "expected": 0.01014
+	    },
+	  "16700": {
+	      "actual": 0.02588,
+	      "expected": 0.24754
+	    },
+	  "16740": {
+	      "actual": 0.44242,
+	      "expected": 0.49257
+	    },
+	  "16860": {
+	      "actual": -0.26323,
+	      "expected": -0.0125
+	    },
+	  "16980": {
+	      "actual": 0.20434,
+	      "expected": 0.14028
+	    },
+	  "17140": {
+	      "actual": 0.07408,
+	      "expected": 0.1763
+	    },
+	  "17460": {
+	      "actual": 0.29741,
+	      "expected": 0.03136
+	    },
+	  "17820": {
+	      "actual": -0.05474,
+	      "expected": 0.08237
+	    },
+	  "17900": {
+	      "actual": -0.13207,
+	      "expected": 0.13509
+	    },
+	  "18140": {
+	      "actual": 0.30288,
+	      "expected": 0.32325
+	    },
+	  "19100": {
+	      "actual": 0.01006,
+	      "expected": 0.2858
+	    },
+	  "19380": {
+	      "actual": -0.08979,
+	      "expected": 0.03751
+	    },
+	  "19660": {
+	      "actual": -0.00021,
+	      "expected": 0.21545
+	    },
+	  "19740": {
+	      "actual": 0.10985,
+	      "expected": 0.30312
+	    },
+	  "19780": {
+	      "actual": -0.15818,
+	      "expected": 0.17071
+	    },
+	  "19820": {
+	      "actual": 0.02204,
+	      "expected": 0.10532
+	    },
+	  "21340": {
+	      "actual": -0.13147,
+	      "expected": 0.16072
+	    },
+	  "23420": {
+	      "actual": 0.3513,
+	      "expected": 0.4036
+	    },
+	  "24340": {
+	      "actual": -0.2791,
+	      "expected": 0.15338
+	    },
+	  "24660": {
+	      "actual": 0.00282,
+	      "expected": 0.09431
+	    },
+	  "24860": {
+	      "actual": 0.23806,
+	      "expected": 0.18881
+	    },
+	  "25420": {
+	      "actual": 0.10415,
+	      "expected": 0.33289
+	    },
+	  "25540": {
+	      "actual": 0.18427,
+	      "expected": 0.16272
+	    },
+	  "26420": {
+	      "actual": 0.15529,
+	      "expected": 0.39664
+	    },
+	  "26900": {
+	      "actual": 0.41505,
+	      "expected": 0.19592
+	    },
+	  "27140": {
+	      "actual": -0.10943,
+	      "expected": 0.15398
+	    },
+	  "27260": {
+	      "actual": 0.16981,
+	      "expected": 0.1984
+	    },
+	  "28140": {
+	      "actual": -0.00704,
+	      "expected": 0.15757
+	    },
+	  "28940": {
+	      "actual": -0.1163,
+	      "expected": 0.1368
+	    },
+	  "29460": {
+	      "actual": -0.00888,
+	      "expected": 0.24922
+	    },
+	  "29820": {
+	      "actual": 0.34455,
+	      "expected": 0.2192
+	    },
+	  "30780": {
+	      "actual": -0.16346,
+	      "expected": 0.10099
+	    },
+	  "31080": {
+	      "actual": 0.14937,
+	      "expected": 0.20619
+	    },
+	  "31140": {
+	      "actual": -0.0272,
+	      "expected": 0.15373
+	    },
+	  "32580": {
+	      "actual": 0.00186,
+	      "expected": 0.39466
+	    },
+	  "32820": {
+	      "actual": -0.04061,
+	      "expected": 0.08147
+	    },
+	  "33100": {
+	      "actual": 0.11156,
+	      "expected": 0.19153
+	    },
+	  "33460": {
+	      "actual": 0.08258,
+	      "expected": 0.03223
+	    },
+	  "34980": {
+	      "actual": 0.4176,
+	      "expected": 0.3428
+	    },
+	  "35300": {
+	      "actual": -0.32638,
+	      "expected": 0.13295
+	    },
+	  "35380": {
+	      "actual": -0.19194,
+	      "expected": -0.01096
+	    },
+	  "35620": {
+	      "actual": 0.41943,
+	      "expected": 0.19631
+	    },
+	  "35840": {
+	      "actual": -0.13948,
+	      "expected": 0.16081
+	    },
+	  "36260": {
+	      "actual": 0.10285,
+	      "expected": 0.25978
+	    },
+	  "36420": {
+	      "actual": 0.04007,
+	      "expected": 0.25003
+	    },
+	  "36540": {
+	      "actual": -0.00216,
+	      "expected": 0.15005
+	    },
+	  "36740": {
+	      "actual": 0.05565,
+	      "expected": 0.26154
+	    },
+	  "37100": {
+	      "actual": 0.50514,
+	      "expected": 0.09079
+	    },
+	  "37340": {
+	      "actual": -0.08732,
+	      "expected": 0.08084
+	    },
+	  "37980": {
+	      "actual": 0.23984,
+	      "expected": 0.17902
+	    },
+	  "38060": {
+	      "actual": -0.00264,
+	      "expected": 0.22479
+	    },
+	  "38300": {
+	      "actual": -0.06894,
+	      "expected": 0.24142
+	    },
+	  "38900": {
+	      "actual": 0.22409,
+	      "expected": 0.29255
+	    },
+	  "39300": {
+	      "actual": -0.05505,
+	      "expected": 0.12179
+	    },
+	  "39340": {
+	      "actual": 0.30718,
+	      "expected": 0.41139
+	    },
+	  "39580": {
+	      "actual": 0.11922,
+	      "expected": 0.40817
+	    },
+	  "40060": {
+	      "actual": 0.19948,
+	      "expected": 0.20134
+	    },
+	  "40140": {
+	      "actual": -0.01685,
+	      "expected": 0.34264
+	    },
+	  "40380": {
+	      "actual": -0.3795,
+	      "expected": 0.00952
+	    },
+	  "40900": {
+	      "actual": -0.44308,
+	      "expected": -0.02279
+	    },
+	  "41180": {
+	      "actual": -0.08023,
+	      "expected": 0.17404
+	    },
+	  "41620": {
+	      "actual": 0.05589,
+	      "expected": 0.24236
+	    },
+	  "41700": {
+	      "actual": 0.06241,
+	      "expected": 0.37429
+	    },
+	  "41740": {
+	      "actual": -0.02631,
+	      "expected": 0.15017
+	    },
+	  "41860": {
+	      "actual": 0.63606,
+	      "expected": 0.33812
+	    },
+	  "41940": {
+	      "actual": 0.45572,
+	      "expected": 0.28238
+	    },
+	  "42540": {
+	      "actual": -0.30743,
+	      "expected": 0.09225
+	    },
+	  "42660": {
+	      "actual": 0.28913,
+	      "expected": 0.09869
+	    },
+	  "44060": {
+	      "actual": 0.06702,
+	      "expected": 0.12499
+	    },
+	  "44700": {
+	      "actual": -0.28082,
+	      "expected": 0.0123
+	    },
+	  "45060": {
+	      "actual": -0.17817,
+	      "expected": 0.0047
+	    },
+	  "45300": {
+	      "actual": 0.15708,
+	      "expected": 0.20068
+	    },
+	  "45780": {
+	      "actual": -0.19085,
+	      "expected": 0.01561
+	    },
+	  "46060": {
+	      "actual": -0.24872,
+	      "expected": 0.09489
+	    },
+	  "46140": {
+	      "actual": -0.05748,
+	      "expected": 0.16378
+	    },
+	  "46520": {
+	      "actual": 0.55552,
+	      "expected": 0.10445
+	    },
+	  "47260": {
+	      "actual": 0.00172,
+	      "expected": 0.02033
+	    },
+	  "48620": {
+	      "actual": -0.20476,
+	      "expected": 0.0484
+	    },
+	  "49180": {
+	      "actual": -0.19709,
+	      "expected": 0.16035
+	    },
+	  "49660": {
+	      "actual": -0.53765,
+	      "expected": -0.09084
+	    },
+	  "99999": {
+	      "actual": 0.29534,
+	      "expected": 0.19896
+	    }
+	}
+	;
+	var metro_names = 
+	{
+	    "10420": "Akron, OH",
+	    "10580": "Albany, NY",
+	    "10740": "Albuquerque, NM",
+	    "10900": "Allentown, PA-NJ",
+	    "12060": "Atlanta, GA",
+	    "12260": "Augusta, GA-SC",
+	    "12420": "Austin, TX",
+	    "12540": "Bakersfield, CA",
+	    "12580": "Baltimore, MD",
+	    "12940": "Baton Rouge, LA",
+	    "13820": "Birmingham, AL",
+	    "14260": "Boise City, ID",
+	    "14860": "Bridgeport, CT",
+	    "15380": "Buffalo, NY",
+	    "15980": "Cape Coral, FL",
+	    "16700": "Charleston, SC",
+	    "16740": "Charlotte, NC-SC",
+	    "16860": "Chattanooga, TN-GA",
+	    "16980": "Chicago, IL-IN-WI",
+	    "17140": "Cincinnati, OH-KY-IN",
+	    "17460": "Cleveland, OH",
+	    "17820": "Colorado Springs, CO",
+	    "17900": "Columbia, SC",
+	    "18140": "Columbus, OH",
+	    "19100": "Dallas, TX",
+	    "19380": "Dayton, OH",
+	    "19660": "Deltona, FL",
+	    "19740": "Denver, CO",
+	    "19780": "Des Moines, IA",
+	    "19820": "Detroit, MI",
+	    "21340": "El Paso, TX",
+	    "23420": "Fresno, CA",
+	    "24340": "Grand Rapids, MI",
+	    "24660": "Greensboro, NC",
+	    "24860": "Greenville, SC",
+	    "25420": "Harrisburg, PA",
+	    "25540": "Hartford, CT",
+	    "26420": "Houston, TX",
+	    "26900": "Indianapolis, IN",
+	    "27140": "Jackson, MS",
+	    "27260": "Jacksonville, FL",
+	    "28140": "Kansas City, MO-KS",
+	    "28940": "Knoxville, TN",
+	    "29460": "Lakeland, FL",
+	    "29820": "Las Vegas, NV",
+	    "30780": "Little Rock, AR",
+	    "31080": "Los Angeles, CA",
+	    "31140": "Louisville, KY-IN",
+	    "32580": "McAllen, TX",
+	    "32820": "Memphis, TN-MS-AR",
+	    "33100": "Miami, FL",
+	    "33460": "Minneapolis, MN-WI",
+	    "34980": "Nashville, TN",
+	    "35300": "New Haven, CT",
+	    "35380": "New Orleans, LA",
+	    "35620": "New York, NY-NJ-PA",
+	    "35840": "North Port, FL",
+	    "36260": "Ogden, UT",
+	    "36420": "Oklahoma City, OK",
+	    "36540": "Omaha, NE-IA",
+	    "36740": "Orlando, FL",
+	    "37100": "Oxnard, CA",
+	    "37340": "Palm Bay, FL",
+	    "37980": "Philadelphia, PA-NJ-DE-MD",
+	    "38060": "Phoenix, AZ",
+	    "38300": "Pittsburgh, PA",
+	    "38900": "Portland, OR-WA",
+	    "39300": "Providence, RI-MA",
+	    "39340": "Provo, UT",
+	    "39580": "Raleigh, NC",
+	    "40060": "Richmond, VA",
+	    "40140": "Riverside, CA",
+	    "40380": "Rochester, NY",
+	    "40900": "Sacramento, CA",
+	    "41180": "St. Louis, MO-IL",
+	    "41620": "Salt Lake City, UT",
+	    "41700": "San Antonio, TX",
+	    "41740": "San Diego, CA",
+	    "41860": "San Francisco, CA",
+	    "41940": "San Jose, CA",
+	    "42540": "Scranton, PA",
+	    "42660": "Seattle, WA",
+	    "44060": "Spokane, WA",
+	    "44700": "Stockton, CA",
+	    "45060": "Syracuse, NY",
+	    "45300": "Tampa, FL",
+	    "45780": "Toledo, OH",
+	    "46060": "Tucson, AZ",
+	    "46140": "Tulsa, OK",
+	    "46520": "Urban Honolulu, HI",
+	    "47260": "Virginia Beach, VA-NC",
+	    "48620": "Wichita, KS",
+	    "49180": "Winston, NC",
+	    "49660": "Youngstown, OH-PA",
+	    "99997": "All other 90 metro areas",
+	    "99998": "Extremely dense 4 metro areas",
+	    "99999": "U.S. 94 metro areas"
+	  }
+	;
 
 	var palette = {
 		primary:{
@@ -10669,6 +11283,7 @@
 	    //one time setup
 	    var wrap = d3.select(container).classed("chart-view",true);
 
+	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Metropolitan America saw a large increase in job density from 2004 to 2015");
 
 	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
@@ -10677,6 +11292,10 @@
 	    var g_x_axis = svg.append("g").classed("axis-group",true);
 	    var g_back = svg.append("g");
 	    var g_trend = svg.append("g");
+	    var g_anno = svg.append("g");
+
+	    var t_ = g_anno.selectAll("g.text-group").data([["94 metro areas"], ["New York", "Chicago", "San Francisco", "Seattle"], ["Other 90"]]).enter().append("g").classed("text-group",true).style("opacity","0");
+	    var ts_ = t_.selectAll("text").data(function(d){return d}).enter().append("text").attr("y", function(d,i){return i*16}).text(function(d){return d}).style("font-size","15px").attr("dy","8");
 
 	    var lines = g_trend.selectAll("path").data(["99999", "99998", "99997"])
 	                       .enter().append("path")
@@ -10705,7 +11324,7 @@
 	    var axis_x = d3.axisBottom(scale_x).tickValues([2005, 2010, 2015]).tickFormat(function(v){return v});
 
 	    var aspect = 1/2;
-	    var padding = {top:20, right:25, bottom: 40, left: 60 };
+	    var padding = {top:20, right:125, bottom: 40, left: 60 };
 
 	    function redraw(){
 	        var w = this.w < 320 ? 320 : (this.w > 750 ? 750 : this.w);
@@ -10719,7 +11338,11 @@
 	        scale_x.range([padding.left, w - padding.right]);
 	        scale_y.range([h - padding.bottom, 0 + padding.top]);
 
-	        console.log(scale_y.ticks(4));
+	        t_.attr("transform", function(d,i){
+	            var v = (i == 0 ? 0.3 : (i == 1 ? 0.42 : 0.1));
+	            var y = scale_y(v);
+	            return "translate(" + (w-padding.right+3) + ", " + y + ")";
+	        });
 
 	        var grid_lines_ = g_back.selectAll("line").data(scale_y.ticks(4));
 	        grid_lines_.exit().remove();
@@ -10732,7 +11355,7 @@
 
 	        great_recession.attr("x", scale_x(2007)).attr("y", padding.top)
 	                       .attr("width", scale_x(2009) - scale_x(2007))
-	                       .attr("height", h - padding.top - padding.bottom + 5);
+	                       .attr("height", h - padding.top - padding.bottom);
 
 	        axis_x(g_x_axis);
 	        axis_y(g_y_axis);
@@ -10747,19 +11370,24 @@
 	    //set extent
 
 	    //redraw
+	    function show_text(j){t_.filter(function(d,i){return i==j}).style("opacity",1);}
+	    function hide_text(j){t_.filter(function(d,i){return i==j}).style("opacity",0);}
 
 
 	    var views = [
 	        {
 	            text:["The perceived job density of all 94 large metro areas taken together increased nearly 30 percent, indicating job growth was highly concentrated in dense urban areas from 2004 to 2015."],
 	            enter:function(){
-	                wrap.style("opacity",1);
+	                wrap.style("opacity","1");
 	                line_all.style("opacity", 1);
-	                console.log("enter blue");
+	                show_text(0);
+	                //console.log("enter blue");
 	            },
 	            exit:function(){
+	                wrap.style("opacity",null);
 	                line_all.style("opacity", 0);
-	                console.log("exit blue");
+	                hide_text(0);
+	                //console.log("exit blue");
 	            }
 	        },
 
@@ -10768,60 +11396,134 @@
 	            enter:function(){
 	                wrap.style("opacity",1);
 	                great_recession.style("opacity",1);
-	                console.log("enter recession highlight");
+	                //console.log("enter recession highlight");
 	            },
 	            exit:function(){
 	                great_recession.style("opacity",0);
-	                console.log("exit recession highlight");
+	                //console.log("exit recession highlight");
 	            }
 	        },
 
 	        {
-	            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle. These four metro areas saw an even greater increase in job density, accounting for about 90 percent of the increase in job density seen among all 94 large metro areas during this period."],
+	            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle."],
 	            enter:function(){
 	                wrap.style("opacity",1);
 	                line_4.style("opacity", 1);
-	                console.log("enter yellow");
+	                show_text(1);
+	                //console.log("enter yellow");
 	            },
 	            exit:function(){
 	                line_4.style("opacity", 0);
-	                console.log("exit yellow");
+	                hide_text(1);
+	                //console.log("exit yellow");
 	            }
 	        },
 
 	        {
-	            text:["In contrast to job density trends in the four extremely dense metro areas, job density in the other 90 large metro areas increased only 9 percent on average.","However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
+	            text:["In contrast, job density in the other 90 large metro areas increased only 9 percent on average. However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
 	            enter:function(){
 	                wrap.style("opacity",1);
 	                line_other.style("opacity", 1);
-	                console.log("enter green");
+	                show_text(2);
+	                //console.log("enter green");
 	            },
 	            step:function(s){
 
 	            },
 	            exit:function(){
 	                line_other.style("opacity", 0);
-	                console.log("exit green");
+	                hide_text(2);
+	                //console.log("exit green");
 	            }
 	        }
 	    ];
 
 	    //static, non-scrollytelling
 	    if(arguments.length > 1){
-	        views[i].enter.call(wrap.append("p").html(views[i].text).node());
+	        panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
 	    }
 
 	    return views;
 
 	}
 
-	function seq0$1(container, i){
+	function seq1(container, i){
+
+	    //one time setup
+	    var wrap = d3.select(container).classed("chart-view",true).style("background-color","#dddddd");
+
+	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
+	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Actual versus expected perceived job density [shift share graphic]");
+
+
+	    function redraw(){
+
+	        
+	    }
+
+	    //register resize callback. initialize
+	    on_resize(redraw, true);
+
+	    //set extent
+
+	    //redraw
+
+
+	    var views = [
+	        {
+	            text:["What we mean by expected job density"],
+	            enter:function(){
+	                wrap.style("opacity","1");
+	            },
+	            exit:function(){
+	                wrap.style("opacity",null);
+	            }
+	        },
+	        {
+	            text:["What this means intuitively: when expected density outpaces actual density change, the geographic distribution of jobs has shifted toward lower density areas."]
+	        },
+	        {
+	            text:["Example?"]
+	        }
+	    ];
+
+	    //static, non-scrollytelling
+	    if(arguments.length > 1){
+	        panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
+	    }
+
+	    return views;
+
+	}
+
+	function seq2(container, i){
 
 	    var data = seq0data.changes["99999"];
 
 	    //one time setup
 	    var wrap = d3.select(container).classed("chart-view",true);
 
+	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Jobs in metropolitan America grew denser than expected from 2004 to 2015");
 
 	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
@@ -10902,20 +11604,21 @@
 
 	    var views = [
 	        {
-	            text:["[This is the change in job density we would have expected to see if each office and factory added jobs at its industry-wide average rate -- <em>trying for something plainspoken</em>]"],
+	            text:["This is the expected change in job density—what we would have expected to see if each office and factory added jobs at its industry-wide average rate"],
 	            enter:function(){
 	                wrap.style("opacity",1);
 	                line_expected.style("opacity", 1);
 	                //console.log("enter blue");
 	            },
 	            exit:function(){
+	                wrap.style("opacity",null);
 	                line_expected.style("opacity", 0);
 	                //console.log("exit blue");
 	            }
 	        },
 
 	        {
-	            text:["[This is what we actually saw, indicating that new and existing jobs shifted to more dense locations within metro areas -- <em>again, plainspoken</em>]"],
+	            text:["This is what we actually saw, indicating that, on average, new and existing jobs shifted to more dense locations within metro areas"],
 	            enter:function(){
 	                wrap.style("opacity",1);
 	                line_actual.style("opacity",1);
@@ -10928,7 +11631,17 @@
 
 	    //static, non-scrollytelling
 	    if(arguments.length > 1){
-	        views[i].enter.call(wrap.append("p").html(views[i].text).node());
+	        panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
 	    }
 
 	    return views;
@@ -10937,14 +11650,18 @@
 
 	function seq3(container, i){
 
-	    var data = sector_data["99999"].slice().sort(function(a,b){return d3.descending(a.actual, b.actual)});
+	    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.actual, b.actual)});
 
 	    //one time setup
 	    var wrap = d3.select(container).classed("chart-view",true);
 
+	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase and exceeded expectations");
 
 	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
+
+	    wrap.append("p").classed("legend",true)
+	        .html('<span class="actual-density-change">Actual job density change</span><br /><span class="expected-density-change">Expected job density change</span>');
 
 	    var g_x_axis = svg.append("g").classed("axis-group",true);
 	    var g_back = svg.append("g");
@@ -10965,13 +11682,21 @@
 	    var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
 	    var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
 
-	    console.log(data);
-
-	    var scale_x = d3.scaleLinear().domain([min, max]).nice();
+	    var scale_x = d3.scaleLinear().domain([-0.4, 0.6]).nice();
 	    var axis_x = d3.axisTop(scale_x).ticks(5, "+,.0%");
 
 	    var aspect = 2/3;
-	    var padding = {top:50, right:25, bottom: 5, left: 5 };
+	    var padding = {top:50, right:25, bottom: 5, left: 15 };
+
+	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
+	                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
+	                        .style("shape-rendering","crispEdges");
+
+	    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
+	                              .attr("x", padding.left)
+	                              .attr("dx","-10")
+	                              .attr("dy","5").attr("text-anchor","end")
+	                              ;
 
 	    function redraw(){
 	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
@@ -10988,6 +11713,11 @@
 
 	        scale_x.range([padding.left, w - padding.right]);
 
+	        gridlines.attr("d", function(d){
+	            var x = Math.floor(scale_x(d))+0.5;
+	            return "M" + x + "," + padding.top + " l0," + (h - padding.top - padding.bottom);
+	        });
+
 	        axis_x(g_x_axis);
 
 	        //[expected, actual]
@@ -10996,6 +11726,13 @@
 	                        .attr("x1", function(d){return scale_x(d.expected)})
 	                        .attr("x2", function(d){return scale_x(d.actual)})
 	                        ;
+
+	        group_labels.attr("y", group_h2)
+	                    .attr("x", function(d){
+	                        var min = Math.min(d.expected, d.actual);
+	                        return scale_x(min);
+	                    });
+	        
 	    }
 
 	    //register resize callback. initialize
@@ -11008,34 +11745,1188 @@
 
 	    var views = [
 	        {
-	            text:["Only manufacturing and wholesale were expected to decline in density from 2004 to 2015"],
+	            text:['Only manufacturing and wholesale were expected to decline in density from 2004 to 2015'],
 	            enter:function(){
-	                console.log("step 1 enter");
 	                wrap.style("opacity","1");
-	                groups.style("opacity", function(d){return d.naics == "31" || d.naics == "42" ? "1" : "0.15"});
+	            },
+	            step: function(s){
+	                if(s > 0){
+	                    groups.style("opacity", function(d){return d.naics == "31" || d.naics == "42" ? "1" : "0.15"});
+	                    //console.log("1 - STEP");
+	                }
 	            },
 	            exit:function(){
-	                console.log("step 1 exit");
-	                groups.style("opacity","1");
+	                wrap.style("opacity",null);
 	            }
 	        },
 	        {
 	            text:["In the end, it was manufacturing and logistics which became less dense"],
-	            enter:function(){
-	                console.log("step 2 enter");
-	                wrap.style("opacity","1");
-	                groups.style("opacity", function(d){return d.naics == "31" || d.naics == "48" ? "1" : "0.15"});
-	            },
-	            exit:function(){
-	                console.log("step 2 exit");
-	                groups.style("opacity", function(d){return d.naics == "31" || d.naics == "42" ? "1" : "0.15"});
+	            step: function(s){
+	                if(s > 0){
+	                    groups.style("opacity", function(d){return d.naics == "31" || d.naics == "48" ? "1" : "0.15"});
+	                    //console.log("2 - STEP");
+	                }
+	            }
+	        },
+	        {
+	            text: ["12 of 16 major sectors of the economy actually saw greater-than-expected increases in job density"],
+	            step: function(s){
+	                if(s > 0){
+	                    groups.style("opacity", function(d){ return d.actual > d.expected ? "1" : "0.15"});
+	                    //console.log("3 - STEP");
+	                }
+	            }
+	        },
+	        {
+	            text: ["While four saw perceived job density change by less than expected."],
+	            step: function(s){
+	                if(s > 0){
+	                    groups.style("opacity", function(d){ return d.actual < d.expected ? "1" : "0.15"});
+	                    //console.log("3 - STEP");
+	                }
 	            }
 	        }
 	    ];
 
 	    //static, non-scrollytelling
 	    if(arguments.length > 1){
-	        views[i].enter.call(wrap.append("p").html(views[i].text).node());
+	        panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
+	    }
+
+	    return views;
+
+	}
+
+	//current fork of map.js
+	//used in black home devaluation and opportunity industries (late-2018)
+
+	function map(container){
+	    //one-time-setup
+
+	    var scope = {
+	        width:360,
+	        width_user:null,
+	        min_width:240,
+	        aspect: 0.6,
+	        projection: d3.geoAlbersUsa(),
+	        responsive: true,
+	        scalable: false,
+	        translate:[0,0],
+	        scale:1
+	    };
+	    scope.path = d3.geoPath(scope.projection);
+	    scope.height = scope.width * scope.aspect;
+
+	    //main outer wrap
+	    var wrap0 = d3.select(container).append("div").classed("c-fix",true).style("padding","0px").style("position","relative").style("min-height","15px");
+
+	    var title_box = wrap0.append("div");
+	    var title = title_box.append("p").classed("map-title",true);
+	    var legend_top = title_box.append("div");
+
+	    //map dom
+	    //map_panel holds map -- set dims on this panel
+	    var map_panel = wrap0.append("div").style("position","relative").style("z-index","7").style("top","0px").style("left","0px");
+	    var svg = map_panel.append("svg").attr("width","100%").attr("height","100%").style("overflow","visible");
+	    var g_translate = svg.append("g");
+	    var g_back = g_translate.append("g");
+	    var g_main = g_translate.append("g");
+	    var g_front = g_translate.append("g");
+	    var g_anno = g_translate.append("g");
+
+	    var panels = {root:svg, back:g_back, main:g_main, front:g_front, anno:g_anno, legend_top:legend_top};
+
+	    //tooltip
+	    var tooltip = map_panel.append("div")
+	                           .style("position","absolute")
+	                           .style("min-width","30px")
+	                           .style("max-width","500px")
+	                           .style("min-height","100px")
+	                           .style("pointer-events","none")
+	                           .style("padding","0px 0px 0px 11px")
+	                           .style("display","none")
+	                           ;
+
+	    var tooltip_content = tooltip.append("div").style("padding","10px 15px 10px 10px").style("border","1px solid " + palette.mediumgray)
+	                                .style("position","relative").style("z-index","10").style("background-color","#ffffff")
+	                                .style("box-shadow","2px 3px 8px rgba(0,0,0,0.4)");
+
+	    var tooltip_arrow_left = tooltip.append("div").style("width","12px").style("position","absolute")
+	                            .style("left","0px").style("top","0px")
+	                            .style("height","100px").style("z-index","11");
+	        tooltip_arrow_left.append("svg").attr("width","100%").attr("height","100%")
+	                            .append("path").attr("d", "M12.5,12 L1,20 L12.5,28")
+	                            .attr("stroke", palette.mediumgray)
+	                            .attr("fill","#ffffff")
+	                            ;
+
+	    var tooltip_arrow_right = tooltip.append("div").style("width","12px").style("position","absolute")
+	                            .style("left","100%").style("top","0px")
+	                            .style("height","100px").style("z-index","11");
+	        tooltip_arrow_right.append("svg").attr("width","100%").attr("height","100%").style("margin-left","-1px")
+	                            .append("path").attr("d", "M0,28 L11.5,20 L0,12")
+	                            .attr("stroke", palette.mediumgray)
+	                            .attr("fill","#ffffff")
+	                            ;
+
+	    //build svg filters
+	    var defs = wrap0.append("div").style("height","0px").style("overflow","hidden").append("svg").append("defs");
+	    var filter = defs.append("filter").attr("id","feBlur").attr("width","150%").attr("height","150%");
+	    filter.append("feOffset").attr("result","offsetout").attr("in","SourceGraphic").attr("dx","6").attr("dy","6");
+	    filter.append("feColorMatrix").attr("result","matrixout").attr("in","offsetout").attr("type","matrix").attr("values","0.25 0 0 0 0 0 0.25 0 0 0 0 0 0.25 0 0 0 0 0 1 0");
+	    filter.append("feGaussianBlur").attr("result","blurout").attr("in","matrixout").attr("stdDeviation","4");
+	    filter.append("feBlend").attr("in","SourceGraphic").attr("in2","blurout").attr("mode","normal");
+
+
+	    var tooltip_test = wrap0.append("div").style("position","absolute").style("z-index","0")
+	                            .style("top","0px").style("left","0px").style("width","100%")
+	                            .style("overflow","visible").style("visibility","hidden")
+	                            .append("div").style("display","inline-block").style("visibility","hidden")
+	                            .classed("tooltip-test-area", true).style("padding","10px 15px 10px 10px")
+	                            .style("user-select","none");
+
+	    var tip_show_timer;
+	    var tip_hide_timer;
+	    var ttip_width_threshold = 500;
+
+	    //get location of element, relative to map_panel
+	    function get_centroid(el){
+	        var x;
+	        var y;
+	        try{
+	            var mnode = map_panel.node();
+	            var mbox = mnode.getBoundingClientRect();
+	            
+	            var ebox = el.getBoundingClientRect();
+	            var w = ebox.right - ebox.left;
+	            var h = ebox.bottom - ebox.top;
+	            
+	            //element x,y
+	            var x0 = ebox.left + (w/2);
+	            var y0 = ebox.top + (h/2);
+	            
+	            x = x0 - mbox.left - mnode.clientLeft;
+	            y = y0 - mbox.top - mnode.clientTop;
+	        }catch(e){
+	            x = 0;
+	            y = 0;
+	        }
+	        return [x, y];
+	    }
+
+	    function show_tooltip(html, centroid){
+	        clearTimeout(tip_hide_timer);
+	        clearTimeout(tip_show_timer);
+
+	        if(scope.width >= ttip_width_threshold){
+	            tooltip_test.html(html);
+
+	            tip_show_timer = setTimeout(function(){
+	                //show to left or right
+	                var show_right = true;
+	                var left;
+	                var top;
+	                try{
+	                    var tip_box = tooltip_test.node().getBoundingClientRect();
+	                    var tip_width = tip_box.right - tip_box.left;
+	                    show_right = tip_width + centroid[0] < scope.width;
+	                }
+	                catch(e){
+	                    show_right = true;
+	                }
+
+	                if(!show_right){
+	                    left = (centroid[0]-tip_width-25-3)+"px";
+	                    top = (centroid[1]-20)+"px";
+	                    tooltip_arrow_right.style("visibility","visible");
+	                    tooltip_arrow_left.style("visibility","hidden");
+	                }
+	                else{
+	                    left = (centroid[0]+3)+"px";
+	                    top = (centroid[1]-20)+"px";
+	                    tooltip_arrow_left.style("visibility","visible");
+	                    tooltip_arrow_right.style("visibility","hidden");
+	                }
+
+	                tooltip.style("left",left).style("top",top).style("display", "block");
+	                tooltip_content.html(html);
+	            }, 10); 
+	        }        
+	    }
+
+	    function hide_tooltip(callback){
+	        clearTimeout(tip_hide_timer);
+	        clearTimeout(tip_show_timer);
+
+	        tip_hide_timer = setTimeout(function(){
+	            tooltip.style("left","0px").style("top","0px").style("display", "none");
+	            if(typeof callback === "function"){
+	                callback();
+	            }
+	        }, 50);
+	    }
+
+	    //hold 
+	    var draw_stack = [];
+	    var clip_geo = null;
+
+	    //draw, redraw, resize
+	    var resize_timeout;
+
+	    window.addEventListener("resize", function(){
+	        clearTimeout(resize_timeout);
+	        hide_tooltip();
+	        if(scope.responsive){
+	            //wrap0.style("overflow","hidden"); //avoid horizontal scroll bars while resizing
+	            map_panel.style("width","auto").style("height","auto");
+	            svg.style("opacity","0.25");
+	            resize_timeout = setTimeout(function(){
+	                draw();
+	                svg.style("opacity","1");
+	                //map_panel.style("background-color",null);
+	            }, 375);
+	        }
+	    });
+
+	    //internal draw method
+	    function draw(){
+	        wrap0.style("overflow","visible"); //allow tooltips to overflow
+	        dims(); //if width set at any point by user--using map.print() or map.width()--dims will use that
+
+	        map_panel.style("width", scope.scalable ? "auto" : scope.width+"px")
+	                .style("height", scope.scalable ? "auto" : scope.height+"px");
+
+	        svg.attr("viewBox", "0 0 " + scope.width + " " + scope.height);
+
+	        if(clip_geo !== null){
+	            scope.projection.fitExtent([[0, 0], [scope.width, scope.height]], clip_geo);
+	        }
+
+	        var i = -1;
+	        while(++i < draw_stack.length){
+	            draw_stack[i]();
+	        }
+
+	    }    
+
+	    //map methods exposed to user for:
+	    // 1) add_states(f, attrs, geokey, clip_to_this)
+	    // 2) add_points(f, attrs, geokey, lonlat, clip_to_this)
+	    // 3) print -- render map
+	    var map_methods = {};
+
+	    map_methods.add_states = function(f, geokey, clip_to_this){
+	        var g = g_main.append("g");
+	        var features = [];
+	        
+	        if(f.hasOwnProperty("type") && f.type=="FeatureCollection" && f.features.length > 0){
+	            features = f.features;
+	        }
+	        else if(f instanceof Array && f.length > 0){
+	            features = f;
+	        }
+	        else{
+	            throw new Error("Argument f must be a FeatureCollection or an array of D3-supported geojson feature objects");
+	        }
+
+	  
+	        //set clip_geography for projection
+	        if((arguments.length > 2 && !!clip_to_this) || clip_geo === null){
+	            clip_geo = {type:"FeatureCollection", features:features};
+	        }
+
+	        //selection of states
+	        var selection = null;
+
+	        //tooltip functions
+	        var ttip_show;
+	        
+	        var ttip = function(key){
+	            if(typeof ttip_show === "function" && selection !== null){
+	                ttip_show(key);
+	            }
+	        };        
+
+	        //hide function
+	        var ttip_hide_;
+	        var ttip_hide = function(){
+	            hide_tooltip(ttip_hide_);
+	        };
+
+	        g.on("mousedown", ttip_hide);
+
+	        //attributes
+	        var attrs = {};
+
+	        function draw_layer(){
+	            var selection_ = g.selectAll("path").data(features, geokey);
+	            selection_.exit().remove();
+	            selection = selection_.enter().append("path").merge(selection_).attr("d", scope.path);
+	    
+	            //apply attributes
+	            for(var a in attrs){
+	                if(attrs.hasOwnProperty(a)){
+	                    if(typeof attrs[a] === "function"){
+	                        selection.attr(a, function(d){
+	                            return attrs[a].call(this, geokey(d))
+	                        });
+	                    }
+	                    else{
+	                        selection.attr(a, attrs[a]);
+	                    }
+	                    
+	                }
+	            }
+
+	            selection
+	            .on("mouseenter", function(d){
+	                ttip(geokey(d));
+	            })
+	            .on("mousedown", function(d){
+	                ttip(geokey(d));
+	                d3.event.stopPropagation();
+	            })
+	            .on("mouseleave", ttip_hide);
+	        }
+
+	        draw_stack.push(draw_layer);
+
+	        //return object for this layer
+	        var layer_methods = {};
+
+	        layer_methods.hide = function(){g.style("visibility","hidden").style("pointer-events","none"); return layer_methods;};
+	        layer_methods.show = function(){g.style("visibility",null).style("pointer-events",null); return layer_methods;};
+	        layer_methods.opacity = function(o){g.style("opacity", o==null ? 0 : o); return layer_methods;};
+
+	        layer_methods.tooltips = function(html_, hide_){
+	            
+	            //register fn
+	            ttip_show = function(key){
+	                //get target path
+	                var path = selection.filter(function(d){
+	                    return geokey(d) == key;
+	                });
+
+	                if(path.size()==1){
+	                    var node = path.node();
+	                    var html = html_(key, node);
+	                    var centroid; 
+	                    try{
+	                        //use centroid
+	                        var mnode = map_panel.node();
+	                        var mbox = mnode.getBoundingClientRect();
+	                        var offset_x = mbox.left + mnode.clientLeft;
+	                        var offset_y = mbox.top + mnode.clientTop;
+	                        var xy = scope.path.centroid(path.datum());
+	                        var pt = svg.node().createSVGPoint();
+	                        pt.x = xy[0];
+	                        pt.y = xy[1];
+	                        var pt_ctm = pt.matrixTransform(g_translate.node().getScreenCTM());
+	                        centroid = [pt_ctm.x - offset_x, pt_ctm.y - offset_y];
+	                    }
+	                    catch(e){
+	                        //fallback to getBoundingClientRect()
+	                        centroid = get_centroid(node);
+	                    }
+	                    //var centroid = get_centroid(node);
+	                    show_tooltip.call(node, html, centroid);
+	                }
+	                else{
+	                    //would only occur if user passes an invalid geocode
+	                    console.warn("Multiple or no matching points.");
+	                }
+	            };  
+	            
+	            if(arguments.length > 1){
+	                ttip_hide_ = hide_;
+	            }            
+
+	            return layer_methods;
+	        };
+
+	        layer_methods.highlight = function(key){
+	            if(key==null){
+	                ttip_hide();
+	            }
+	            else{
+	                ttip(key);
+	            }
+	        };        
+
+	        //to do, enable adding of attrs
+	        layer_methods.attr = function(a){
+	            if(arguments.length > 0){
+	                attrs = a;
+	            }
+	            return layer_methods;
+	        };
+
+	        //end state layer factory (add_states);
+	        return layer_methods;    
+	    };
+
+
+	    map_methods.add_points = function(f, geokey, lonlat, clip_to_this){
+	        var g = g_main.append("g");
+	       
+	        var g_voro = g.append("g"); //render voronoi here
+	        var g_points = g.append("g"); //render circles here
+	        var g_labels = g.append("g").style("pointer-events","none"); //labels
+	        
+	        var point_labeler = function(cbsa){return ""};
+	        var point_label_dxdy = [0,0]; // [dx, dy]
+	        var point_label_styles = {};
+	        var point_labels = null;
+	        
+	        //set default lonlat accessor
+	        if(lonlat == null || typeof lonlat == "undefined"){
+	            lonlat = function(d){return [d.lon, d.lat]};
+	        }
+	        
+	        //build a feature array of geojson points
+	        var geo_features = f.map(function(d){
+	            return {
+	                    "type": "Feature",
+	                    "geometry": {
+	                        "type": "Point",
+	                        "coordinates": lonlat(d)
+	                    },
+	                    "properties": d
+	            }   
+	        });        
+
+	        //set clip_geography for projection
+	        if((arguments.length > 3 && !!clip_to_this) || clip_geo === null){
+	            clip_geo = {type:"FeatureCollection", features:geo_features};
+	        }
+	        
+	        //return object for this layer
+	        var layer_methods = {};
+
+	        layer_methods.hide = function(){g.style("visibility","hidden").style("pointer-events","none"); return layer_methods;};
+	        layer_methods.show = function(){g.style("visibility",null).style("pointer-events",null); return layer_methods;};
+	        layer_methods.opacity = function(o){g.style("opacity", o==null ? 0 : o); return layer_methods;};
+	        layer_methods.labels = function(fn, position, styles){
+	            if(arguments.length > 0){
+	                point_labeler = fn;
+	                point_label_dxdy = position != null ? position : [0,0];
+	                point_label_styles = styles != null ? styles : {};
+	                return layer_methods;
+	            }
+	            else{
+	                return point_labels;
+	            }
+	        };
+
+	        //selection of points
+	        var selection = null;
+
+	        layer_methods.points = function(){
+	            return selection;
+	        };
+
+	        //voronoi layer
+	        var voro_selection = null;
+
+	        //tooltip fn
+	        var ttip_show;
+	        var ttip = function(key){
+	            if(typeof ttip_show === "function" && selection !== null){
+	                ttip_show(key);
+	            }
+	        };
+
+	        //hide function
+	        var ttip_hide_;
+	        var ttip_hide = function(){
+	            hide_tooltip(ttip_hide_);
+	        };
+
+	        g.on("mousedown", ttip_hide);
+
+	        //attributes
+	        var attrs = {};
+
+	        var is_sorted = false;
+
+	        function draw_layer(){
+
+	            //project features
+	            var projected_features = f.map(function(d){
+	                var p = scope.projection(lonlat(d));
+	                return {xy:p, data:d, key:geokey(d)}
+	            }).filter(function(d){
+	                return d.xy != null;
+	            });
+	            
+	            //sort data
+	            if(!is_sorted && typeof attrs.r === "function"){
+	                projected_features.sort(function(a, b){
+	                    var ar = attrs.r(a.key);
+	                    var br = attrs.r(b.key);
+	                    return d3.descending(ar, br);
+	                });
+	                is_sorted = true;
+	            }
+
+	            var selection_ = g_points.selectAll("circle").data(projected_features, function(d){return d.key});
+	            selection_.exit().remove();
+	            selection = selection_.enter().append("circle").merge(selection_)
+	                        .attr("cx", function(d){return d.xy[0]})
+	                        .attr("cy", function(d){return d.xy[1]})
+	                        .order()
+	                        ;
+
+	            var point_labels_ = g_labels.selectAll("text").data(projected_features, function(d){return d.key});
+	            point_labels_.exit().remove();
+	            point_labels = point_labels_.enter().append("text").merge(point_labels_)
+	                                        .attr("x", function(d){return d.xy[0]})
+	                                        .attr("y", function(d){return d.xy[1]})
+	                                        .attr("dx", point_label_dxdy[0])
+	                                        .attr("dy", point_label_dxdy[1])
+	                                        .text(function(d){
+	                                            return point_labeler(d.key);
+	                                        })
+	                                        ;
+	            
+	            for(var ptstyl in point_label_styles){
+	                if(point_label_styles.hasOwnProperty(ptstyl)){
+	                    point_labels.style(ptstyl, point_label_styles[ptstyl]);
+	                }            }
+	            
+	            //apply attributes
+	            for(var a in attrs){
+	                if(attrs.hasOwnProperty(a)){
+	                    if(typeof attrs[a] === "function"){
+	                        selection.attr(a, function(d, i){
+	                            return attrs[a].call(this, d.key)
+	                        });
+	                    }
+	                    else{
+	                        selection.attr(a, attrs[a]);
+	                    }
+	                    
+	                }
+	            }
+
+
+	            //add voronoi paths
+	            var voro = d3.voronoi()
+	                        .extent([[0,0], [scope.width, scope.height]])
+	                        .x(function(d){return d.xy[0]})
+	                        .y(function(d){return d.xy[1]})
+	                        .polygons(projected_features)
+	                        .map(function(d, i){
+	                            var path = "M0,0";
+	                            var key = null;
+	                            var centroid = [0,0];
+	                            var data = null;
+
+	                            if(d!=null){
+	                                path = "M" + d.join("L") + "Z";
+	                                key = d.data.key;
+	                                centroid = d.data.xy;
+	                                data = d.data;
+	                            }
+
+	                            return {path: path, key: key, centroid: centroid, data: data}
+	                        })
+	                        ;
+	            
+	            var mv_u = g_voro.selectAll("path").data(voro);
+	                mv_u.exit().remove();
+	            voro_selection = mv_u.enter().append("path").merge(mv_u)
+	                                .attr("d", function(d){
+	                                    return d.path;
+	                                })
+	                                .attr("stroke","none")
+	                                .attr("fill","none")
+	                                .style("pointer-events","all");  
+
+	            selection.on("mouseenter", function(d){
+	                        ttip(d.key);
+	                    })
+	                    .on("mousedown", function(d){
+	                        ttip(d.key);
+	                        d3.event.stopPropagation();
+	                    })
+	                    .on("mouseleave", ttip_hide);
+	            
+	            voro_selection.on("mouseenter", function(d){
+	                        ttip(d.key);
+	                    })
+	                    .on("mousedown", function(d){
+	                        ttip(d.key);
+	                        d3.event.stopPropagation();
+	                    })
+	                    .on("mouseleave", ttip_hide);
+	                                          
+	        }
+
+	        draw_stack.push(draw_layer);
+
+	        layer_methods.tooltips = function(html_, hide_){
+	            
+	            //register
+	            ttip_show = function(key){
+	                //get circle node by filtering selection of circles
+	                var dot = selection.filter(function(d){
+	                    return d.key == key;
+	                });
+
+	                if(dot.size()==1){
+	                    var node = dot.node();
+	                    var html = html_(key, node); 
+	                    //var centroid = dot.datum().xy;
+	                    var centroid = get_centroid(node);
+	                    show_tooltip.call(node, html, centroid);
+	                }
+	                else{
+	                    //would only occur if user passes an invalid geocode
+	                    console.warn("Multiple or no matching points.");
+	                } 
+	            };
+
+	            if(arguments.length > 1){
+	                ttip_hide_ = hide_;
+	            }
+	            
+	            return layer_methods;
+	        };
+
+	        layer_methods.highlight = function(key){
+	            //ttip checks that selection exists
+	            if(key==null){
+	                ttip_hide();
+	            }
+	            else{
+	                ttip(key);
+	            }
+	        }; 
+
+
+	        layer_methods.attr = function(a){
+	            if(arguments.length > 0){
+	                attrs = a;
+	            }
+	            return layer_methods;
+	        };
+
+	        //end point layer factory (add_points);
+	        return layer_methods;    
+	    };
+
+	    function dims(width){
+	        if(arguments.length == 0 || width == null){
+	            
+	            //if user passes null, switch back to auto width
+	            if(width === null){
+	                scope.width_user = null;
+	            }
+
+	            //infer width if not (ever) specified by user
+	            if(scope.width_user == null){
+	                try{
+	                    var box = wrap0.node().getBoundingClientRect();
+	                    width = box.right - box.left;
+	                    if(width < scope.min_width){
+	                        width = scope.min_width;
+	                    }
+	                    else if(width > 1400){
+	                        width = 1400;
+	                    }
+	                }
+	                catch(e){
+	                    width = 360;
+	                }  
+	            }
+	            else{
+	                //use previously specified width
+	                width = scope.width_user;
+	            }
+	        }
+	        else{
+	            scope.responsive = false;
+	            scope.width_user = width;
+	            if(width < scope.min_width){
+	                scope.min_width = width;
+	            }
+	        }
+
+	        scope.width = width;
+	        scope.height = scope.aspect * scope.width;
+	      
+	    }
+
+	    map_methods.width = function(width){
+	        if(arguments.length > 0){
+	            dims(width);
+	            return map_methods;
+	        }
+	        else{
+	            return scope.width;
+	        }
+	    };
+
+	    map_methods.min_width = function(width){
+	        if(arguments.length > 0){
+	            scope.min_width = width;
+	            return map_methods;
+	        }
+	        else{
+	            return scope.min_width;
+	        }
+	    };
+
+	    map_methods.title = function(t){
+	        if(arguments.length > 0){
+	            title.html(t);
+	        }
+	        else{
+	            //return the actual p selection
+	            return title;
+	        }
+	    };
+
+	    map_methods.print = function(width){
+	        dims(width);
+	        draw();
+	    };
+
+	    map_methods.scalable = function(){
+	        scope.scalable = !scope.scalable;
+	        return map_methods;
+	    };
+
+	    map_methods.panels = function(){
+	        return panels;
+	    };
+
+	    return map_methods;
+
+	}
+
+	//requires topojson
+
+	var state_topo = {"type":"Topology","bbox":[-179.174265,18.917465999999997,-66.949895,71.352561],"transform":{"scale":[0.0011222549225492254,0.0005243561935619356],"translate":[-179.174265,18.917465999999997]},"objects":{"geos":{"type":"GeometryCollection","geometries":[{"type":"MultiPolygon","arcs":[[[0]],[[1,2]]],"properties":{"geo_id":"23","geo_name":"Maine","geo_name2":"ME"}},{"type":"MultiPolygon","arcs":[[[3]],[[4]],[[5]],[[6]],[[7]],[[8]],[[9]],[[10]]],"properties":{"geo_id":"15","geo_name":"Hawaii","geo_name2":"HI"}},{"type":"Polygon","arcs":[[11,12,13,14,15]],"properties":{"geo_id":"04","geo_name":"Arizona","geo_name2":"AZ"}},{"type":"Polygon","arcs":[[16,17,18,19,20,21]],"properties":{"geo_id":"05","geo_name":"Arkansas","geo_name2":"AR"}},{"type":"Polygon","arcs":[[22,23,24,25]],"properties":{"geo_id":"10","geo_name":"Delaware","geo_name2":"DE"}},{"type":"Polygon","arcs":[[26,27,28,29,30,31]],"properties":{"geo_id":"13","geo_name":"Georgia","geo_name2":"GA"}},{"type":"Polygon","arcs":[[32,33,34,35,36]],"properties":{"geo_id":"27","geo_name":"Minnesota","geo_name2":"MN"}},{"type":"MultiPolygon","arcs":[[[37]],[[38]],[[39]],[[40]],[[41]],[[42,43,-12,44]]],"properties":{"geo_id":"06","geo_name":"California","geo_name2":"CA"}},{"type":"Polygon","arcs":[[45,46]],"properties":{"geo_id":"11","geo_name":"District of Columbia","geo_name2":"DC"}},{"type":"MultiPolygon","arcs":[[[47]],[[48]],[[49]],[[-31,50,51]]],"properties":{"geo_id":"12","geo_name":"Florida","geo_name2":"FL"}},{"type":"Polygon","arcs":[[52,53,54,55,56,57,58]],"properties":{"geo_id":"16","geo_name":"Idaho","geo_name2":"ID"}},{"type":"Polygon","arcs":[[59,60,61,62,63,64]],"properties":{"geo_id":"17","geo_name":"Illinois","geo_name2":"IL"}},{"type":"Polygon","arcs":[[-35,65,-60,66,67,68]],"properties":{"geo_id":"19","geo_name":"Iowa","geo_name2":"IA"}},{"type":"Polygon","arcs":[[-64,69,70,71,72,73,74]],"properties":{"geo_id":"21","geo_name":"Kentucky","geo_name2":"KY"}},{"type":"Polygon","arcs":[[-20,75,76,77]],"properties":{"geo_id":"22","geo_name":"Louisiana","geo_name2":"LA"}},{"type":"MultiPolygon","arcs":[[[78]],[[79,-25,80,81,82,83,-46,84,85]]],"properties":{"geo_id":"24","geo_name":"Maryland","geo_name2":"MD"}},{"type":"MultiPolygon","arcs":[[[86]],[[87]],[[88]],[[89,90,91]],[[92]],[[93,94]]],"properties":{"geo_id":"26","geo_name":"Michigan","geo_name2":"MI"}},{"type":"Polygon","arcs":[[-67,-65,-75,95,-17,96,97,98]],"properties":{"geo_id":"29","geo_name":"Missouri","geo_name2":"MO"}},{"type":"Polygon","arcs":[[99,100,101,102,-55]],"properties":{"geo_id":"30","geo_name":"Montana","geo_name2":"MT"}},{"type":"MultiPolygon","arcs":[[[103]],[[104,105,106,107,108,109,110]]],"properties":{"geo_id":"36","geo_name":"New York","geo_name2":"NY"}},{"type":"Polygon","arcs":[[111,-59,112,-43,113]],"properties":{"geo_id":"41","geo_name":"Oregon","geo_name2":"OR"}},{"type":"Polygon","arcs":[[-96,-74,114,115,-27,116,117,-18]],"properties":{"geo_id":"47","geo_name":"Tennessee","geo_name2":"TN"}},{"type":"Polygon","arcs":[[118,-21,-78,119,120]],"properties":{"geo_id":"48","geo_name":"Texas","geo_name2":"TX"}},{"type":"MultiPolygon","arcs":[[[-82,121]],[[122,-85,-47,-84,123,124,-115,-73]]],"properties":{"geo_id":"51","geo_name":"Virginia","geo_name2":"VA"}},{"type":"MultiPolygon","arcs":[[[125]],[[126]],[[127,-95,128,-61,-66,-34]]],"properties":{"geo_id":"55","geo_name":"Wisconsin","geo_name2":"WI"}},{"type":"Polygon","arcs":[[-102,129,-36,-69,130,131]],"properties":{"geo_id":"46","geo_name":"South Dakota","geo_name2":"SD"}},{"type":"Polygon","arcs":[[-57,132,133,-14,134]],"properties":{"geo_id":"49","geo_name":"Utah","geo_name2":"UT"}},{"type":"Polygon","arcs":[[135,-91,136,-70,-63]],"properties":{"geo_id":"18","geo_name":"Indiana","geo_name2":"IN"}},{"type":"MultiPolygon","arcs":[[[137]],[[138]],[[139,140,141,142,143,-107]]],"properties":{"geo_id":"25","geo_name":"Massachusetts","geo_name2":"MA"}},{"type":"Polygon","arcs":[[-19,-118,144,145,-76]],"properties":{"geo_id":"28","geo_name":"Mississippi","geo_name2":"MS"}},{"type":"Polygon","arcs":[[-131,-68,-99,146,147,148]],"properties":{"geo_id":"31","geo_name":"Nebraska","geo_name2":"NE"}},{"type":"Polygon","arcs":[[149,150,-121,151,-15]],"properties":{"geo_id":"35","geo_name":"New Mexico","geo_name2":"NM"}},{"type":"Polygon","arcs":[[-125,152,153,-28,-116]],"properties":{"geo_id":"37","geo_name":"North Carolina","geo_name2":"NC"}},{"type":"MultiPolygon","arcs":[[[154]],[[155,-143,156]]],"properties":{"geo_id":"44","geo_name":"Rhode Island","geo_name2":"RI"}},{"type":"MultiPolygon","arcs":[[[157]],[[-90,158,159,160,-71,-137]]],"properties":{"geo_id":"39","geo_name":"Ohio","geo_name2":"OH"}},{"type":"Polygon","arcs":[[161,162,-97,-22,-119,-151]],"properties":{"geo_id":"40","geo_name":"Oklahoma","geo_name2":"OK"}},{"type":"Polygon","arcs":[[-154,163,-29]],"properties":{"geo_id":"45","geo_name":"South Carolina","geo_name2":"SC"}},{"type":"Polygon","arcs":[[164,-148,165,-162,-150,-134]],"properties":{"geo_id":"08","geo_name":"Colorado","geo_name2":"CO"}},{"type":"Polygon","arcs":[[-147,-98,-163,-166]],"properties":{"geo_id":"20","geo_name":"Kansas","geo_name2":"KS"}},{"type":"Polygon","arcs":[[-144,-156,166,-108]],"properties":{"geo_id":"09","geo_name":"Connecticut","geo_name2":"CT"}},{"type":"Polygon","arcs":[[-113,-58,-135,-13,-44]],"properties":{"geo_id":"32","geo_name":"Nevada","geo_name2":"NV"}},{"type":"MultiPolygon","arcs":[[[167]],[[-53,-112,168]]],"properties":{"geo_id":"53","geo_name":"Washington","geo_name2":"WA"}},{"type":"Polygon","arcs":[[-161,169,-86,-123,-72]],"properties":{"geo_id":"54","geo_name":"West Virginia","geo_name2":"WV"}},{"type":"Polygon","arcs":[[-132,-149,-165,-133,-56,-103]],"properties":{"geo_id":"56","geo_name":"Wyoming","geo_name2":"WY"}},{"type":"Polygon","arcs":[[-117,-32,-52,170,-145]],"properties":{"geo_id":"01","geo_name":"Alabama","geo_name2":"AL"}},{"type":"Polygon","arcs":[[171,-3,172,-141,173]],"properties":{"geo_id":"33","geo_name":"New Hampshire","geo_name2":"NH"}},{"type":"Polygon","arcs":[[174,-110,175,-23]],"properties":{"geo_id":"34","geo_name":"New Jersey","geo_name2":"NJ"}},{"type":"Polygon","arcs":[[176,-37,-130,-101]],"properties":{"geo_id":"38","geo_name":"North Dakota","geo_name2":"ND"}},{"type":"Polygon","arcs":[[177,-111,-175,-26,-80,-170,-160]],"properties":{"geo_id":"42","geo_name":"Pennsylvania","geo_name2":"PA"}},{"type":"Polygon","arcs":[[178,-174,-140,-106]],"properties":{"geo_id":"50","geo_name":"Vermont","geo_name2":"VT"}},{"type":"MultiPolygon","arcs":[[[179]],[[180]],[[181]],[[182]],[[183]],[[184]],[[185]],[[186]],[[187]],[[188]],[[189]],[[190]],[[191]],[[192]],[[193]],[[194]],[[195]],[[196]],[[197]],[[198]],[[199]],[[200]],[[201]],[[202]],[[203]],[[204]],[[205]],[[206]],[[207]],[[208]],[[209]],[[210]],[[211]],[[212]],[[213]],[[214]],[[215]],[[216]]],"properties":{"geo_id":"02","geo_name":"Alaska","geo_name2":"AK"}}],"bbox":[-179.174265,18.917465999999997,-66.949895,71.352561]}},"arcs":[[[98240,47616],[44,37],[23,-104],[-35,-88],[-50,60],[18,95]],[[96315,50325],[41,12],[23,63],[56,-26],[33,-67],[18,-109],[43,-9],[9,71],[4,29],[19,47],[-10,57],[12,67],[-18,45],[40,59],[23,-5],[23,-55],[46,-10],[39,-20],[-1,84],[-35,47],[-43,110],[31,103],[34,65],[52,62],[35,71],[94,69],[56,58],[-28,98],[17,43],[59,86],[63,71],[6,81],[-11,56],[-43,-2],[9,71],[-13,39],[10,80],[36,76],[24,79],[-46,83],[32,115],[20,73],[24,29],[-2,60],[41,57],[38,44],[35,50],[23,36],[28,275],[23,232],[159,343],[225,477],[113,238],[195,395],[57,-12],[43,-29],[61,-26],[-13,-84],[12,-253],[66,-62],[58,-65],[87,71],[114,51],[63,13],[15,61],[72,29],[42,-20],[76,12],[-8,66],[20,54],[82,-3],[58,-27],[46,-49],[62,-80],[76,-103],[41,-42],[56,-147],[89,-101],[0,-517],[1,-368],[5,-615],[2,-460],[0,-191],[27,-38],[-48,-93],[36,-75],[-36,-92],[20,-97],[-19,-101],[82,3],[32,-93],[38,-18],[87,-49],[71,17],[28,-62],[5,-134],[-53,-9],[-6,-86],[51,-149],[-30,-140],[-18,-62],[24,-51],[56,-166],[46,-54],[37,40],[24,84],[60,-37],[38,-16],[43,-97],[19,-83],[8,-75],[44,-171],[44,-69],[-8,-104],[38,-60],[-68,-94],[-42,-50],[-39,-68],[-47,-84],[-57,-48],[-53,-72],[-67,48],[-27,-42],[-44,-4],[-39,-85],[-26,-88],[16,-63],[-68,-91],[-49,111],[-17,74],[-47,-46],[-78,-13],[-39,-58],[-16,-86],[-39,-49],[-33,33],[-38,-46],[-31,6],[-32,-113],[-48,64],[-20,43],[-56,-25],[14,-87],[-17,-41],[-33,-76],[49,-78],[-118,17],[-7,-72],[-15,-171],[-95,16],[-58,-31],[-72,-54],[-30,-117],[-35,-12],[-11,139],[-98,-36],[-85,-62],[-27,99],[-27,102],[41,55],[-56,113],[-79,29],[-12,-119],[-19,-79],[39,-97],[-32,-75],[21,-64],[-29,-62],[-49,4],[-39,2],[-34,-106],[-26,-5],[-33,-75],[-37,-43],[-30,116],[-34,74],[-26,-64],[-14,-26],[-58,-137],[-44,7],[-23,-34],[-65,-37],[-59,-22],[-33,-93],[-47,-30],[-23,-51],[-20,7],[-6,103],[-48,31],[-60,-59],[-16,-64],[-62,6],[-22,-79],[-65,5],[-20,-56],[-23,-93],[9,-75],[-35,-34],[-67,-24],[-36,4],[-21,-80],[52,-55],[-51,-87],[-29,-99],[-44,-39],[-46,7],[-32,-42],[-28,-99],[7,-80],[1,-12],[-18,-111],[-24,-56],[-38,-111],[-34,-31]],[[96654,46042],[-47,38],[-64,94],[3,97],[11,71],[-53,101],[-46,104],[-54,98],[14,102],[7,85],[5,68],[-16,115],[-8,250],[-7,263],[-10,484],[-7,317],[-2,82],[-7,264],[-3,114],[-13,450],[-18,503],[-24,583]],[[20605,1646],[39,71],[27,62],[24,13],[30,57],[20,86],[33,70],[21,27],[6,82],[-22,70],[-36,116],[-11,102],[11,149],[33,31],[49,-33],[55,-60],[29,-59],[60,-74],[35,-54],[35,13],[50,-33],[102,-89],[105,-101],[92,-146],[38,-77],[34,-80],[-4,-151],[3,-92],[37,22],[35,-1],[23,-92],[6,-110],[24,-54],[84,-106],[34,-37],[-1,-56],[-54,-128],[-60,-98],[-69,-97],[-82,-77],[-41,-43],[-42,-14],[-52,25],[-43,-44],[-43,-80],[-26,-15],[-56,-94],[-46,-27],[-45,-130],[-32,-118],[-20,-71],[-22,-55],[-30,-46],[-48,99],[-71,85],[-68,43],[-29,119],[2,153],[9,151],[10,77],[2,94],[-18,129],[-14,73],[-24,62],[-16,133],[-8,99],[-17,66],[-28,14],[-4,37],[-28,117],[13,95]],[[20026,3820],[17,114],[55,91],[50,-23],[40,-117],[33,-108],[69,34],[63,58],[81,-16],[42,-87],[56,-59],[64,-97],[51,-28],[16,-98],[-15,-88],[-37,-63],[-77,-72],[-72,2],[-66,-61],[-83,-34],[-48,37],[-11,111],[-13,153],[-3,33],[-10,71],[-29,16],[-28,-40],[-15,15],[-69,67],[-50,132],[-11,57]],[[20052,3132],[54,65],[38,21],[22,-47],[3,-100],[-42,-31],[-73,-13],[-30,53],[28,52]],[[19706,3806],[44,32],[64,-9],[58,-58],[32,-60],[25,-82],[-26,-106],[-47,-38],[-16,-10],[-53,-9],[-20,78],[-1,97],[-17,53],[-43,58],[0,54]],[[19512,4274],[24,49],[-10,79],[53,-12],[65,-34],[79,-20],[23,18],[27,22],[19,0],[37,-82],[3,0],[68,-2],[88,16],[30,-34],[-27,-90],[-56,-84],[-67,-34],[-68,32],[-65,43],[-48,25],[-81,-21],[-72,-6],[-52,26],[30,109]],[[18661,5085],[95,6],[40,78],[26,83],[52,70],[22,9],[39,-118],[42,-144],[36,-87],[-8,-120],[28,-51],[44,40],[38,-4],[-2,-106],[12,-86],[53,-85],[-19,-56],[-24,-39],[-51,27],[-20,-25],[-27,-14],[-37,51],[-34,42],[-54,12],[-28,6],[-38,-13],[-57,-20],[-13,-1],[-24,89],[-9,55],[-35,59],[-3,49],[-45,110],[2,69],[-42,104],[41,10]],[[17278,6002],[34,63],[14,81],[22,37],[84,80],[27,42],[33,-4],[29,-34],[21,49],[50,-18],[26,24],[36,-35],[44,-59],[17,-115],[-22,-117],[-15,-38],[2,-81],[-4,-91],[-43,-74],[-53,-84],[-73,29],[-42,17],[-26,-1],[-41,80],[-52,52],[-42,31],[-28,79],[2,87]],[[16863,5526],[18,141],[32,64],[50,50],[14,27],[8,62],[36,15],[12,-13],[7,-29],[-17,-33],[-14,-70],[6,-59],[-40,-37],[-29,-17],[-16,-40],[-14,-47],[-14,-82],[-22,20],[-17,48]],[[57433,26320],[13,44],[34,-14],[44,13],[42,12],[35,67],[56,120],[5,108],[-12,41],[-4,93],[-27,98],[-57,24],[-47,-10],[-38,13],[-32,129],[24,103],[1,135],[3,48],[-43,62],[14,68],[0,101],[-16,54],[46,26],[34,8],[6,21],[28,109],[65,117],[-4,104],[3,105],[18,59],[8,50],[-7,79],[-14,128],[13,70],[-3,69],[-23,54],[22,54],[49,103],[17,60],[5,69],[2,27],[20,36],[51,43],[49,62],[57,38],[46,102],[34,37],[-1,88],[-29,75],[-81,107],[-63,93],[-39,1],[0,126],[-39,122],[-38,211],[-23,64],[-76,173],[-52,110],[4,133],[-3,113]],[[57510,30675],[7,127],[5,101],[19,-1],[23,34],[-13,235],[-35,281],[-34,76],[2,143],[8,165],[-32,77],[-7,157],[-6,155],[31,96],[-28,70],[-27,80],[-10,126],[-1,116],[6,64],[62,25],[35,45],[50,20],[53,-1],[22,-41],[35,-6],[28,37],[40,-5],[31,-67],[19,-86],[40,-52],[51,-38],[55,17],[12,54],[34,131],[48,138],[-2,143],[1,108],[-2,531],[-1,756]],[[58029,34486],[76,-1],[890,1],[60,0],[62,0],[254,1],[6,0],[161,0],[842,1],[6,0],[114,-2],[188,4],[282,1],[250,-10],[418,0],[450,3],[401,-1]],[[62489,34483],[0,-237],[0,-1445],[0,-452],[-1,-507],[0,-478],[0,-358],[1,-412],[0,-834],[-1,-1234],[0,-888],[0,-383],[0,-822],[-1,-670],[0,-653],[-1,-548],[-1,-885]],[[62485,23677],[-695,3],[-561,-2],[-548,-2],[-260,177],[-890,603],[-863,570],[-372,246],[-947,620],[2,55],[14,53],[-16,27],[13,55],[-9,45],[40,61],[40,132]],[[75345,33531],[229,0],[253,-1],[105,-1],[82,0],[149,1],[103,0],[140,-1],[100,-1],[19,0],[149,0],[243,0],[13,0],[60,0],[185,0],[31,0],[160,-1],[178,1],[26,0],[120,1],[280,1],[26,0],[172,-3],[38,-1],[2,0],[248,1],[97,1],[208,1],[17,0],[168,0],[73,0],[244,-5],[60,-1],[11,-68],[9,-85],[58,-55],[2,-56],[0,-103],[-46,-71],[-36,-99],[-58,-56],[-13,-86],[-53,-50],[-39,-126],[-27,-98],[71,1],[165,4],[129,1],[52,1],[150,2]],[[79698,32579],[41,-101],[31,-50],[3,-34],[1,-16],[-67,-41],[-6,-49],[5,-73],[-65,-51],[-60,-67],[-46,14],[-36,-114],[51,-85],[20,-46],[-50,-36],[-11,-90],[-12,-36],[-71,17],[-7,-103],[21,-75],[-20,-80],[-23,15],[-37,-25],[22,-89],[-31,-112],[-40,-57],[62,-47],[4,-89],[-6,-74],[8,-88],[-62,20],[-19,-72],[-14,-77],[-60,-20],[-32,-22],[-8,-63]],[[79184,30663],[58,-111],[-5,-58],[-56,-68],[-79,-69],[-55,-1],[-9,-88],[-29,-46],[-36,-119],[-3,-74],[-33,-91],[33,-91],[-17,-82],[-13,-126],[7,-83],[-59,-60],[-17,-92],[-61,54],[-32,-40],[11,-102],[-53,-19],[-25,-83],[-48,-22],[10,-76],[-10,-45],[-39,-23],[-7,-76],[40,-28],[24,-43],[-16,-86],[-45,-17],[-33,-34],[-23,-44],[-38,15],[-36,-45],[47,-33],[8,-69],[-31,-58],[8,-101],[24,-35],[-1,-81],[-52,25],[-24,-4],[-28,-52],[61,-63],[-23,-102],[-69,-18],[42,-77],[-52,-66],[-23,-90],[23,-69],[16,-58],[21,-68],[30,-64],[-25,-85],[15,-131],[35,-12],[16,-78],[-14,-99],[-18,-94],[-44,6],[-24,-70],[54,-83],[-41,-96]],[[78421,26865],[-88,1],[-153,2],[-47,1],[-344,3],[-173,1],[-137,1],[-248,6],[-198,4],[-221,6],[-15,0],[-186,1],[-37,0],[-123,1],[-101,0],[-28,1],[-180,1],[-81,0],[-204,-1]],[[75857,26893],[1,269],[-1,325],[0,201],[0,220],[-26,40],[-63,11],[-36,27],[-27,-41],[-22,12],[-58,-24],[-31,5],[-14,-20],[-30,17],[-28,23],[-59,115]],[[75463,28073],[3,289],[4,289],[2,150],[5,325],[4,324],[4,282],[3,243],[3,179],[5,308],[1,83],[4,245],[7,407],[3,179],[-16,242],[-21,271],[-19,247],[-33,419],[-18,218],[-9,114],[-22,263],[-28,381]],[[92456,39829],[-40,-69],[-16,-97],[-28,-55],[-23,-74],[-22,-33],[14,-65],[28,-34],[-13,-82],[-1,-71]],[[92355,39249],[-58,-36],[19,-77],[45,-97],[14,-33],[33,-76],[54,-126],[12,-145],[-11,-105],[10,-144],[49,-73],[31,-137],[3,-17],[-1,-49],[64,-132],[65,-103],[41,-13],[21,27],[16,-192],[16,-306],[4,-162]],[[92782,37253],[-121,-1],[-139,3],[-123,3],[-191,12],[-6,157],[-7,177],[-13,371],[-23,597],[-7,198],[-10,249],[-19,658]],[[92123,39677],[13,0],[19,68],[32,65],[48,56],[61,25],[22,9],[79,-19],[59,-52]],[[83376,30642],[117,-2],[79,-1],[19,0],[77,3],[11,1],[196,3],[58,1],[3,0],[103,1],[45,0],[31,0],[43,0],[94,1],[101,-1],[166,1]],[[84519,30649],[172,-1],[111,-1],[61,0],[282,-2],[63,5],[59,4],[143,9],[191,9]],[[85601,30672],[-14,-86],[-15,-58],[-54,-77],[-46,-59],[-28,-58],[-35,-64],[3,-57],[-29,-59],[3,-23],[8,-58],[2,-8],[54,-71],[50,-67],[60,-41],[46,-97],[5,-11],[41,-70],[2,-3],[48,-40],[3,1],[58,17],[47,-20],[28,-137],[17,-78],[38,-118],[5,-16],[27,-83],[8,-62],[18,-123],[65,-127],[42,-129],[3,-9],[26,-100],[5,-21],[39,-16],[73,-134],[95,-89],[76,-170],[21,-83],[14,-57],[34,-90],[17,-10],[25,-14],[8,-4],[69,-97],[11,-30],[22,-67],[58,-59],[6,-100],[-12,-128],[78,-76],[-1,-118],[74,-73],[1,-12],[7,-87],[86,-92],[38,-27],[12,-9],[52,-77],[37,-55],[2,-137],[32,-87],[39,-127],[6,-166],[1,-10],[17,-163],[-3,-91],[9,-13],[52,-72],[39,-27],[8,-6],[72,-150],[0,-103],[19,-50],[36,-96],[4,-111],[-22,-74],[5,-20],[25,-95],[5,-122],[67,-55],[28,32],[57,-83],[51,-44]],[[87581,25016],[38,-20],[-4,-69],[-56,-85],[-27,-58],[-53,-107],[-32,-84],[-36,-99],[-48,-73],[-8,-44],[6,-146],[-36,-128],[-3,-74],[-33,-104],[-40,-111],[-18,-102],[16,-90],[-20,-113],[-19,-73],[-57,-133],[-30,-21],[1,-101],[-17,-107],[7,-49],[3,-25],[3,-132],[-31,-166],[-17,-98],[14,-115]],[[87084,22489],[-56,25],[-19,1],[-30,-15],[-64,27],[-31,29],[-57,9],[-28,46],[-40,31],[-54,5],[-30,54],[-36,13],[-46,-79],[-34,-68],[-8,-111],[-7,-70],[30,-103],[-2,-134],[-9,-160],[-12,-84],[1,-64],[-48,-17],[-43,5],[-33,9],[-27,107],[8,95],[-25,89],[10,83],[-179,31],[-36,7],[-111,14],[-94,12],[-167,21],[-227,28],[-158,20],[-43,6],[-127,16],[-100,11],[-117,13],[-69,8],[-166,18],[-68,8],[-37,4],[-143,13],[-85,7],[-84,8],[-301,32],[-46,3],[-48,116],[-14,118],[-1,85],[-43,111],[-20,77],[3,45]],[[83913,23044],[-8,101],[-22,104],[-64,149],[0,138],[16,69],[1,26],[1,25],[-4,79],[23,130],[-5,71],[18,97],[9,48],[-14,50],[-1,94],[-60,143],[6,72],[-20,203],[25,103],[41,141],[4,47],[10,134],[4,48],[-10,93],[54,94],[60,64],[10,23],[25,62],[-57,81],[-47,59],[22,50],[2,31],[8,121],[-31,155],[-56,113],[-17,143],[-23,138],[-41,183],[-21,66],[-43,471],[-4,41],[-51,569],[-18,194],[-21,235],[-20,219],[-23,255],[-11,119],[-20,223],[-7,84],[-30,308],[-11,109],[-25,250],[-9,94],[-19,191],[-24,240],[-19,211],[-11,121],[-9,116]],[[73018,57372],[266,-2],[468,0],[383,0],[566,-2],[19,0],[148,0],[0,355],[0,237],[0,143],[85,-59],[61,30],[33,0],[66,-68],[55,-23],[17,-204],[21,-170],[21,-48],[0,-191],[28,0],[32,-221],[-2,-83],[-8,-97],[67,-99],[98,-71],[56,-14],[14,10],[37,26],[96,-13],[27,-41],[1,-52],[141,-24],[147,-24],[74,-3],[34,-113],[-9,-84],[126,-19],[100,24],[84,32],[3,88],[83,25],[21,41],[125,31],[58,-34],[48,4],[119,9],[54,-70],[148,-106],[83,7],[3,-66],[-23,-79],[73,-50],[54,14],[52,-65],[-12,-119],[48,-107],[42,-144],[48,39],[17,72],[1,87],[29,59],[89,16],[96,-8],[49,-72],[17,-140],[78,-19],[85,-61],[15,-10],[59,-3],[20,-152],[118,-21],[15,-105],[69,26],[115,5],[77,28],[84,107],[107,94],[3,2],[112,89],[56,12],[35,-126],[25,-106],[65,-50],[122,51],[85,-31],[137,-5],[162,16],[95,-47],[50,-128],[93,-58],[106,64],[111,-23],[121,6],[-59,-76],[-94,-45],[-68,-63],[-50,-51],[-116,-56],[-45,-60],[-87,-37],[-103,-63],[-121,-46],[-88,-36],[-103,-61],[-98,-89],[-79,-61],[-118,-129],[-138,-175],[-110,-159],[-103,-195],[-111,-176],[-62,-91],[-104,-94],[-64,-121],[-82,-83],[-62,-94],[-89,-81],[-95,-110],[-44,-57],[42,-186]],[[77664,52996],[-32,8],[-44,46],[-38,-6],[-35,-69],[-20,-58],[-78,-3],[0,-320],[-1,-479],[0,-324],[-40,-42],[-12,-70],[-36,7],[-51,-33],[-20,-55],[-65,-6],[-32,-45],[-67,-42],[-58,-77],[-34,-93],[-15,-86],[-44,-102],[-39,-41],[-16,-145],[6,-125],[71,-21],[39,-10],[26,-61],[37,-101],[35,-66],[-10,-80],[-36,-113],[-56,-99],[-5,-171],[21,-136],[3,-20],[-56,-91],[37,-82],[10,-154],[-16,-167],[-33,-164],[12,-18],[54,-84],[31,-48],[70,-146],[61,-67],[134,-37],[34,1],[39,-38],[3,-2],[20,-100],[41,-60],[12,-17],[108,-60],[23,-17],[108,-82],[42,-83],[21,-166],[34,-65],[34,-63],[87,-67],[64,-124],[66,-71],[13,-5],[105,-43],[15,-33],[59,-128],[60,-123],[3,-11],[38,-141],[-26,-203],[18,-126],[18,-68],[14,-123]],[[78375,46882],[-244,1],[-106,0],[-107,0],[-84,0],[-227,0],[-89,0],[-240,-1],[-93,0],[-283,-1],[-137,0],[-22,0],[-160,0],[-239,-1],[-71,0],[-64,0],[-287,1],[-247,1],[-127,0],[-47,0],[-367,0],[-53,1],[-268,0],[-154,-1],[-88,0],[-310,-1],[-24,0],[-171,1],[-129,0],[-227,0]],[[73710,46882],[0,99],[0,567],[0,662],[1,312],[-1,350],[-2,499],[-1,328],[-1,630],[-22,73],[-35,56],[-36,20],[-50,42],[-51,4],[-32,51],[-28,80],[-34,109],[-56,111],[-7,48],[22,67],[73,90],[64,59],[38,93],[38,67],[14,106],[7,121]],[[73611,51526],[-9,155],[1,10],[16,118],[-36,259],[-5,191],[-41,74],[-55,146],[-32,249],[-41,136],[3,106],[-1,162],[22,257],[-62,186],[13,136],[-7,132],[-12,241],[-16,312],[2,112],[1,139],[-25,147],[-41,183],[-60,190],[-37,169],[-28,177],[-33,125],[-36,147],[1,9],[3,39],[11,122],[-7,165],[-2,164],[-8,194],[0,17],[1,6],[4,76],[38,160],[-19,87],[-28,113],[-30,181],[-37,149],[-1,105]],[[53981,27748],[97,38],[102,-149],[75,-110],[-35,-100],[-44,40],[-81,12],[-15,83],[-72,123],[-27,63]],[[53981,26925],[48,-105],[83,-163],[83,-140],[-64,-40],[-56,83],[-83,167],[-54,162],[43,36]],[[53103,27388],[61,55],[74,-79],[-2,-72],[-31,-24],[-72,34],[-30,86]],[[52803,28875],[52,25],[105,-42],[154,8],[86,1],[25,0],[70,-6],[1,-96],[-26,-11],[-86,3],[-59,3],[-97,-23],[-52,-50],[-66,6],[-69,33],[-3,83],[-35,66]],[[52400,28910],[112,-37],[95,-59],[72,22],[63,-103],[9,-79],[-67,-53],[-65,-36],[-51,62],[-18,55],[-147,66],[-80,69],[77,93]],[[48975,44018],[188,-5],[159,-1],[147,-1],[123,8],[75,5],[78,-5],[104,11],[76,8],[89,-11],[219,1],[266,9],[189,-1],[167,-4],[227,-5],[153,-6],[203,-6],[7,0],[168,1],[193,-8],[138,0],[167,1],[171,0],[284,1],[163,0]],[[52729,44010],[0,-228],[1,-488],[-2,-830],[1,-606],[1,-276],[1,-763],[0,-372],[-1,-323],[-2,-447],[-2,-350],[-3,-472],[2,-240],[1,-101],[0,-86],[1,-129],[86,-127],[282,-417],[2,-3],[229,-341],[44,-65],[109,-163],[185,-278],[400,-610],[65,-101],[361,-560],[168,-262],[137,-213],[388,-616],[70,-113],[147,-235],[457,-741],[100,-165],[252,-414],[179,-297],[41,-69],[177,-294],[217,-366],[90,-152],[128,-217],[103,-176],[214,-367],[152,-262]],[[57433,26320],[-250,-36],[-414,-62],[-518,-83],[-53,-10],[-387,-66],[-77,-14],[-206,-36],[-238,-45],[-11,162],[-28,101],[-25,32],[-44,-37],[-8,59],[0,165],[-23,68],[-1,33],[7,23],[10,-4],[6,19],[1,77],[-23,214],[-31,155],[-42,143],[-74,191],[-91,185],[-43,40],[-44,103],[-62,38],[-10,44],[-78,131],[-24,41],[-77,61],[-65,93],[-79,144],[-39,44],[-46,-32],[-66,-62],[-53,17],[-33,37],[-37,7],[-29,74],[31,57],[-17,152],[-42,162],[-53,111],[-75,22],[-67,-11],[-59,-2],[-53,-59],[-44,63],[-90,27],[-102,80],[-36,8],[-105,128],[-26,99],[-12,75],[-38,44],[-56,86],[-76,101],[-67,41],[-72,49],[-60,-24],[-22,-25],[-68,39],[-45,0],[-34,-13],[-87,68],[-70,32],[-81,23],[-137,-6],[-139,-44],[-54,144],[-34,38],[-28,27],[-37,-6],[-20,52],[39,212],[-12,73],[-10,14],[14,230],[-54,87],[19,136],[14,110],[4,86],[-6,87],[-35,56],[-34,44],[-38,-30],[-80,84],[-45,83],[15,88],[16,127],[-20,132],[-64,45],[-42,14],[-99,211],[-47,122],[-94,59],[-37,89],[-16,133],[-67,118],[-49,78],[-21,162],[-41,84],[-38,20],[-42,142],[-52,126],[-89,118],[-41,27],[-56,117],[-13,173],[-34,175],[-26,185],[42,99],[56,-44],[41,136],[16,181],[5,72],[-19,66],[-44,156],[-40,71],[-40,5],[-67,-39],[-71,9],[-89,111],[-48,112],[-22,55],[-34,26],[-19,55],[-47,82],[-19,117],[11,127],[4,42],[-7,72],[-30,117],[-3,48],[-42,59],[-21,55],[-1,105],[19,69],[0,141],[-13,162],[41,57],[60,9],[12,-29],[7,-99],[18,-18],[-4,-27],[-28,-14],[29,-220],[103,-65],[68,-103],[35,32],[15,15],[-29,101],[-7,112],[-9,52],[-46,59],[-32,53],[-2,54],[-54,42],[-18,63],[26,38],[-27,150],[-40,-6],[-41,96],[51,43],[-1,56],[23,3],[19,2],[53,78],[-35,103],[-82,73],[-87,-68],[-7,-144],[41,-69],[-32,-56],[2,-86],[34,-54],[27,-78],[-58,-49],[-48,7],[-57,85],[-69,60],[-21,-24],[-47,79],[-38,79],[-52,76],[-74,29],[-31,-75],[-33,21],[45,209],[6,119],[-30,118],[1,68],[-16,46],[-44,4],[-13,69],[-15,105],[-72,161],[-75,69],[-73,104],[-16,59],[-82,197],[-65,80],[-51,108],[-59,87],[-19,54],[-45,78],[-20,80],[37,126],[-27,198],[-40,131],[-29,148],[-24,171],[10,163],[43,203],[-14,131],[-9,119],[-33,74],[-20,208],[-50,59],[-42,113],[-72,174],[-30,15],[-16,109],[-47,72],[-43,27],[-63,103],[-75,114],[-18,32],[9,135],[-11,82],[-39,121],[20,128],[76,295],[111,350],[52,278],[-6,113],[-26,74],[-8,98],[36,97],[28,187],[26,290],[-17,206],[-31,155],[-24,153],[-10,38],[-32,13],[-49,108],[23,103],[15,180],[-8,110]],[[90937,38174],[70,117],[34,-57],[83,-139],[-62,-105],[-53,-88]],[[91009,37902],[0,146],[-46,69],[-26,57]],[[86756,10778],[54,161],[70,88],[79,71],[12,37],[113,109],[124,-111],[55,-155],[-88,-69],[-54,-27],[-37,37],[-66,-41],[-69,-54],[-80,-66],[-114,-25],[1,45]],[[86575,10729],[28,71],[102,7],[-44,-164],[-98,1],[12,85]],[[86421,10789],[39,91],[51,-62],[-12,-108],[-70,-7],[-8,86]],[[87084,22489],[15,-22],[-14,-185],[8,-150],[4,-31],[3,-18],[13,-28],[13,-271],[20,-166],[76,-644],[16,-61],[8,-117],[5,-71],[41,-218],[42,-220],[54,-244],[50,-227],[72,-305],[52,-160],[107,-360],[53,-161],[72,-216],[56,-153],[53,-263],[-56,-93],[-17,-142],[2,-150],[13,-152],[38,-247],[89,-359],[57,-229],[47,-272],[12,-77],[57,-338],[49,-223],[40,-179],[13,-110],[19,-75],[31,-194],[32,-212],[7,-87],[4,-61],[2,-20],[-3,-182],[0,-59],[0,-62],[-3,-82],[-10,-114],[-10,-158],[-13,-202],[-9,-137],[-21,-309],[-8,-327],[3,-79],[1,-3],[4,-103],[-13,-106],[-28,-186],[-19,37],[-47,91],[-32,-141],[-32,-86],[-11,-142],[-21,-140],[24,-145],[67,62],[53,189],[11,-132],[-67,-239],[-107,-331],[-123,-293],[-138,-254],[-280,-302],[-123,-73],[-40,78],[98,118],[170,151],[211,296],[84,169],[15,117],[4,82],[-42,13],[-96,-33],[-54,-70],[-33,-10],[-57,74],[-57,-23],[-36,-63],[-83,-30],[-63,-12],[-55,122],[-26,120],[21,166],[1,142],[-55,186],[-29,179],[-44,143],[-59,57],[-25,139],[-78,77],[-127,147],[-52,-71],[-48,96],[-27,178],[-46,289],[-32,335],[-71,208],[-29,30],[-51,-1],[-54,-57],[-46,27],[-49,76],[-57,238],[-17,186],[0,111],[-45,194],[-49,167],[-74,255],[-57,245],[-21,88],[-63,180],[-33,78],[-39,91],[-46,179],[21,-4],[62,-11],[58,139],[29,94],[34,115],[33,33],[40,86],[-14,80],[-37,24],[-57,49],[-29,-60],[-32,-71],[-3,-89],[-24,-62],[-47,-143],[-25,-24],[-5,125],[-7,101],[-39,115],[-50,119],[5,158],[11,156],[0,3],[-20,157],[-8,136],[86,134],[29,154],[30,182],[6,25],[23,97],[7,115],[-10,148],[0,140],[-39,48],[-1,152],[-15,95],[37,105],[-32,92],[-31,101],[-1,91],[-57,85],[23,30],[-26,84],[-89,20],[-61,17],[-18,-100],[-33,10],[-23,126],[4,97],[-29,40],[-56,41],[-5,104],[-24,95],[-34,74],[-48,9],[-12,59],[-83,103],[-4,138],[-8,143],[-62,54],[-48,46],[-40,123],[-38,133],[-48,117],[-97,112],[-128,118],[-61,109],[-56,10],[-55,-21],[-48,-33],[-26,22],[-73,-52],[-68,-93],[22,-89],[0,-2],[7,-71],[-14,-51],[-66,12],[-42,41],[-58,-28],[-37,-42],[11,-148],[-35,-47],[-79,-43],[-75,-136],[-89,-69],[-150,-131],[-100,106],[-91,74],[-83,-41],[-45,188],[-12,160],[28,150],[-36,55],[-55,22],[-75,124],[-26,57],[-86,77],[-102,156],[-168,176],[-80,62],[-118,77],[-156,64],[-13,6],[-197,30],[-149,-22],[-45,-7],[-61,-23],[-210,-78],[-101,-24],[-46,5],[-89,-40],[-88,-32]],[[81671,21670],[59,122],[18,112],[58,64],[-42,40],[-27,95],[12,82],[27,103],[0,101],[-37,67],[-72,87],[-17,56],[-83,188],[39,163],[-7,88],[71,0],[84,1],[101,1],[133,1],[209,-3],[86,0],[41,-1],[87,-2],[111,-2],[156,-1],[21,0],[158,-1],[136,0],[126,-1],[128,4],[152,3],[72,2],[9,0],[138,3],[167,2],[102,0],[26,0]],[[55476,51640],[-24,125],[-35,46],[42,110],[10,54],[-35,55],[-1,102],[-29,95],[-59,97],[25,107],[-4,118],[0,1302],[-1,403],[-1,705],[0,461],[0,130],[1,152],[5,568],[1,446],[1,362],[0,291]],[[55372,57369],[246,1],[302,1],[328,1]],[[56248,57372],[0,-951],[0,-40],[1,-327],[0,-179],[0,-173],[-1,-239],[10,-29],[7,-22],[63,-143],[53,-105],[49,-54],[9,-103],[99,-122],[-11,-80],[38,-60],[-24,-90],[3,-83],[74,-97],[-52,-47],[-16,-75],[118,-97],[41,-101],[55,-56],[88,-37],[40,-18],[31,-88],[32,-67],[60,-83],[61,-133],[44,-75],[35,-96],[63,-74],[30,-35],[-14,-89],[56,-107],[80,-63],[21,-76],[61,3],[19,-16],[45,-36],[5,-105],[27,-10],[39,-16],[84,9],[82,38],[22,-26],[14,-16],[-10,-132],[-18,-133],[-46,-18],[17,-166],[-34,-47],[-8,-145],[-9,-71],[-7,-70],[3,-120],[-61,-12],[-6,-81],[54,-54],[-18,-127],[35,-80],[35,-51],[-10,-96],[22,-55],[-31,-52],[-83,-37],[-41,-107],[52,-110],[4,-101],[-32,-35],[-2,-84],[13,-41],[15,-50],[44,-29],[79,-97],[80,-23],[24,109],[58,14],[92,112],[61,95],[-1,81],[40,8],[20,-34],[44,-73],[34,-40],[49,-41],[3,-150],[38,-81],[-3,-101],[28,-82],[-3,-114],[76,-172],[67,-203],[57,-54],[53,-78],[12,-100],[-10,-102],[-22,-81],[46,-130],[40,-15],[68,-68],[48,45],[103,-111],[27,-107],[46,-151],[-10,-99],[48,-112],[0,-89],[50,-105],[62,-70],[49,48],[4,4],[-5,67],[83,108],[24,7],[94,-23],[115,-21],[76,-61],[26,154],[65,76],[57,-48],[86,-28],[81,17],[146,51],[56,-100],[92,92],[78,-6],[48,-3],[39,53],[45,183],[10,32],[17,47],[48,66],[7,-7],[47,-51],[49,-108],[40,-85],[20,-91],[52,-76],[18,-81],[66,-37]],[[60704,48739],[0,-189],[0,-496],[1,-251],[1,-143],[0,-420],[1,-357],[1,-353],[0,-464],[1,-667],[-2,-398],[-1,-314],[0,-663]],[[60706,44024],[-292,-2],[-86,-2],[-33,0],[-216,-1],[-320,-3],[-44,2],[-95,5],[-341,-2],[-314,-4],[-222,-4],[-220,-5],[-286,-9],[-200,10]],[[58037,44009],[-214,1],[-282,0],[-268,11],[-124,-3],[-245,-5],[-278,3],[-218,-1],[-412,1],[-261,0],[-350,4],[-7,1]],[[55378,44021],[0,722],[0,818],[-1,415],[0,1089],[1,160],[2,274],[34,109],[9,28],[14,166],[20,89],[-36,107],[71,128],[2,3],[-6,48],[-56,28],[-6,79],[-78,3],[-55,77],[-44,-35],[-41,56],[4,15],[18,62],[-22,60],[-23,59],[25,69],[-10,99],[52,84],[22,65],[43,180],[29,144],[43,56],[73,58],[38,102],[21,57],[28,112],[-22,95],[16,99],[51,88],[0,1],[26,69],[52,269],[5,27],[14,86],[77,246],[76,236],[35,93],[-57,126],[-7,100],[-51,85],[-65,6],[-63,85],[-45,26],[-65,128],[-24,98],[-26,70]],[[78195,40928],[42,40],[-7,101],[11,111],[-24,46],[18,92],[31,58],[82,48],[54,-2],[2,1],[57,67],[2,51],[3,48],[21,104],[-1,79],[43,91],[53,83],[29,80],[7,124],[-11,175],[-36,99],[-39,6],[-36,93],[-29,67],[36,160],[0,1],[2,10],[6,57],[33,103],[55,13],[37,-14],[51,48],[72,9],[76,4],[74,58],[42,59],[52,6],[46,8],[40,75],[46,32],[22,36],[3,126],[19,58],[3,64],[1,26],[55,72],[6,5],[55,56],[-1,62],[15,75],[6,88],[1,16],[15,110],[-21,85],[2,126],[-41,81],[-55,49],[-61,54],[-56,69],[-27,74],[12,80],[-26,71],[-63,87],[-43,68],[-22,17],[-50,47],[3,69]],[[78887,44990],[183,-2],[10,0],[181,1],[264,-4],[80,-1],[306,-7],[82,-2],[32,-1],[288,-7],[45,-1],[46,0],[146,-3],[62,-1],[178,3],[181,1],[78,0],[15,0],[269,-5],[87,-2]],[[81420,44959],[-3,-136],[-15,-113],[-13,-114],[1,-7],[30,-172],[1,-3],[35,-103],[16,-46],[47,-88],[6,-12],[12,-89],[31,-183],[8,-50],[1,-5],[11,-21],[-2,-17],[-2,-25],[6,-49],[19,-66],[1,-4],[5,-17],[19,-64],[26,-34],[6,-47],[0,-30]],[[81666,43464],[-1,-340],[-1,-442],[0,-252],[0,-269],[0,-28],[0,-219],[0,-686],[-3,-543],[-2,-456],[-1,-662],[1,-109],[0,-249],[0,-14],[0,-232],[-41,-15],[-20,-52],[5,-102],[1,-23],[15,-69],[-57,-85],[2,-17],[12,-106],[47,-85],[-6,-107],[44,-56],[2,-123],[-18,-61],[11,-44],[12,-49],[20,-132],[-41,-152],[-66,-73],[-16,-97],[-21,-91],[6,-55],[-53,-62],[-24,-84],[-35,-123],[-46,-122],[-68,-73],[-54,-60],[-6,-75],[43,-88],[-31,-99],[-24,-85],[-37,-47],[12,-132],[-21,-133],[-24,-68],[35,-109]],[[81217,36009],[-28,-108],[-65,-86],[-25,-82],[25,-152],[1,-3],[53,-84],[5,-47],[4,-31],[-85,-40],[-111,-28],[-68,-91],[-54,33],[-42,-41],[-19,-116],[-25,-93],[39,-135],[42,-134],[-18,-98],[-28,-58],[-50,-2],[-71,87],[-73,54],[-53,26],[-73,80],[-86,59],[-62,-6],[-51,-68],[-36,-91],[-62,-127],[1,-4],[34,-104],[-3,-68]],[[80233,34451],[-56,15],[-56,49],[-90,51],[-22,116],[-64,162],[-13,124],[-42,55],[20,82],[19,19],[40,40],[2,98],[-40,113],[-37,121],[10,55],[3,21],[4,20],[-11,85],[-14,136],[-62,52],[-68,69],[-26,104],[-76,78],[-61,93],[-65,-63],[-45,92],[17,91],[-48,6],[-64,87],[-40,67],[-83,83],[-30,64],[-62,103],[-37,104],[-8,166],[20,103],[6,13],[3,6],[46,97],[15,110],[9,43],[5,24],[6,26],[57,128],[4,91],[-13,54],[-13,73],[38,88],[1,1],[43,63],[4,83],[-84,94],[-20,23],[-61,24],[-87,70],[-64,4],[-29,-98],[-49,-76],[-36,8],[-55,86],[-17,122],[-33,133],[29,89],[-24,96],[-20,200],[-98,162],[-86,115],[-90,91],[-23,88],[-33,84],[-42,13],[-23,88],[-91,141],[-27,39],[-55,82],[3,56],[3,55],[-33,64],[-34,47],[7,119],[-8,73],[-41,139],[-13,113],[-12,176],[5,57],[8,92],[4,40],[20,100],[45,107]],[[78375,46882],[-13,-94],[19,-60],[10,-32],[-7,-56],[47,-74],[42,-40],[44,-114],[-26,-61],[-42,-91],[-36,-75],[0,-104],[0,-79],[14,-98],[3,-22],[16,-138],[35,-75],[25,-169],[47,-107],[68,-68],[40,-18],[39,-18],[97,-37],[38,-37],[25,-95],[27,-130]],[[78195,40928],[-70,45],[-19,59],[-40,54],[-39,74],[-10,75],[-46,22],[-13,54],[-39,66],[-187,-14],[-214,-11],[-153,-6],[-92,-4],[-164,-8],[-43,-3],[-25,0],[-202,-4],[-139,-7],[-34,-2],[-187,-4],[-26,-1],[-163,-1],[-36,0],[-157,-4],[-60,-1],[-155,-6],[-68,-2],[-125,-2],[-70,-1],[-143,-1],[-56,0],[-88,2],[-167,4],[-85,2],[-137,4],[-119,3],[-118,2],[-35,1],[-142,4],[-207,6]],[[74322,41323],[16,34],[-30,95],[-57,56],[-38,103],[48,89],[-6,119],[27,79],[-24,72],[8,91],[-33,86],[1,67],[1,59],[-4,78],[6,68],[4,51],[-47,-5],[-2,102],[19,77],[-31,84],[-3,91],[1,38],[5,126],[-54,27],[-20,141],[-67,-30],[-10,63],[-24,100],[6,105],[3,15],[18,87],[21,135],[-39,90],[-45,133],[23,123],[-81,92],[-44,47],[4,126],[-70,102],[9,91],[1,8],[0,88],[-64,138],[-3,140],[27,97],[-57,55]],[[73717,44956],[-29,37],[-14,14],[15,74],[-45,163],[-58,89],[-29,71],[2,103],[40,92],[35,97],[-3,84],[37,70],[-18,35],[25,53],[-17,66],[47,53],[6,28],[11,60],[-17,56],[-15,148],[-42,0],[-27,50],[-23,84],[43,17],[5,90],[3,73],[-65,93],[9,67],[-13,59],[130,0]],[[81217,36009],[52,-33],[30,15],[29,54],[-31,101],[12,55],[3,16],[44,25],[57,-88],[75,32],[10,-17],[28,-51],[49,-8],[16,89],[51,51],[58,-10],[33,26],[27,21],[77,-70],[25,-28],[30,-34],[14,-16],[67,-49],[38,-65],[28,-76],[43,114],[13,91],[29,85],[29,12],[44,17],[47,69],[55,48],[3,2],[27,-78],[52,-121],[57,-45],[10,-8],[28,-23],[14,102],[80,-7],[-14,125],[3,133],[30,11],[15,4],[33,78],[1,1],[41,71],[28,20],[31,23],[38,-93],[64,-146],[99,-25],[55,-73],[33,40],[19,23],[21,22],[26,26],[16,157],[8,131],[1,17],[49,98],[21,82],[19,-10],[39,-19],[60,53],[33,90],[11,68],[11,74],[30,63],[80,34],[22,69],[36,37],[0,1],[16,42],[-18,99],[-3,117],[-9,103],[43,43],[53,-4],[8,2],[51,12],[33,-36],[32,-48],[13,-18],[36,15],[67,88],[45,32],[53,37],[94,23],[39,-8],[9,124],[4,16],[11,44],[-40,28],[-42,45],[40,78],[-15,75],[-42,98],[32,49],[36,53]],[[84075,38501],[62,79],[33,-28],[33,-65],[49,-38],[13,-10],[50,50],[40,4],[6,1],[5,1],[12,27],[17,10],[15,-14],[11,-58],[28,-72],[66,-36],[5,-13],[21,-59],[9,-65],[49,-144],[-1,-72],[7,-24],[12,-46],[69,-31],[73,-34],[1,-1],[65,30],[45,-23],[21,-14],[47,-31],[16,-67],[45,-39],[10,-72],[59,-38],[24,-15],[29,22],[3,3],[15,69],[83,43],[83,-62],[57,-15],[50,-74],[30,-45],[20,27],[22,29],[60,-16],[38,38],[15,60],[63,70],[10,16],[17,26],[61,25],[48,24],[6,-27],[10,-45],[2,-76],[16,-141],[35,-61],[10,-18],[68,-10],[43,-81],[11,-14],[40,-59],[22,-105]],[[86059,37197],[-3,-147],[23,-55],[-9,-129],[-15,-90],[-25,-127],[69,-136],[75,-165],[-20,-114],[61,-85],[18,-56],[26,-79],[38,-75],[6,-31],[22,-114],[62,-63],[75,-111],[69,-96],[86,-13]],[[86617,35511],[-208,-310],[-96,-144],[-41,-66],[-84,-41],[-97,-84],[-6,-7],[-144,-160],[4,-103],[-26,-65],[-57,-32],[-48,-63],[3,-102],[-26,-74],[-105,-66],[-56,6],[-35,-104],[-19,-101],[-89,-31],[-134,-76],[-45,-39],[-80,-1],[-78,-61],[-54,-63]],[[85096,33724],[-14,-35],[-182,8],[-83,6],[-213,4],[-31,2],[-212,7],[-248,12],[-7,1],[-141,17],[-27,4],[-108,15],[-161,7],[-13,1],[-130,-16],[-46,-6],[-217,10],[-50,3],[-76,3],[-91,10],[-95,10],[-110,10],[-184,17],[-85,8],[-39,-27],[-49,27],[-140,-7],[-44,-2],[-221,-5],[-48,-1],[-197,-5],[-11,-1],[-261,-6],[-47,-2],[-142,-7],[3,58],[-144,25],[-53,2],[13,-91],[20,-150],[-15,-98],[-68,-3],[-323,5],[-20,0],[-4,0],[-268,1],[-131,1],[-220,6],[-120,-8],[-64,-4],[-109,-2]],[[79870,33528],[-28,76],[24,70],[58,-16],[63,-7],[27,114],[45,3],[3,0],[40,-88],[46,-16],[26,107],[20,49],[10,21],[-33,104],[40,75],[1,58],[0,5],[7,111],[25,85],[15,101],[4,25],[-30,46]],[[78421,26865],[28,-45],[56,-82],[1,-94],[-60,-75],[-21,-70],[3,-69],[40,-69],[50,-28],[-37,-76],[17,-162],[22,-41],[5,-10],[0,-2],[34,-107],[-44,-8],[7,-141],[77,-26],[-18,-139],[58,-19],[-24,-112],[-38,-131],[-105,-12],[62,-191],[4,-14],[-40,-96],[-1,-52],[-33,-69],[-53,-26],[-4,-102],[-47,-82],[-50,-83],[-49,18],[-13,-83],[35,-98],[2,-5],[-56,-25],[-13,-168],[-60,-45],[5,-63],[18,-79],[-46,-22],[-25,-69],[6,-113],[-20,-93],[-3,-99],[24,-89],[-49,-57],[-51,11],[-20,-63],[48,-78],[-28,-108],[24,-87],[31,-80],[-69,-96],[368,0],[43,0],[103,0],[209,1],[60,0],[170,1],[18,0],[178,0],[2,0],[77,1],[322,2],[55,1],[96,0],[-19,-170],[-38,-177],[-39,-178],[9,-111],[4,-47],[27,-177],[70,-141],[11,-45],[19,-76],[40,-202],[24,-173],[74,-70]],[[79884,21480],[-72,-72],[-46,-47],[-24,-81],[-88,-58],[-56,-51],[-7,-126],[51,-35],[46,-32],[38,-83],[48,-20],[44,34],[21,195],[72,110],[44,38],[91,-4],[35,62],[62,83],[45,27],[-3,-163],[-26,-134],[-14,-130],[-5,-92],[-50,-141],[19,-89],[-114,27],[-4,-169],[-55,-58],[-35,-38],[-27,32],[-60,-73],[34,-127],[-5,-94],[34,-114],[44,-54],[91,-27],[61,-8],[48,-97],[51,14],[59,-124],[16,-114],[81,-8],[10,-92],[-46,-146],[-45,-31],[-29,-85],[6,-73],[-68,59],[-36,69],[-56,-92],[-70,-146],[-3,159],[38,104],[-26,99],[-38,49],[-44,126],[-73,52],[-38,18],[-29,73],[-77,26],[-104,28],[-36,-22],[-65,-102],[-91,-133],[-57,-75],[-90,-113],[-100,-41],[-96,-15],[-40,5],[-146,-2],[-86,-33],[-57,4],[-49,26],[-9,93],[-57,110],[-52,14],[-84,34],[-57,58],[-108,57],[-50,97],[52,59],[10,60],[-61,58],[-26,56],[14,45],[-42,100],[-59,-51],[-22,55],[-40,62],[-6,66],[-4,54],[-52,70],[-39,-1],[18,131],[-39,89],[-62,7],[-63,-47],[-40,-42],[-18,-144],[62,-60],[82,-51],[-51,-150],[-47,-32],[-84,85],[-102,104],[-31,24],[-84,-7],[-83,-81],[-63,-15],[-77,31],[-57,25],[-84,32],[-44,22],[-60,30],[-174,144],[-101,83],[-85,48],[-79,41],[-106,9],[-103,-15],[-113,-8],[-181,-51],[-51,-41],[-35,-47]],[[76040,20545],[-22,64],[-25,72],[-34,79],[50,93],[18,39],[20,42],[20,115],[59,128],[31,58],[2,4],[2,111],[-1,117],[-9,98],[2,36],[4,60],[-48,104],[14,128],[6,10],[32,52],[-7,146],[-17,74],[40,91],[-1,62],[49,104],[11,112],[43,123],[10,127],[4,15],[21,90],[-17,81],[9,79],[7,82],[-8,147],[5,109],[-60,-6],[-10,146],[-55,80],[6,141],[-26,102],[-46,76],[21,68],[-55,44],[-42,113],[16,69],[12,149],[-45,200],[-50,167],[-60,63],[-58,126],[0,278],[0,430],[-1,383],[0,867]],[[91894,36441],[34,21],[25,-60],[-5,-128],[-55,30],[1,137]],[[88837,39675],[75,0],[309,3],[102,0],[109,0],[76,0],[306,0],[33,0],[217,-1],[21,0],[274,-2],[267,-2],[8,0],[196,0],[20,0],[194,0],[8,0],[181,2],[64,0],[130,0],[134,0],[160,1],[6,0],[87,0],[288,1],[21,0]],[[92782,37253],[-32,-242],[-16,-25],[-36,-173],[-30,-173],[-15,-65],[-43,-131]],[[92610,36444],[-340,-63],[-41,-83]],[[92229,36298],[-47,40],[-55,2],[-68,-103],[-29,-3],[-5,110],[37,122],[-1,41],[-5,78],[-65,44],[-5,120],[70,26],[-22,78],[-50,14],[-84,11],[6,-128],[18,-125],[6,-86],[-39,19],[-41,73],[6,129],[-42,75],[-73,140],[-36,37],[7,71],[-27,78],[-50,170],[53,95],[-12,52],[10,77],[43,8],[25,-6],[33,-1],[-8,120],[-23,-4],[-34,80],[-32,0],[-43,-64],[-22,13],[6,84],[-44,51],[9,60],[62,16],[35,105],[46,-75],[26,33],[-13,120],[1,68],[-42,0],[-60,-33],[-14,-97],[-37,-19],[12,169],[36,129],[18,63],[33,-21],[29,-19],[-1,139],[-12,53],[-28,50],[31,129],[29,108],[29,55],[17,71],[43,69],[44,30],[18,12],[31,39],[-5,74],[-44,-2],[-76,-90],[-69,-100],[-65,-98],[-47,-100],[-41,-33],[-26,-49],[-34,0],[-31,-2],[-25,-51],[87,-88],[6,-96],[1,-75],[24,-59],[-49,-54],[-20,-51],[19,-29],[-17,-64],[-19,-43],[-24,-64],[24,-24],[-33,-99],[-28,-58],[29,-61],[-3,-116],[16,-91],[-5,-146],[22,-108],[37,-77],[51,-101],[6,-54],[-14,-95],[25,-29],[-16,-108],[35,-117],[30,-76],[-10,-74],[8,-120],[-45,82],[-52,76],[-45,-7],[-53,71],[-45,117],[-73,38],[-60,2],[-58,32],[-52,32],[-52,81],[-47,69],[-24,142],[-13,45],[-53,-40],[-42,-27],[-78,-57],[-44,105],[12,196],[56,119],[49,26],[-1,39]],[[90928,37603],[-2,74],[41,60],[6,8],[23,1],[11,54],[0,16],[2,74],[0,12]],[[90937,38174],[-24,57],[-50,7],[-42,35],[1,78],[-55,48],[-44,19],[-91,27],[-17,56],[-35,29],[-1,77],[32,46],[23,63],[-33,62],[-50,54],[-31,43],[-70,29],[-47,8]],[[90403,38912],[-24,61],[5,92],[-52,142],[-22,95],[-6,117],[-85,39],[-72,-12],[-68,133],[-127,-23],[-78,-53],[-63,-17],[-49,-112],[-20,-71],[-116,8],[-57,27],[-46,21],[-29,103],[-28,55],[-72,-161],[-81,-142],[-13,-75],[-70,63],[-50,-2],[-67,-136],[-85,-142],[-19,-32],[-63,-60],[-63,-95],[-55,-43],[2,264],[2,357],[5,362]],[[84257,51448],[88,-126],[87,-55],[57,-53],[-34,-84],[-80,6],[-92,144],[-57,101],[31,67]],[[83290,51146],[44,13],[114,166],[146,-24],[-15,-92],[-118,-329],[-46,-47],[-55,27],[-66,212],[-4,74]],[[82901,49824],[84,222],[49,-16],[31,-61],[-20,-107],[-93,-139],[-66,24],[15,77]],[[85293,43511],[-117,-8],[-159,-10],[-104,-6],[-226,-14],[-202,-11],[-69,-4],[-328,-17]],[[84088,43441],[0,122],[-17,0],[-331,0],[-32,0],[-53,0],[-328,-1],[-117,-1],[-242,1],[-145,1],[-246,-1],[-20,0],[-103,0],[-165,1]],[[82289,43563],[117,144],[85,158],[86,317],[32,95],[89,207],[9,21],[64,268],[6,47],[33,231],[10,170],[2,30],[17,224],[-6,231],[-10,199],[-26,182],[-17,67],[-38,146],[-81,273],[-37,179],[-27,159],[-45,149],[-10,97],[27,103],[59,139],[8,92],[4,40],[-15,148],[-14,101],[-34,97],[-11,69],[50,78],[25,39],[34,103],[4,10],[32,96],[74,221],[15,107],[2,156],[11,67],[14,93],[-29,155],[5,97],[78,56],[64,25],[9,70],[11,83],[7,170],[70,-9],[43,119],[69,-58],[66,76],[30,140],[58,79],[43,149],[73,76],[18,-64],[-31,-255],[10,-31],[31,-102],[40,33],[39,49],[45,56],[12,106],[-12,151],[3,51],[5,121],[68,86],[88,85],[90,4],[36,2],[86,23],[41,64],[-61,38],[-53,14],[-61,162],[-9,90],[51,135],[81,89],[-39,141],[132,-16],[84,71],[36,-16],[12,-6],[147,-151],[82,-88],[43,33],[75,-10],[105,-73],[14,-9],[62,-123],[27,-114],[87,-11],[79,-11],[60,-96],[129,-74],[87,-84],[99,7],[92,-156],[-18,-90],[18,-38],[62,-128],[44,-216],[-66,28],[-52,55],[-39,-37],[6,-97],[-3,-113],[77,-104],[29,-11],[4,-42],[17,-191],[18,-131],[-34,-154],[-3,-234],[-17,-292],[-58,-59],[-36,-70],[-73,-7],[-39,-202],[-14,-189],[-85,-39],[-12,-91],[-85,-6],[-72,-47],[-37,-129],[-17,-221],[-16,-80],[34,-119],[82,2],[77,-96],[28,-42],[14,-21],[137,245],[16,28],[5,22],[24,92],[42,175],[23,66],[111,35],[18,67],[113,38],[79,43],[19,56],[86,46],[121,-88],[74,-143],[68,-223],[19,-174],[5,-94],[11,-208],[48,-304],[15,-375],[15,-108],[18,-127],[63,-185],[-12,-102],[-36,-123],[2,-239],[-38,-238],[-66,-159],[-85,-60],[-24,188],[59,77],[-60,27],[-83,-88],[31,-56],[9,-68],[-92,-43],[-10,-173],[-48,-189],[-58,-37],[-96,-81],[-17,-113],[-16,-107],[0,-165],[-46,-69],[-28,-121],[-47,-95],[-50,-26],[-14,-86],[-49,-52],[-40,-84],[15,-130],[-26,-15]],[[80154,55288],[37,51],[144,110],[69,52],[42,29],[69,42],[78,86],[86,88],[76,51],[108,68],[-2,-84],[-109,-123],[-26,-117],[-124,-87],[-120,-57],[-41,-123],[-130,-86],[-101,-60],[-39,50],[-47,49],[30,61]],[[79087,52729],[81,79],[80,32],[171,84],[114,137],[30,49],[47,73],[99,50],[70,-10],[64,13],[63,18],[75,5],[167,131],[76,137],[101,31],[62,14],[23,48],[8,17],[32,111],[66,78],[103,121],[102,71],[64,84],[11,14],[73,148],[119,98],[60,50],[118,39],[139,18],[114,-10],[108,-34],[79,-60],[-12,-68],[-174,7],[-126,-4],[-2,-103],[-65,-57],[-71,-85],[-87,-100],[-41,-133],[-89,-112],[-41,-145],[-47,-119],[-15,-36],[-20,-139],[94,42],[114,109],[90,71],[70,-92],[18,-2],[129,-15],[110,-63],[80,-67],[82,-112],[19,-119],[63,-139],[108,-129],[13,-138],[171,-19],[52,16],[125,39],[65,-115],[83,-31],[54,56],[48,145],[61,-41],[62,-88],[87,123],[243,194],[44,36],[128,2],[116,24],[21,5],[320,-16],[200,139],[17,4],[58,15],[186,18],[-57,-186],[1,-232],[51,-148],[107,-30],[153,52],[63,-59],[102,-31],[28,50],[37,66],[113,-16],[89,90],[67,-43],[-6,-90],[-12,-187],[36,-221],[-9,-29],[-6,-128],[79,-81],[46,-95],[82,-76],[59,127],[86,-14],[108,-21],[105,-179],[-41,-148],[-50,-5],[-67,56],[-127,-15],[-98,54],[-151,9],[-31,-5],[-125,-23],[-108,-46],[-93,88],[-77,-58],[-59,7],[-90,-84],[25,-112],[-77,20],[-111,137],[-77,144],[-132,85],[-102,29],[-103,31],[-142,-5],[-96,-183],[-43,-45],[-101,38],[-49,-62],[-43,-54],[-141,88],[-184,-44],[-63,-206],[-81,-140],[-90,-101],[-68,-166],[-17,-150],[-68,131],[7,153],[51,79],[-112,150],[-58,-169],[-112,-95],[-95,88],[-90,-109],[-73,-213],[-31,-92],[-56,-179],[-101,-257],[-75,-156],[-37,-183]],[[81607,49924],[-51,21],[-42,84],[-42,89],[27,92],[39,135],[9,100],[-44,29],[-39,-55],[-44,-3],[-56,-1],[6,77],[8,97],[37,55],[1,99],[16,95],[8,66],[-42,84],[39,39],[-21,57],[-67,98],[-78,17],[-25,60],[-47,-25],[-51,31],[-26,44],[54,103],[-37,89],[-56,47],[-60,31],[-57,-7],[-63,61],[-26,-23],[-104,79],[-60,-11],[-17,-47],[-40,-2],[-19,46],[-54,26],[-64,-11],[-108,97],[-52,46],[-90,80],[-487,201],[-259,107],[-170,71],[-34,159],[-51,152],[-63,36],[-41,65],[-49,-37],[-28,62]],[[79870,33528],[17,-69],[-19,-80],[28,-79],[-11,-64],[-69,-4],[-10,-64],[51,-60],[-43,-76],[-67,20],[-13,-45],[58,-75],[3,-5],[28,-90],[-45,-61],[-33,-41],[-11,-118],[-36,-38]],[[75345,33531],[0,215],[0,294],[0,443]],[[75345,34483],[0,308],[0,340],[0,49],[0,89],[0,517],[3,583],[0,94],[1,44],[1,339],[0,457],[0,134],[3,363],[0,5],[0,203],[1,257],[0,118],[0,133],[14,79],[-28,3],[-51,53],[-54,-27],[-52,68],[-23,68],[-28,62],[-45,95],[17,131],[-52,14],[-32,78],[-60,102],[-57,114],[33,43],[27,35],[2,36],[6,75],[59,63],[0,71],[64,1],[35,49],[-10,45],[-6,102],[-45,95],[-20,46],[-60,-6],[-56,-68],[-54,64],[-79,92],[-69,108]],[[74730,40207],[-36,55],[-31,-4],[-28,82],[18,73],[-34,62],[-43,91],[8,91],[-67,44],[-5,61],[-41,35],[-49,25],[11,83],[-7,57],[-31,128],[-9,58],[-18,64],[-38,-2],[-8,113]],[[56248,57372],[489,0],[261,-3],[429,3],[43,0],[269,1],[175,-3],[100,-1],[143,-1],[191,-2],[282,2],[232,-1],[822,1],[44,0],[259,-1],[314,-2],[206,0],[237,1],[233,1],[188,0],[83,2],[238,0],[598,2],[9,0],[213,-1],[223,-1],[408,0],[273,1],[474,0],[235,-1],[69,1],[164,0],[501,0],[341,-1],[109,0],[55,0],[245,1],[374,-1],[81,0],[185,0],[162,-1],[296,2],[441,0]],[[66942,57370],[-1,-291],[1,-407],[1,-266],[0,-200],[1,-282],[2,-468],[0,-47],[1,-321],[-1,-381],[-1,-518],[0,-3],[0,-387],[-1,-369],[0,-419],[1,-138],[0,-192],[0,-60],[0,-353],[0,-85],[0,-638]],[[66945,51545],[1,-121],[0,-33],[1,-219],[1,-366],[0,-128],[1,-295],[0,-235],[0,-168],[1,-241],[-16,-2]],[[66934,49737],[-863,6],[-45,0],[-688,0],[-157,-6],[-213,-7],[-557,4],[-412,11],[-499,0],[-77,0],[-224,-2],[-224,-2],[-108,0],[-393,0],[-36,12],[-420,-6],[-200,1],[-175,0],[-293,-8],[-340,-13],[-71,21],[-231,-3],[-11,-257],[1,-270],[0,-112],[0,-79],[6,-288]],[[95482,42636],[82,31],[9,-74],[-105,-32],[14,75]],[[88583,44535],[119,105],[155,165],[64,105],[88,86],[80,66],[49,35],[2,9],[22,84],[43,60],[13,85],[68,51],[60,58],[48,87],[-13,66],[-15,78],[-26,36],[3,90],[-17,37],[-30,9],[-52,71],[13,119],[-12,17],[-50,22],[13,90],[4,17],[10,37],[-8,131],[-15,77],[210,105],[256,100],[73,2],[121,4],[164,5],[134,-20],[159,-41],[8,-1],[42,-4],[89,-110],[98,-91],[44,28],[112,45],[31,13],[68,-6],[120,16],[116,-27],[42,-2],[99,66],[65,25],[41,37],[34,28],[48,116],[12,13],[90,97],[88,96],[41,8],[2,1],[44,-26],[75,32],[28,87],[7,143],[-15,198],[-15,96],[-60,101],[-57,30],[-72,20],[27,81],[118,89],[-25,101],[-61,12],[12,79],[-8,53],[14,62],[19,60],[42,75],[72,20],[37,48],[3,78],[57,36],[86,92],[46,3],[78,107],[25,33],[23,93],[37,85],[177,272],[128,186],[80,96],[70,98],[100,81],[69,57],[54,54],[11,36],[76,11],[65,60],[80,-46],[17,2],[72,10],[30,4],[156,-5],[180,-8],[184,10],[137,7],[209,5],[264,14]],[[94302,49763],[-1,-77],[5,-101],[-36,-116],[12,-58],[21,-35],[7,-11],[-21,-98],[-7,-97],[-22,-153],[21,-100],[4,-9],[13,-31],[31,-75],[17,-127],[-24,-110],[-12,-49],[9,-90],[6,-89],[1,-10],[-30,-53],[-40,-121],[-19,-128],[-18,-109],[27,-59],[-4,-69],[3,-87],[30,-103],[-15,-111],[7,-18],[28,-72],[-38,-136],[-18,-78],[-10,-113],[26,-59],[61,110],[32,-78],[44,-95],[-9,-327],[-3,-93],[-12,-532],[-8,-386],[-11,-60],[23,-107]],[[94372,45443],[-38,-216],[-40,-234],[-28,-161],[-24,-140],[-87,-507],[17,-62],[2,-8]],[[94174,44115],[-16,-430],[-13,-349],[-9,-217],[-6,-164],[-13,-278],[61,-158],[-190,-186],[-29,-27],[61,-158],[0,-27],[2,-35],[0,-1]],[[94022,42085],[-36,-87],[-52,-51],[-9,-60],[23,-10],[24,-11],[53,15],[33,38],[104,39],[3,9],[10,44],[44,-22],[39,39],[55,-49],[85,-43],[6,-3],[71,45],[4,51],[31,31],[62,-14],[161,3],[135,22],[109,38],[73,87],[52,82],[50,42],[31,61],[57,30],[90,72],[7,-29],[-65,-129],[-25,-82],[58,-52],[49,24],[32,118],[38,-26],[-10,-90],[39,-64],[82,96],[36,18],[56,-19],[-72,-123],[-143,-90],[-179,-106],[-87,-70],[-322,-195],[-148,-97],[-79,-64],[-119,-64],[-56,-29],[-87,-20],[-40,19],[-65,-33],[-74,-38],[-119,-20],[-98,12],[-22,3],[-45,-28],[-102,-63],[-45,52],[-59,52],[-49,-95],[-78,-69],[-54,-17]],[[93485,41165],[10,81],[29,26],[11,65],[2,73],[2,2],[26,25],[9,2],[66,10],[14,30],[3,6],[18,38],[0,2],[5,21],[9,39],[2,5],[5,23],[9,36],[26,79],[12,35],[2,9],[2,7],[17,63],[8,33],[3,15],[11,61],[2,7],[12,63],[11,87],[-131,118],[-152,141],[-20,19],[-60,57],[-58,60],[-81,84],[-211,208]],[[93098,42795],[-36,131],[-58,10],[-80,46],[-83,78],[-54,150],[-5,128],[-4,211],[-18,94],[-35,74],[-69,41],[-65,44],[-25,118],[-44,87],[-121,13],[-68,-1],[-283,-1],[-210,1],[-35,0],[-282,0],[-86,2],[-328,1],[-72,0],[-537,-3],[-125,-1],[-73,0],[-177,2],[-156,-1],[-58,0],[-33,0],[-257,1],[-287,-1],[-57,0],[-70,-1],[-366,-1],[-124,1],[-134,0],[-1,253],[1,264]],[[49567,52143],[60,19],[47,-75],[-3,-91],[53,-68],[7,0],[74,-3],[60,50],[42,35],[45,-8],[99,-98],[37,-55],[52,-40],[43,-132],[38,-102],[2,-92],[23,-86],[-9,-110],[30,-97],[-11,-150],[16,-35],[16,-35],[84,-65],[135,-51],[48,-37],[52,23],[43,-52],[62,-8],[12,11],[58,53],[73,11],[88,62],[46,55],[25,18],[20,15],[30,59],[50,26],[68,-24],[59,21],[121,41],[8,-6],[74,-47],[15,-9],[77,20],[109,-64],[28,-123],[55,18],[33,61],[126,16],[27,-16],[16,-10],[36,55],[148,84],[33,39],[15,18],[39,2],[76,-89],[16,0],[75,-1],[109,42],[63,8],[62,90],[63,23],[63,51],[31,24],[86,27],[59,17],[118,18],[62,120],[26,11],[74,-37],[50,14],[60,16],[96,35],[117,-14],[57,49],[66,79],[1,0],[275,2],[63,0],[213,-1],[331,-1],[17,0],[232,0],[102,-2],[110,-3],[112,-2],[390,-2]],[[55378,44021],[-153,0],[-183,-2],[-197,-1],[-222,0],[-289,-3],[-270,-3],[-245,-5],[-201,2],[-185,-1],[-103,1],[-32,0],[-326,5],[-243,-4]],[[48975,44018],[-52,90],[-39,42],[-33,118],[-9,97],[-20,89],[-24,45],[0,108],[-13,85],[-9,168],[32,190],[-1,110],[-11,115],[-34,35],[2,26],[-55,86],[-38,202],[64,211],[1,6],[39,223],[22,169],[14,122],[12,88],[-16,61],[42,77],[59,179],[48,230],[13,103],[22,181],[30,301],[9,90],[25,369],[10,249],[-4,98],[28,247],[0,163],[17,250],[1,135],[-9,181],[9,71],[36,218],[12,182],[0,4],[31,187],[2,136],[9,121],[-15,129],[17,159],[-14,112],[25,143],[8,185],[0,90],[-26,92],[2,49],[4,103],[-5,135],[-24,74],[50,59],[8,123],[-27,190],[-73,107],[38,72],[77,-107],[65,25],[73,39],[35,-45],[51,52],[66,23],[35,58]],[[85096,33724],[181,-3],[174,-2],[260,-6],[137,-3],[198,3],[108,1],[172,-1],[46,0],[61,-1],[25,0],[189,-1],[10,42],[86,-3],[160,-5],[-27,-45]],[[86876,33700],[-20,-98],[4,-132],[-35,-104],[8,-45],[17,-97],[-56,5],[-57,12],[-67,-87],[-46,-141],[-61,-198],[-46,-35],[-42,-3],[-12,61],[-63,43],[-48,-60],[-29,12],[-44,-35],[-55,-61],[-50,-146],[-38,-47],[-45,-54],[-47,39],[14,99],[-30,69],[-86,-84],[-48,-49],[-7,-77],[-26,-54],[-40,45],[-44,-39],[10,-100],[-34,-90],[-36,-85],[-63,9],[-43,-22],[-58,-24],[-32,-72],[-51,-18],[-37,-112],[-45,6],[-66,-94],[-28,-16],[-41,-76],[-79,7],[-59,3],[-105,-12],[-69,-82],[-61,-87],[-50,-40],[-43,-86],[13,-68],[-28,-45],[13,-100],[-66,-92],[-72,-13],[-40,54],[-53,-81],[-3,-40],[-32,-414]],[[83376,30642],[-231,4],[-398,8],[-140,-1],[-281,3],[-47,1],[-334,12],[-5,0],[-7,1],[-340,8],[-17,0],[-202,4],[-132,0],[-181,4],[3,-23]],[[81064,30663],[-52,-1],[-94,1],[-95,0],[-282,-1],[-32,0],[-173,-1],[-9,0],[-153,-1],[-137,0],[-74,-1],[-186,1],[-71,0],[-64,0],[-458,3]],[[67874,33532],[748,0],[116,0],[184,-1],[180,0],[480,-1],[117,1],[62,0],[260,0],[42,0],[209,0],[274,0],[3,0],[0,-2802],[0,-542],[0,-354],[2,1],[61,30],[78,-133],[21,-37],[48,-100],[61,-103],[86,-13],[14,63],[97,-20],[4,-1],[45,-31],[22,118],[40,-10],[67,-96],[48,-117],[9,-21],[19,-190],[52,-10],[65,-15],[50,14],[45,-8],[11,-2],[60,-82],[58,-9],[62,-47],[42,4],[38,60],[34,-16],[29,-14],[44,-103],[47,-59],[46,34],[8,6],[14,83],[31,55],[40,-21],[84,-36],[50,-25],[27,51],[13,26],[22,-96],[0,-106],[15,-88],[68,-13],[52,-9],[-5,-127],[1,-64],[1,-24],[76,-55],[56,58],[38,86],[79,126],[56,-44],[11,-88],[31,-44],[3,-3],[64,38],[2,-6],[29,-82],[7,-90],[63,-8],[49,87],[64,67],[36,26],[35,-127],[-35,-72],[50,-167],[52,25],[3,74],[8,74],[21,82],[62,58],[-3,61],[33,50],[7,1],[9,1],[26,3],[7,-84],[42,-106],[50,41],[15,-51],[58,-20],[27,86],[20,76],[58,-64],[4,-5],[-3,-95],[18,-22],[44,-2],[19,-85],[59,12],[29,-64],[21,-59],[15,-40],[50,78],[26,66],[43,-42],[50,101],[19,59],[79,19],[114,64],[43,-22],[38,-6],[21,-4],[28,27],[46,45],[61,18],[59,41],[41,0],[28,-79],[70,-32],[85,-2],[37,11],[24,8],[27,99],[24,61],[63,-44],[5,-5],[49,-60],[43,-80],[58,-20],[37,-79],[34,-66],[54,-70],[67,16],[30,-51],[16,-26],[75,-65],[51,-7],[39,-91],[39,30]],[[76040,20545],[-21,-22],[-89,6],[-85,-21],[-93,-66],[-172,-142],[-15,-12],[-116,-96],[-83,-71],[-68,-71],[-54,-118],[8,-71],[-72,-100],[-199,-250],[-88,-154],[-59,-85],[-94,-169],[-76,-129],[-51,-14],[-60,-66],[-73,-79],[-85,-94],[-114,-132],[-168,-146],[-173,-164],[-119,-150],[-55,-80],[-47,-122],[-169,-181],[-78,-111],[-64,-103],[-54,-97],[-30,-55],[-105,-234],[-37,-140],[-40,-93],[-45,-132],[-64,-229],[-40,-164],[-34,-159],[-36,-209],[-20,-158],[-18,-333],[11,-333],[39,-351],[31,-193],[30,-185],[24,-175],[27,-202],[34,-425],[6,-124],[6,-89],[-10,-42],[-45,23],[-63,-49],[-54,-24],[-25,-39],[6,-64],[-12,-55],[-44,1],[-29,74],[-37,1],[-41,77],[-36,34],[-54,131],[-48,32],[-55,16],[-32,44],[-68,6],[-65,3],[-59,8],[-26,-43],[-46,34],[-52,-6],[-42,0],[-46,33],[-49,70],[-74,91],[-50,79],[-54,30],[-65,39],[-33,32],[-37,-31],[-39,57],[-73,116],[-24,82],[-75,-23],[-60,70],[-65,34],[-45,-30],[-25,57],[17,97],[-12,44],[-59,95],[-26,203],[-8,130],[-30,121],[-23,105],[-54,70],[-28,94],[-24,102],[-53,83],[4,154],[11,100],[-13,122],[-17,86],[-21,51],[-38,21],[38,203],[-7,74],[-2,94],[-27,-3],[-2,155],[-24,65],[-60,38],[-72,39],[-48,119],[-38,47],[-38,70],[-30,87],[-24,97],[-11,82],[-13,95],[-47,44],[-39,157],[-42,98],[-88,105],[-21,33],[-62,102],[-18,97],[-29,116],[-15,124],[-28,95],[-18,74],[-8,114],[-46,79],[-46,86],[-5,104],[-24,89],[-2,81],[-37,58],[-45,129],[-17,102],[-12,141],[-13,131],[-47,56],[-40,75],[-21,113],[-47,83],[-34,70],[-97,105],[-57,182],[-69,28],[-50,90],[-55,0],[-45,110],[-2,119],[-53,45],[-30,141],[-47,41],[-44,10],[-52,57],[-83,-56],[-53,4],[-85,43],[-59,8],[-81,25],[-49,-9],[-46,-30],[-38,11],[-41,51],[-59,46],[-65,65],[-44,-29],[-17,-80],[-21,-105],[-68,28],[-39,1],[-34,-54],[-55,-8],[-57,-19],[-15,-117],[-40,-105],[-35,-124],[-27,-65],[-20,-149],[5,-86],[-42,-90],[-17,-124],[18,-87],[-42,-97],[-69,-56],[-36,-111],[-36,-33],[-21,-112],[-24,-86],[-90,18],[-47,-18],[-72,70],[-91,92],[-54,103],[-61,56],[-60,39],[-58,40],[-57,125],[-60,47],[-106,27],[-72,66],[-78,100],[-34,82],[-42,105],[-71,82],[-56,36],[-72,116],[-78,138],[-23,180],[-48,141],[-47,127],[-12,150],[-16,66],[10,158],[-9,199],[-34,91],[-19,80],[-55,132],[-32,38],[-9,130],[-17,146],[-32,133],[-42,10],[-26,119],[-55,26],[-32,63],[-55,72],[-52,85],[-86,30],[-70,68],[-5,69],[-79,103],[-62,90],[-19,86],[-43,121],[-73,72],[-57,58],[-19,67],[-67,165],[-61,57],[-14,88],[-45,53],[-68,12],[-85,110],[-54,109],[-39,93],[-21,111],[-43,127],[-16,45],[-43,79],[-44,14],[-15,-22],[-39,67]],[[64732,24536],[-47,59],[-49,110],[11,81],[-6,109],[11,56],[215,1],[157,1],[181,0],[220,1],[532,-3],[210,0],[63,0],[182,0],[551,-1],[40,0],[229,0],[353,0],[234,1],[0,165],[0,110],[-1,720],[0,125],[0,499],[2,209],[3,496],[3,323],[3,347],[5,485],[3,485],[0,573],[1,458],[0,243],[0,395],[0,363],[0,73],[1,838],[0,223],[1,602],[-1,849],[35,0]],[[92610,36444],[-86,-252],[-37,-83],[-52,34],[-45,-70],[-56,-161],[-36,-162],[-20,-103],[6,-92],[-58,-147],[7,-32],[6,-29],[-55,-150],[-14,-72],[-38,-73],[-15,-96],[-19,-102],[-72,-144],[-40,-54],[-33,21],[-17,168],[-22,191],[32,152],[10,146],[27,198],[4,29],[38,136],[35,129],[42,89],[-5,80],[73,47],[30,64],[-49,103],[78,89]],[[86617,35511],[32,-49],[-47,-110],[43,-66],[3,-59],[33,-109],[41,-89],[67,-20],[28,-61],[4,-6],[54,-71],[105,8],[24,32],[45,52],[49,39],[59,127],[122,-196],[100,83],[104,40],[14,3],[54,10],[75,55],[-42,93],[16,69],[6,2],[1,0],[18,6],[59,-99],[94,80],[107,116],[66,-86],[5,-7],[58,69],[97,141],[8,94],[52,72],[-61,115],[2,5],[29,65],[35,120],[17,84],[60,119],[68,119],[17,30],[58,146],[8,37],[21,91],[20,139],[59,93],[47,65],[9,12],[-15,77],[62,82],[40,142],[-1,62],[19,90],[18,153],[95,-73],[59,-183],[95,-57],[52,-17],[12,-3],[59,109],[3,12],[24,91],[42,150],[55,101],[4,58],[28,136],[30,71],[21,79],[116,-147],[43,130],[43,120],[81,61],[55,108],[52,51],[26,83],[22,68],[84,134],[-13,54],[21,97],[3,74],[54,147],[3,106],[-9,108],[105,-144],[38,-50],[137,-190],[183,-252],[17,69],[27,116],[53,175]],[[90928,37603],[-104,1],[-43,-140],[-25,-181],[5,-159],[31,-64],[15,-32],[92,24],[61,13],[41,14],[24,-59],[-5,-50],[27,-45],[5,-10],[29,-59],[-4,-55],[46,-33],[64,-64],[80,-3],[58,-10],[63,-15],[11,-74],[58,-77],[23,-57],[16,-43],[58,-76],[98,-81],[72,-87],[-13,-107],[-53,-73],[-2,-142],[-14,-94],[44,-101],[-17,-115],[8,-41],[14,-78],[21,-140],[1,-89],[-24,-125],[-81,123],[-24,41],[-39,-31],[44,-137],[23,-71],[-28,-86],[41,-68],[4,-6],[29,-92],[16,-46],[19,-57],[-29,-158],[6,-15],[14,-30],[12,-25],[70,-64],[11,-5],[79,-38],[40,36],[42,-10],[31,-233],[36,-206],[27,-117],[21,-153]],[[92053,33628],[-142,0],[-85,0],[-170,0],[-159,0],[-45,1],[-175,0],[-160,-10],[-220,1],[-23,0],[-97,-1],[-401,-1],[-16,0],[-118,-1],[-131,-1],[-77,-1],[-170,-2],[-119,-2],[-47,-1],[-199,1],[-56,0],[-130,1],[-175,-1],[-71,0],[-111,-1],[-113,0],[-36,-1],[-182,2],[-158,1],[-121,1],[-23,0],[-216,3],[-121,11],[-161,16],[-83,8],[-120,-1],[-55,-1],[-143,10],[-102,10],[-157,8],[-131,7],[-158,16]],[[82192,50545],[87,56],[27,-72],[-55,-114],[-29,-110],[-50,108],[20,132]],[[78768,53603],[32,22],[80,35],[80,-33],[14,-38],[30,-106],[-11,-49],[-22,-39],[-79,-17],[-38,94],[-29,56],[-49,33],[-8,42]],[[77664,52996],[48,-45],[66,14],[60,0],[156,85],[63,44],[21,0],[35,0],[89,61],[45,16],[41,55],[52,19],[40,57],[39,-42],[34,48],[38,18],[47,45],[45,43],[-5,108],[58,38],[64,-75],[41,-46],[55,-84],[-48,-136],[-55,-110],[-18,-49],[25,-77],[-56,-78],[-15,-79],[-21,-47],[27,-9],[24,-9],[62,63],[31,17],[35,41],[16,87],[66,-89],[87,-115],[15,2],[38,7],[61,-54],[17,9]],[[81607,49924],[-31,-96],[-5,-130],[-59,-5],[-58,-22],[-45,-17],[-27,-56],[4,-96],[-14,-31],[-45,-75],[-33,-119],[-37,-69],[-17,-107],[3,-104],[-38,-70],[32,-64],[55,-18],[40,85],[29,65],[81,59],[13,28],[11,25],[10,19],[16,31],[-1,60],[66,141],[58,101],[45,11],[14,23],[61,32],[48,92],[50,151],[64,129],[24,164],[56,11],[48,70],[11,90],[46,68],[36,13],[35,-17],[-1,-120],[-58,-77],[-2,-100],[-15,-106],[-68,-127],[-44,-123],[-16,-119],[-62,-100],[-38,-118],[-50,-183],[-24,-84],[-40,-86],[-46,-240],[-42,-265],[21,-117],[13,-94],[-29,-98],[-54,-53],[-49,-95],[-39,-221],[-33,-176],[9,-121],[23,-82],[-7,-85],[2,-82],[-75,-222],[-3,-134],[-42,-138],[-43,-215],[-7,-211],[-3,-136],[27,-117],[-23,-93],[47,-137],[7,-166],[3,-7],[9,-21],[49,-109],[-16,-161],[-27,-108],[1,-124],[12,-166]],[[66945,51545],[342,0],[202,0],[192,0],[199,-1],[48,0],[55,0],[156,0],[137,0],[199,0],[214,-1],[78,0],[1,0],[182,0],[212,0],[171,-1],[230,0],[307,0],[234,0],[183,-1],[127,-2],[242,-1],[144,-2],[96,1],[107,-2],[130,0],[225,0],[77,0],[251,-3],[88,-1],[188,-3],[307,-1],[55,0],[26,0],[180,-1],[209,0],[280,0],[130,1],[462,-1]],[[73717,44956],[-50,-15],[-21,53],[-77,-8],[-42,115],[-46,71],[11,106],[-72,7],[-21,68],[-93,67],[-53,-18],[-53,73],[-95,18],[-73,92],[-21,63],[-58,24],[-35,-19],[-67,19],[-31,-38],[-57,15],[-75,5],[-90,-24],[-90,27],[-50,14],[-17,-24],[-25,-103],[-40,-56],[-76,-10],[-62,85],[-39,60],[-74,40],[-43,26],[-25,22],[-70,61],[-43,21],[-39,65],[-18,67],[-311,-1],[-362,0],[-250,0],[-281,0],[-311,0],[-714,-1],[-203,1],[-761,2],[-291,1],[-342,1],[-186,0],[-423,1],[-26,0],[-488,0]],[[66938,45929],[-1,551],[-1,513],[0,562],[0,549],[0,75],[0,133],[-1,841],[-1,584]],[[60706,44024],[1,-805],[0,-27],[-1,-391],[0,-691],[452,-3],[372,1],[65,0],[43,1],[254,1],[414,6],[179,-1]],[[62485,42115],[2,-333],[0,-312],[0,-17],[-3,-902],[1,-583],[-1,-969],[0,-459],[-8,-1194],[0,-428],[16,-212],[0,-540],[-1,-756],[-2,-927]],[[58029,34486],[-1,168],[0,374],[-1,396],[1,215],[0,269],[2,258],[0,510],[0,193],[0,295],[0,321],[0,199],[2,384],[-1,242],[1,943],[0,561],[0,213],[1,366],[0,37],[0,536],[1,186],[2,440],[1,521],[0,397],[2,541],[0,500],[-2,458]],[[81666,43464],[48,-67],[49,29],[44,-112],[93,-17],[35,16],[86,41],[87,46],[85,80],[21,20],[75,63]],[[84088,43441],[1,-316],[1,-199],[0,-34],[0,-261],[0,-36],[1,-250],[0,-252],[0,-127],[1,-371],[-1,-431],[-1,-285],[-4,-468],[-3,-363],[-2,-363],[-3,-638],[-3,-314],[0,-232]],[[97036,42706],[73,6],[102,11],[26,138],[58,-63],[22,-180],[-49,-51],[-73,6],[-102,15],[-57,118]],[[96538,42788],[68,23],[63,144],[74,79],[45,-57],[51,-53],[29,-11],[14,-125],[-115,-8],[-104,-13],[-67,-74],[-47,-101],[-10,126],[-1,70]],[[94372,45443],[109,-4],[106,-5],[4,0],[79,-4],[59,-2],[49,-3],[261,-15],[51,-3]],[[95090,45407],[7,0],[35,-3],[115,-6],[71,-5],[70,-4],[39,-2],[135,-8],[27,-1],[83,-5],[54,-3],[97,-5],[254,-13],[51,-2],[34,75],[1,0],[8,0],[57,2],[-4,102],[33,47],[29,-7],[47,-11],[14,48],[15,53],[58,19],[32,30],[59,-28],[42,4]],[[96553,45684],[11,-172],[29,-135],[38,-79],[43,-14],[32,52],[38,-23],[8,-81],[-54,-101],[-39,-9],[-94,-30],[-40,-22],[11,-114],[-45,-39],[-24,-81],[-62,-7],[1,-7],[6,-123],[-20,-66],[4,-16],[23,-85],[17,27],[28,45],[32,-10],[27,-62],[13,-6],[42,-21],[7,-10],[45,-72],[41,-149],[5,-12],[36,-86],[-5,-68],[-31,-77],[15,-85],[48,-38],[22,17],[33,-63],[19,-111],[-14,-82],[4,-8],[38,-72],[47,-40],[105,-32],[46,-28],[50,42],[83,30],[87,54],[19,41],[-2,83],[-56,62],[-5,103],[-8,140],[-60,27],[-36,-12],[-48,83],[49,36],[45,20],[80,-54],[49,-125],[13,-101],[5,-40],[34,-221],[7,-224],[-2,-132],[-31,-136],[-41,-14],[0,145],[4,98],[-43,-12],[-92,-28],[-99,-62],[-46,24],[-71,-46],[-40,-28],[-27,-63],[-75,-20],[-84,-56],[-71,-62],[-50,-76],[-60,-39],[-81,-32],[12,87],[114,82],[72,87],[25,30],[3,83],[-63,74],[-50,-112],[-28,9],[-51,-20],[-28,-70],[-36,-58],[-48,-21],[-44,20],[-31,-23]],[[96283,43062],[-15,201],[4,109],[-56,29],[-59,147],[-60,58],[-10,94],[1,117],[-38,0],[0,112],[0,63],[0,65],[-68,-4],[-90,-5],[-42,-2],[-172,-10]],[[95678,44036],[-1,30],[-75,3],[-92,3],[-102,3],[-86,3],[-106,4],[-71,1],[-117,3],[-71,-7],[-113,11],[-28,-64],[-39,-8],[-33,73],[-136,3],[-48,3],[-65,4],[-93,5],[-228,9]],[[81064,30663],[40,-140],[51,-58],[-33,-514],[-18,-304],[-16,-271],[-27,-447],[-4,-54],[-36,-598],[-6,-88],[-18,-314],[-26,-468],[-12,-199],[-20,-368],[-7,-119],[-23,-414],[-14,-255],[-28,-514],[-7,-111],[-22,-376],[-14,-229],[0,-271],[5,-177],[4,-146],[9,-354],[0,-28],[15,-585],[5,-222],[12,-501],[1,-7],[7,-359],[8,-332]],[[80890,21840],[-13,-52],[-33,11],[-22,-53],[-46,38],[-53,-17],[-27,44],[-45,15],[-33,-35],[-42,7],[-64,25],[-67,63],[-68,-5],[-100,-43],[-93,-71],[-95,-45],[-45,-27],[-71,-92],[-21,-76],[-25,-26],[-43,-21]],[[74730,40207],[-28,0],[-397,0],[-201,1],[-12,0],[-116,-1],[-76,1],[-205,0],[-299,1],[-61,0],[-38,0],[-83,0],[-321,1],[-41,0],[-322,1],[-40,0],[-98,0],[-128,0],[-177,0],[-205,0],[-97,0],[-101,0],[-303,0],[-100,0],[-288,-1],[-112,0],[-165,-1],[-325,0],[-14,1],[-253,0],[-233,1],[-18,0],[-269,0],[-208,0],[-104,0],[-117,0],[-258,1],[-196,0]],[[68721,40212],[0,640],[0,21],[0,173],[0,491],[0,99],[0,482],[-450,0],[-86,0],[-377,0],[-273,-1],[-171,0],[-426,-1]],[[66938,42116],[0,216],[0,312],[0,220],[0,420],[0,518],[0,222],[0,28],[0,445],[0,477],[0,213],[0,37],[0,705]],[[62489,34483],[379,1],[215,0],[337,1],[463,0],[54,0],[484,0],[7,-14],[351,2],[118,1],[300,2],[8,0],[249,1],[164,0],[102,0],[150,0],[27,0],[59,0],[30,-1],[347,-3],[350,0],[295,5],[245,3],[576,4],[75,0]],[[67874,34485],[0,-172],[0,-447],[0,-138],[0,-196]],[[64732,24536],[-3,2],[-411,-1],[-271,0],[-111,0],[-701,0],[0,-541],[0,-318],[-445,0],[-136,-2],[-169,1]],[[92053,33628],[26,-220],[37,-276],[23,-111],[47,-226],[53,-178],[79,-300],[45,-179],[21,-78],[33,-251],[-25,-391],[-42,-316],[-90,-11],[-110,-71],[-138,-121],[-89,-110],[-111,-141],[-85,-157],[-69,-102],[-68,-129],[-57,-134],[-76,-240],[-16,76],[-58,85],[-96,46],[-160,-27],[-184,-85],[-21,-10],[-93,-87],[-73,-99],[-125,-122],[-46,-65],[-107,-148],[-70,-133],[-45,-85],[-58,-158],[-77,-364],[-17,-98],[-23,-128],[-41,10],[-11,57],[-105,45],[-124,1],[-96,-20],[-140,-97]],[[89671,28480],[-67,123],[-31,56],[-144,259],[-231,417],[-256,469],[-92,162],[-190,333],[-16,0],[-206,6],[-136,3],[-217,8],[-215,7],[-210,12],[14,214],[-52,125],[-57,134],[-28,68],[-95,-120],[-14,55],[19,94],[-6,51],[-254,25],[-35,3],[-113,11],[-244,19],[-94,7],[-85,6],[-63,5],[-157,8],[-71,3],[-51,7],[-52,7],[-40,-48],[-68,-41],[-40,-18],[-97,-41],[-54,-87],[-33,12],[-101,-56],[-99,-56],[-89,-50]],[[95827,42431],[34,135],[43,11],[10,-117],[13,-61],[-66,-6],[-34,38]],[[95623,42724],[22,65],[-3,111],[37,8],[6,246],[2,98],[-1,244],[-2,157],[-6,383]],[[96283,43062],[-18,-22],[-47,-53],[-47,45],[-35,12],[-25,-70],[-34,-1],[-34,19],[-35,-12],[-24,-88],[-25,-69],[-64,3],[-61,-24],[-69,-46],[-75,-21],[-69,-31],[2,20]],[[85819,43437],[34,55],[38,-55],[-6,-97],[-47,-28],[-19,125]],[[85293,43511],[39,-79],[74,20],[85,-110],[60,-38],[87,-55],[34,-76],[84,-78],[67,118],[22,21],[104,-87],[24,-86],[2,-8],[64,-122],[74,-71],[65,-10],[88,77],[12,1],[71,7],[78,78],[98,48],[68,34],[23,-20],[8,-7],[20,-17],[103,7],[10,1],[38,-8],[26,-6],[94,99],[129,180],[20,28],[69,110],[91,101],[91,51],[118,101],[44,18],[91,38],[89,77],[195,92],[56,38]],[[87908,43978],[0,-244],[0,-343],[0,-324],[0,-21],[0,-296],[0,-193],[-1,-621],[0,-8],[0,-4],[0,-94],[1,-405]],[[87908,41425],[-58,-45],[-38,9],[-37,-72],[41,-118],[16,-141],[-24,-116],[22,-156],[-34,-100],[-35,-123],[-20,-67],[-27,-137],[-3,-208],[-22,-39],[-34,-60],[-19,-137],[-1,-88],[-40,-71],[31,-85],[5,-14],[-32,-94],[-69,-106],[-84,-131],[-34,-55],[-47,-115],[-51,-35],[-56,-78],[-88,-84],[-41,11],[-17,82],[-39,28],[-42,-69],[-50,-81],[-5,-104],[-44,-1],[-57,-4],[-30,-103],[-36,-66],[0,-7],[8,-142],[-57,-43],[13,-84],[15,-113],[-46,-67],[-63,-31],[-39,122],[-58,69],[-31,-22],[-42,-80],[-41,-135],[-24,-154],[-42,-42],[7,-81],[14,-192],[9,-97],[-39,-32],[-49,4],[-17,-64],[-10,-122],[-17,-90],[-52,-28],[-58,-14],[-55,-24],[-46,-20],[-30,34]],[[67874,34485],[143,-1],[128,-8],[306,-1],[279,-3]],[[68730,34472],[12,0],[112,1],[309,3],[63,1],[244,3],[129,1],[108,1],[80,1],[198,3],[72,1],[413,1],[77,0],[7,0],[300,-2],[104,-1],[76,0],[44,-1],[247,0],[115,0],[186,0],[220,-2],[170,-1],[6,0],[210,1],[59,0],[217,1],[29,0],[273,0],[69,0],[212,0],[42,0],[312,0],[200,0],[23,0],[252,0],[193,1],[32,0],[33,0],[126,0],[189,0],[46,0],[102,0],[76,0],[222,0],[59,0],[11,0],[252,-1],[84,0]],[[89671,28480],[-117,-64],[-90,-94],[-80,-119],[-67,-126],[-52,-129],[-29,-74],[-50,-95],[-45,-152],[-24,-146],[-16,-170],[7,-60],[-38,-98],[-68,-87],[-34,-38],[-9,-75],[-18,-83],[-57,16],[-53,-27],[-35,65],[-52,-55],[-23,-65],[33,-87],[-28,-54],[-84,-91],[-28,-85],[-82,-76],[-44,-60],[-15,-96],[-74,-85],[-29,-65],[-68,-5],[-64,-47],[-37,-60],[-50,-30],[-82,-100],[-67,-15],[-46,46],[-17,-65],[24,-97],[21,-67],[-19,-93],[-75,-75],[-51,-26],[-43,35],[-62,65],[-46,-63],[35,-52],[51,-93],[-46,-107],[-81,-97],[-42,-19],[-24,-124]],[[62485,42115],[712,-1],[296,2],[491,3],[45,0],[407,-4],[481,-5],[92,-1],[24,0],[814,1],[297,0],[79,0],[319,7],[396,-1]],[[68721,40212],[0,-351],[2,-467],[0,-11],[1,-371],[1,-459],[1,-164],[0,-666],[1,-158],[0,-440],[0,-220],[0,-12],[1,-285],[2,-714],[0,-28],[0,-888],[0,-290],[0,-136],[0,-80]],[[95623,42724],[-23,31],[-62,-12],[-58,-25],[-65,-5],[-36,-28],[-59,31],[-31,-29],[-51,-39],[-50,-5],[-33,-30],[-18,32],[-59,-16],[-67,-38],[-45,35],[-50,-5],[-32,-37],[-62,-10],[-23,45],[-85,-43],[-49,31],[-45,-48],[-30,-52],[-53,-23],[-26,-77],[-19,-13],[-65,21],[-53,-77],[-61,-15],[-37,-11],[16,-35],[-29,-52],[-31,-21],[-41,8],[-44,-25],[-40,-41],[-30,-2],[-55,-59]],[[49844,56767],[148,31],[45,41],[36,115],[37,17],[107,-88],[67,-157],[-50,-109],[25,-81],[-7,-102],[-35,-48],[13,-105],[-63,-20],[-48,41],[-99,39],[-91,86],[-55,162],[-30,178]],[[49567,52143],[-109,15],[-28,73],[-52,-57],[-42,16],[-61,-84],[-30,11],[-41,60],[-13,28],[-99,-46],[14,114],[7,317],[-11,262],[97,11],[33,69],[-46,79],[-94,40],[-18,144],[-33,181],[-38,40],[10,130],[-17,311],[-7,31],[-36,216],[-74,130],[-32,363],[-50,277],[-54,145],[-60,133],[-77,98],[-41,145],[-12,162],[-1,94],[-31,104],[28,127],[18,146],[-50,171],[65,9],[95,-70],[147,-132],[116,-38],[133,-91],[46,-75],[152,-32],[134,4],[51,0],[108,-22],[97,-52],[114,-20],[67,9],[84,110],[70,-106],[55,-57],[52,15],[31,22],[69,47],[65,16],[56,-76],[-4,-166],[1,-82],[45,-99],[15,4],[15,4],[39,49],[24,31],[3,55],[-57,66],[8,152],[-31,101],[-70,57],[-37,127],[41,106],[36,185],[1,8],[-21,115],[34,101],[7,111],[-25,109],[-35,147],[-9,127],[-11,94],[-55,86],[-24,111],[56,116],[452,0],[136,0],[310,-10],[316,5],[240,3],[245,-1],[120,-1],[304,1],[334,-3],[484,2],[290,0],[264,0],[569,0],[174,0],[352,1],[158,-1],[144,-1],[210,-1]],[[87908,41425],[0,-566],[0,-621],[0,-563],[87,0],[308,0],[30,0],[112,0],[136,-1],[256,1]],[[81671,21670],[-123,-58],[-145,-41],[-66,21],[77,77],[9,85],[-61,113],[-43,119],[-18,79],[29,121],[-12,67],[-15,127],[-68,62],[-48,-77],[-3,-108],[-15,-80],[-19,-86],[-2,-189],[-27,-155],[-53,1],[-56,-4],[-48,95],[-46,36],[-28,-35]],[[95944,49768],[2,107],[44,75],[27,117],[12,53],[-30,78],[70,59],[68,61],[35,-65],[55,-51],[39,3],[27,75],[22,45]],[[96654,46042],[-28,-91],[-27,-70],[-29,-98],[-17,-99]],[[95090,45407],[-17,65],[-55,84],[-14,117],[21,60],[0,109],[35,24],[43,70],[-16,76],[24,81],[-15,128],[2,14],[8,103],[7,34],[10,58],[17,109],[-9,81],[14,126],[15,123],[1,154],[41,60],[3,5],[40,214],[56,75],[10,25],[25,67],[12,125],[57,144],[-10,82],[33,72],[0,1],[4,8],[34,131],[-22,156],[7,118],[7,86],[39,62],[51,25],[62,-1],[34,20],[16,10],[36,89],[14,8],[64,33],[40,91],[59,63],[-7,88],[39,60],[-7,92],[-29,72],[-38,156],[51,111],[43,144],[25,59],[-34,122],[28,72]],[[92456,39829],[4,5],[18,23],[35,45],[8,11],[43,5],[31,11],[34,13],[9,10],[25,29],[37,23],[7,5],[-2,97],[15,35],[52,50],[1,1],[62,86],[15,17],[36,42],[61,26],[34,80],[50,10],[41,45],[2,2],[-35,86],[-56,81],[-29,69],[-42,72],[-38,80],[-21,81],[-49,7],[-28,24],[-13,75],[7,50],[-14,127],[-52,52],[-45,-12],[-3,131],[-2,149],[14,92],[59,49],[2,2],[16,111],[23,70],[-29,78],[-32,102],[56,73],[49,81],[21,61],[8,25],[3,8],[66,86],[34,138],[46,130],[49,85],[59,32]],[[93485,41165],[-1,-72],[33,-31],[16,-15],[44,13],[43,-7],[54,-48],[26,100],[19,11],[18,-130],[5,-116],[-9,-131],[-17,-119],[-26,-179],[-30,-274],[-12,-130],[-12,-212],[-9,-83],[-80,-250],[-90,-224],[-11,-69],[-56,-133],[-41,-78],[-97,-90],[-53,-82],[-58,-112],[-22,-62],[-39,-114],[8,-32],[-65,-153],[-26,-70],[-50,-87],[-62,-23],[-30,9],[11,130],[46,164],[16,107],[-18,60],[-82,31],[-45,46],[-38,-9],[-41,-55],[-27,78],[-41,77],[-28,43],[-36,13],[-37,76],[-26,30],[-39,60],[-38,44],[-21,69],[-63,42],[7,71]],[[66942,57370],[600,-2],[389,1],[78,0],[565,-1],[174,0],[353,1],[115,0],[330,0],[619,0],[221,0],[240,0],[346,0],[133,0],[336,1],[116,1],[819,0],[155,1],[487,0]],[[87908,43978],[169,112],[156,150],[16,67],[43,44],[60,-19],[86,85],[71,53],[74,65]],[[94302,49763],[135,4],[20,0],[108,3],[100,-1],[315,-5],[25,-4],[20,-3],[163,-4],[290,2],[97,2],[15,0],[184,7],[73,2],[97,2]],[[0,61717],[159,258],[61,-59],[16,-82],[-145,-171],[-49,-59],[-42,113]],[[254,62272],[188,106],[113,-30],[-30,-88],[-133,-41],[-82,9],[-56,44]],[[871,62911],[95,27],[123,-8],[58,-123],[115,-7],[127,15],[-30,-101],[-94,-56],[-65,-115],[-36,-63],[-37,-157],[-121,63],[-65,91],[57,52],[65,20],[-12,126],[-81,51],[-123,108],[24,77]],[[265,62783],[87,26],[41,-129],[-53,-73],[-92,64],[17,112]],[[1340,62602],[159,52],[159,15],[76,49],[26,203],[16,62],[73,-13],[48,-72],[-48,-131],[-5,-211],[-76,-42],[-76,-32],[-65,31],[-121,-27],[-149,-55],[-50,95],[33,76]],[[1982,62494],[29,211],[121,67],[17,68],[-43,113],[33,74],[67,-3],[106,74],[27,-91],[-5,-87],[-19,-129],[129,36],[107,21],[123,20],[4,125],[-13,97],[-25,125],[55,101],[84,-16],[43,-82],[107,-136],[71,-10],[128,8],[190,36],[23,-77],[-192,-74],[-133,-27],[-155,-139],[-31,-86],[-142,-62],[-118,-52],[-158,-29],[-68,-53],[-100,-77],[-53,-72],[-83,-8],[-116,-48],[-43,30],[33,152]],[[5847,63677],[60,97],[86,64],[109,-47],[22,-70],[-101,-102],[-101,-42],[-100,-18],[25,118]],[[7005,64033],[50,67],[54,-55],[-27,-125],[-69,30],[-8,83]],[[3451,63198],[241,69],[128,70],[153,-2],[143,63],[82,100],[6,192],[113,114],[128,84],[105,-52],[74,-139],[-55,-155],[21,-195],[110,12],[219,12],[110,25],[138,-98],[179,35],[202,-37],[-29,-82],[-168,-39],[-200,-29],[-106,-6],[-163,57],[-112,-23],[-71,12],[-177,43],[-159,33],[-93,-15],[-24,-131],[-131,46],[-161,-56],[-139,23],[-109,-24],[-125,9],[-150,-8],[20,92]],[[7446,64305],[130,118],[125,-35],[-47,-176],[-90,-12],[-92,-78],[-47,34],[21,149]],[[8023,64589],[70,256],[58,49],[151,-70],[84,133],[-51,169],[65,51],[60,-111],[16,-159],[-4,-167],[-33,-166],[-102,27],[-119,-5],[-112,-130],[-116,-22],[33,145]],[[10143,65639],[86,100],[92,10],[119,94],[79,15],[81,53],[80,87],[47,52],[-23,104],[48,52],[32,62],[27,81],[32,91],[-82,84],[-39,52],[0,76],[98,149],[135,83],[122,51],[88,-1],[51,-105],[70,-68],[64,60],[71,89],[82,-47],[35,17],[48,22],[86,-54],[-77,-65],[-44,-37],[-35,-75],[-62,-14],[-76,-115],[61,-42],[123,93],[76,34],[14,-51],[-36,-183],[-94,-39],[-68,-69],[-111,-64],[-57,-109],[-65,-102],[-67,-82],[-82,-88],[-115,-21],[-104,-2],[-72,-8],[-81,-23],[-112,-93],[-15,-57],[-97,-8],[-63,-116],[-45,17],[-74,-53],[-112,45],[-93,66],[54,52]],[[12094,66992],[119,66],[167,68],[125,30],[118,7],[111,117],[53,56],[54,-5],[-47,-122],[-125,-187],[-118,22],[-177,-65],[-239,-28],[-41,41]],[[11684,67259],[91,68],[82,-11],[216,160],[131,-7],[84,-188],[-147,-161],[-210,-82],[-81,-63],[-23,51],[-129,-36],[-59,150],[45,119]],[[8811,64588],[215,209],[76,81],[88,152],[67,55],[-17,143],[37,119],[161,198],[122,-40],[22,109],[23,143],[47,150],[93,87],[188,78],[100,-76],[112,-7],[-17,-86],[-43,-87],[12,-80],[-104,-85],[-118,-102],[-182,-117],[-42,-108],[-62,-114],[-39,-105],[-140,-89],[-66,-81],[-60,-113],[-85,1],[-138,-148],[-147,-102],[-81,-42],[-22,57]],[[5435,79692],[145,-191],[58,-167],[268,-199],[147,-57],[127,-87],[-14,-75],[-144,32],[-191,39],[-237,221],[-149,99],[-46,298],[36,87]],[[6538,85147],[40,106],[-10,183],[53,127],[116,4],[27,-133],[27,-94],[217,-86],[320,-97],[81,33],[226,163],[105,46],[128,-5],[69,-35],[81,-96],[71,-25],[42,-142],[37,-119],[134,-64],[179,-23],[80,-79],[93,-54],[334,-37],[134,-14],[224,-71],[-59,-149],[-80,-123],[-87,-31],[-121,77],[-138,-9],[-184,-114],[-88,-74],[-37,-91],[8,-95],[-63,-75],[-106,43],[-28,158],[-82,120],[-150,109],[-122,35],[-69,-5],[-36,114],[-113,144],[-207,118],[-208,80],[-153,13],[-141,-57],[-53,-54],[-131,-113],[-85,34],[-124,59],[-83,49],[-80,197],[12,152]],[[22791,77179],[96,54],[68,0],[58,-71],[-35,-90],[-114,-19],[-28,20],[-45,106]],[[10464,78724],[101,66],[182,0],[156,-32],[85,-8],[27,75],[-21,36],[109,112],[87,-16],[60,82],[52,52],[106,-65],[116,64],[82,91],[41,-132],[59,-91],[137,45],[181,-97],[-38,-107],[35,-72],[-36,-66],[51,-75],[-38,-112],[67,-88],[91,-126],[-45,-86],[-110,-48],[-57,33],[-77,-59],[-112,4],[-92,-61],[1,-122],[-95,-49],[-72,117],[-81,52],[-134,15],[-136,60],[-115,67],[-129,100],[-113,43],[-142,100],[-96,50],[-9,113],[-78,135]],[[24157,79144],[99,178],[101,-47],[-46,-87],[-58,-138],[-110,-51],[14,145]],[[14551,67879],[231,-119],[214,-89],[-39,-64],[-70,-48],[-126,51],[-135,6],[-91,100],[16,163]],[[15815,69226],[62,9],[23,-4],[-12,-116],[-96,38],[23,73]],[[15573,69288],[155,43],[-33,-123],[-117,-16],[-5,96]],[[16860,68648],[54,238],[5,153],[44,101],[100,62],[138,154],[24,-67],[24,-136],[130,8],[133,135],[29,-123],[134,-271],[120,-251],[-61,-97],[-33,3],[-124,144],[-50,164],[-116,19],[-105,55],[-54,-74],[-191,-12],[-64,-111],[-114,-188],[-23,94]],[[16322,69420],[43,99],[108,61],[151,-43],[164,109],[65,51],[110,-24],[-15,-140],[-136,-142],[-31,-98],[-113,71],[-53,-62],[37,-142],[-35,-99],[-116,58],[-70,-17],[-77,-64],[-19,165],[-13,217]],[[7801,73033],[104,48],[142,9],[9,-117],[-136,-101],[-121,63],[2,98]],[[21683,71522],[120,192],[171,158],[270,11],[102,15],[64,-86],[130,-13],[-8,-61],[-119,-99],[-218,28],[-235,12],[-84,-53],[-106,-140],[-87,36]],[[19501,71800],[104,61],[72,-33],[103,-77],[-63,-39],[-109,19],[-140,-9],[33,78]],[[8337,71928],[182,-20],[124,4],[19,-79],[-115,-89],[-92,5],[-118,179]],[[21737,73326],[77,152],[67,131],[86,120],[98,40],[106,87],[85,39],[181,-15],[57,76],[-4,222],[137,121],[53,27],[65,-20],[122,55],[-19,61],[43,68],[88,-77],[77,94],[-59,102],[-48,39],[51,90],[41,64],[83,42],[18,87],[90,95],[51,93],[106,63],[38,116],[85,21],[48,94],[83,17],[-23,142],[45,110],[50,34],[95,-2],[88,38],[16,-94],[-45,-127],[-71,-88],[-41,-94],[13,-105],[59,-32],[40,8],[38,61],[-10,61],[48,10],[66,-100],[88,38],[35,-55],[96,-37],[147,-161],[19,-100],[-59,-82],[-153,30],[-70,-67],[-136,-25],[-98,-30],[-96,19],[-41,-69],[-114,-62],[-98,-60],[39,-81],[-26,-103],[-47,-65],[13,-78],[33,-45],[64,78],[41,82],[97,-10],[84,120],[8,-53],[88,-61],[-24,-156],[124,-82],[-77,-87],[-126,-37],[47,-112],[65,-60],[136,-25],[2,-57],[-89,-126],[-57,-114],[62,-159],[-62,-79],[-135,174],[-85,28],[-28,-127],[-26,-113],[-58,-79],[-109,-31],[-112,-16],[-5,-132],[62,-43],[-18,-63],[-146,-54],[-121,-118],[-60,-80],[-67,-33],[-55,187],[-74,10],[-84,-70],[34,-103],[1,-205],[-55,-1],[-85,-61],[-69,-47],[-56,-16],[-56,-97],[-62,-50],[-40,-106],[-122,-15],[22,116],[-158,199],[-6,137],[-84,95],[-108,64],[4,242],[-63,245],[-87,51],[-91,9],[13,148]],[[39397,75304],[85,-88],[69,-130],[46,-104],[11,-48],[21,-92],[82,20],[131,-24],[117,-46],[66,18],[73,-37],[-9,-91],[41,-58],[45,-96],[78,-156],[85,-205],[7,-232],[79,-145],[-8,-79],[-48,-160],[4,-222],[71,-108],[-48,-77],[-31,-6],[-96,67],[-104,-70],[-83,-155],[-98,-92],[-67,-41],[-7,-53],[-51,-48],[-48,-59],[-61,-15],[-61,165],[-5,248],[75,319],[-46,202],[-79,328],[-12,182],[-38,302],[-28,273],[-72,188],[-84,270],[-2,155]],[[40311,70569],[106,83],[75,123],[65,105],[14,84],[-26,181],[14,111],[0,88],[66,48],[146,-38],[198,1],[34,-35],[71,-129],[35,-15],[65,-28],[70,-98],[48,-132],[-56,-8],[33,-90],[20,-53],[195,-216],[132,-246],[7,-207],[71,-16],[73,-218],[141,-178],[-103,-79],[118,-244],[79,-25],[53,-180],[-44,-145],[38,-147],[1,-248],[23,-203],[-37,-113],[-27,-59],[-121,-13],[-56,59],[-71,-12],[-52,62],[-33,63],[-95,-6],[-115,-54],[-32,-149],[-70,-3],[-101,52],[-9,101],[-37,57],[-64,72],[-97,187],[-59,110],[-29,108],[-37,112],[22,85],[-16,118],[-44,35],[-53,-22],[-56,18],[-60,62],[3,65],[-106,52],[-9,-173],[-54,28],[-29,137],[51,108],[2,105],[-60,73],[-81,6],[32,165],[22,93],[11,128],[65,131],[-52,107],[1,100],[-143,22],[-53,22],[-13,115]],[[20872,70380],[56,82],[73,122],[67,-31],[-21,-126],[-11,-108],[-22,-53],[-114,20],[-28,94]],[[19996,70868],[45,41],[61,-65],[-3,-90],[-57,-45],[-47,54],[1,105]],[[39903,72368],[109,136],[68,-3],[42,44],[89,-65],[36,-136],[57,-88],[66,77],[-47,221],[-114,129],[36,86],[108,45],[132,-49],[181,-64],[180,-69],[15,0],[190,6],[110,-149],[69,-236],[95,-51],[48,-121],[110,-101],[8,-116],[-54,-108],[-121,-72],[-112,32],[-97,-7],[-126,-123],[-105,16],[-102,-11],[-40,-5],[-174,-22],[-148,-97],[-11,-137],[-38,-84],[-4,-100],[-54,-82],[13,-66],[-30,-104],[-51,-6],[-62,13],[-30,-124],[19,-87],[-16,-133],[-80,-72],[-42,-61],[-51,-62],[-29,65],[-27,157],[74,-5],[80,208],[-51,190],[-20,229],[-11,155],[45,114],[-7,93],[48,165],[-39,47],[-70,-2],[17,125],[-67,92],[-38,293],[23,80]],[[37969,74601],[22,112],[82,37],[72,68],[-19,198],[86,-2],[102,26],[127,22],[139,-32],[84,51],[63,-104],[191,-121],[198,-137],[149,-16],[141,-98],[22,-220],[-70,-71],[47,-190],[11,-40],[102,-503],[-1,-244],[-26,-205],[104,-551],[38,-143],[29,-183],[30,-182],[12,-138],[-10,-159],[-38,-56],[25,-150],[6,-191],[1,-152],[-17,-129],[-18,-60],[-80,83],[-42,66],[-26,123],[-68,98],[-55,146],[-72,176],[-58,140],[-47,143],[-35,-24],[-80,116],[-51,62],[-93,24],[-75,133],[39,48],[27,48],[31,97],[79,150],[-93,94],[-101,68],[-30,-114],[-28,-69],[-169,-40],[-27,13],[10,168],[80,77],[2,82],[-71,7],[-34,97],[30,115],[-19,75],[-30,165],[-46,97],[-92,105],[-36,79],[-67,7],[-67,128],[-11,112],[-48,165],[-61,117],[-77,41],[-23,81],[-79,58],[9,206]],[[16124,75746],[20,127],[123,86],[194,134],[19,-71],[-179,-379],[-72,-53],[-102,-7],[-3,163]],[[9842,89135],[133,137],[294,130],[327,193],[458,327],[651,383],[562,288],[527,199],[370,107],[4,1],[510,20],[196,-65],[-111,-113],[-62,-118],[-67,-91],[22,-155],[5,-91],[-73,-67],[8,-66],[100,-172],[97,-77],[177,49],[111,-1],[201,-48],[133,33],[219,25],[115,-96],[177,18],[82,-34],[173,90],[267,-107],[55,98],[144,196],[59,121],[57,43],[127,-14],[19,-60],[108,-25],[183,45],[-85,154],[-208,102],[-225,54],[-106,-1],[-198,-89],[47,209],[-10,100],[-206,211],[-62,125],[-155,74],[-135,30],[-112,223],[39,86],[103,89],[-1,56],[-149,34],[-185,-14],[-150,74],[-256,59],[-261,60],[-98,33],[-35,192],[-123,393],[-153,286],[-183,163],[-248,141],[-499,394],[-228,179],[-41,17],[-260,106],[-164,37],[-92,59],[-102,153],[-199,130],[-256,85],[-212,6],[220,131],[234,70],[41,150],[47,177],[33,215],[-28,280],[268,-9],[358,-24],[494,51],[393,67],[244,25],[290,133],[315,235],[293,347],[83,237],[1,348],[70,238],[74,167],[179,198],[254,327],[179,198],[377,238],[265,-50],[262,-11],[423,152],[533,348],[308,281],[197,167],[424,154],[51,-110],[233,-47],[249,5],[185,47],[298,24],[235,83],[310,192],[218,227],[240,275],[86,90],[215,125],[33,-107],[198,-70],[209,-33],[27,-110],[133,17],[274,-40],[60,-134],[-11,-66],[-154,-91],[-50,-66],[-170,-39],[-24,-89],[49,-125],[172,-41],[168,30],[51,74],[-25,104],[133,103],[91,162],[180,126],[105,-37],[322,-226],[-24,-124],[32,-222],[126,10],[125,-19],[145,-82],[211,205],[200,-5],[214,13],[167,62],[169,-18],[129,-56],[185,-3],[244,-45],[178,-65],[27,-56],[-138,-97],[-4,-89],[-108,-27],[35,-127],[123,-28],[194,-34],[92,-40],[248,-30],[-33,-84],[-5,-129],[210,-9],[184,-58],[109,-48],[138,111],[104,52],[104,4],[204,35],[128,-42],[100,-79],[203,40],[185,137],[113,-24],[248,38],[252,-62],[222,-112],[234,6],[169,-136],[10,-86],[102,-18],[132,84],[216,-65],[87,-40],[88,-140],[297,-59],[176,35],[64,-99],[152,-15],[94,73],[337,0],[337,-51],[110,-36],[132,49],[209,-156],[168,-90],[231,-86],[243,-52],[98,29],[107,-25],[194,131],[161,25],[321,128],[354,44],[82,-26],[127,50],[252,-120],[225,-87],[262,-161],[43,-80],[147,-38],[200,-111],[269,-93],[252,-180],[196,-21],[185,-73],[0,-2188],[0,-5070],[0,-1],[1,-7509],[0,-2880],[0,-164],[416,-156],[56,165],[430,-239],[260,296],[545,33],[4,-65],[-106,-444],[137,-177],[307,-168],[53,-224],[52,-77],[873,-971],[95,-489],[-25,-152],[1,0],[69,5],[163,177],[357,260],[33,37],[219,13],[83,186],[19,42],[-7,343],[104,-28],[110,143],[-2,65],[-101,77],[142,78],[218,45],[200,124],[218,135],[219,-195],[15,-63],[89,-78],[78,-114],[1,-169],[-37,-101],[51,-77],[-17,-69],[60,-124],[231,-62],[34,-127],[87,-101],[76,0],[91,-178],[-19,-112],[65,-24],[-1,-84],[70,-117],[365,-248],[126,-231],[285,-342],[-73,-80],[105,-219],[149,-230],[89,-287],[185,-299],[100,-263],[90,-197],[86,-187],[170,-296],[104,-254],[-107,-229],[286,-84],[-61,-305],[-6,-32],[227,-133],[-27,-99],[59,-288],[226,22],[107,-125],[262,-190],[71,-78],[2,-2],[245,-67],[62,-54],[106,-143],[138,-54],[37,-189],[73,-25],[88,-58],[127,38],[88,-236],[-8,-146],[-64,-177],[-35,-32],[-23,-152],[34,-86],[-8,-226],[31,-138],[41,-118],[14,-174],[37,-69],[-17,-71],[-92,-145],[-57,-159],[-47,-151],[-105,-200],[-169,-211],[-96,-61],[8,-75],[-52,-43],[-46,70],[-48,60],[-47,-37],[-20,7],[-59,72],[-13,152],[-11,90],[-13,78],[-33,41],[13,91],[-14,88],[-35,53],[-32,86],[-5,54],[-60,12],[-27,-171],[1,-124],[-50,-102],[0,-93],[45,-40],[-52,-101],[-66,-15],[-94,72],[-52,64],[-91,2],[-25,29],[10,75],[5,35],[-37,60],[51,102],[-14,35],[-128,40],[-71,134],[-30,173],[7,251],[9,68],[-114,79],[-127,100],[-61,72],[-16,96],[-20,120],[-37,116],[120,93],[56,122],[-91,84],[-98,11],[-39,-139],[-66,51],[-47,148],[-38,210],[-90,-85],[-102,172],[-9,201],[-112,41],[-30,2],[-44,50],[-30,57],[-61,37],[-36,29],[0,30],[8,23],[75,155],[72,35],[93,-17],[146,26],[88,126],[70,67],[-70,141],[-12,122],[-13,105],[-210,189],[-89,261],[-40,105],[-200,73],[-76,96],[-67,-46],[-129,89],[-69,159],[49,119],[16,121],[-39,200],[-4,109],[-90,92],[-50,89],[20,168],[-43,150],[-5,11],[-125,262],[-179,242],[-26,171],[-61,90],[-78,-4],[-126,22],[-79,36],[-148,38],[-107,275],[-166,126],[-113,-12],[-36,-4],[32,-143],[17,-124],[-46,-32],[12,-176],[-125,70],[-70,12],[-91,190],[-42,-8],[-79,-16],[-94,-11],[-70,139],[-169,-31],[-110,-2],[-63,-71],[-137,-54],[-153,-23],[-95,27],[-29,-74],[8,-62],[-21,-52],[-98,3],[-14,103],[-125,82],[-48,102],[-67,65],[-82,-13],[-143,107],[-104,74],[-189,183],[-77,38],[-24,92],[-138,163],[-94,100],[3,18],[12,77],[-24,80],[-102,136],[-141,143],[-119,71],[-248,116],[-152,150],[-101,75],[-135,74],[-178,96],[-133,81],[-189,153],[-204,165],[106,147],[140,36],[-3,126],[-17,216],[-150,23],[-85,-60],[-186,-88],[-85,-39],[-59,-92],[-151,23],[-339,55],[-116,44],[-209,118],[-210,108],[-83,105],[-98,70],[-125,0],[-157,91],[-134,27],[-324,90],[-284,44],[-146,-7],[-143,-42],[-177,-19],[-318,-40],[-140,-52],[-103,-46],[-97,51],[-41,55],[-52,109],[-68,35],[-144,-50],[-72,109],[-112,58],[-89,50],[-245,45],[-25,114],[-117,61],[-42,-46],[-106,29],[-111,79],[-117,-65],[-114,-32],[-171,93],[-140,70],[-89,-42],[-97,-32],[-32,-18],[-143,-22],[-87,-62],[-104,-103],[-39,4],[-38,70],[-198,21],[-69,-97],[-135,-131],[-100,-121],[-106,-175],[33,-103],[-101,-15],[-16,-90],[70,-56],[-104,-68],[-122,-46],[-106,-42],[-100,-61],[-47,38],[14,102],[52,66],[-90,167],[-129,-13],[-136,-38],[30,83],[-84,110],[-78,-107],[-68,-80],[-139,-38],[-49,55],[-100,15],[-52,-54],[-68,56],[-89,-22],[-78,51],[-87,-57],[-44,-127],[-94,-69],[-86,129],[-89,-98],[-20,-104],[79,-51],[-19,-123],[-88,53],[-94,-53],[-13,-132],[-86,122],[-68,-18],[-74,-117],[-117,-141],[-131,-171],[-15,-81],[-55,-47],[-23,-110],[-40,2],[-43,150],[-18,66],[-74,-21],[-25,-113],[-64,-154],[-36,-26],[-90,74],[-80,-49],[22,-71],[-48,-66],[-53,-17],[-111,-27],[-144,18],[-48,5],[-115,39],[33,-204],[-204,-87],[-175,103],[-51,159],[-61,98],[19,126],[68,145],[128,90],[202,106],[168,94],[109,109],[-82,127],[-135,-92],[-173,-3],[-92,75],[-110,158],[50,144],[50,139],[35,176],[99,171],[165,217],[36,160],[13,144],[54,28],[22,208],[-19,124],[-42,140],[-54,146],[36,43],[97,69],[177,33],[149,126],[169,161],[182,134],[89,54],[54,-23],[131,-235],[76,-20],[110,-22],[76,116],[41,52],[90,62],[32,22],[-102,124],[-154,119],[-54,24],[-179,-45],[33,67],[8,66],[14,119],[-197,-27],[-98,46],[-129,-7],[-131,-72],[-100,-34],[-29,-29],[-67,-66],[-66,-147],[-40,-71],[-77,-12],[-86,-57],[-117,1],[-107,-86],[-107,-117],[-71,-96],[20,-83],[66,-149],[-11,-42],[-162,22],[-126,-117],[-86,-156],[-112,-77],[-62,-123],[26,-113],[60,-39],[-127,-92],[-30,-110],[-115,-89],[-31,-67],[-4,-70],[26,-107],[-23,-124],[-92,-153],[-19,-91],[-143,-87],[-95,13],[-37,-97],[-7,-152],[-31,-114],[-92,-71],[-76,-41],[-61,-13],[-90,20],[-118,-12],[-10,-63],[-22,-78],[-95,-6],[-69,-18],[56,-152],[-43,-65],[-102,-11],[-57,-36],[-65,-39],[-29,-110],[-81,-75],[-17,-136],[-28,-84],[-7,-94],[104,-97],[117,-18],[123,17],[88,5],[88,-141],[104,-10],[78,-84],[62,-82],[50,-78],[-91,-87],[-30,-150],[-38,-64],[-96,-42],[-34,-90],[-124,-61],[-108,7],[-52,-96],[-18,-122],[-64,-10],[-61,-100],[76,-93],[-79,-73],[-26,-138],[-38,-132],[-68,-150],[-106,-79],[-122,-74],[-92,-63],[-164,-30],[-99,46],[-134,-54],[-82,-87],[51,-94],[-32,-74],[-156,-79],[-11,-125],[-62,-83],[-136,87],[-91,32],[-5,-171],[-13,-60],[-84,-44],[-8,-159],[-163,-28],[-117,-18],[30,-142],[-70,-22],[-114,10],[-127,-85],[23,-123],[-6,-168],[8,-125],[-36,-44],[-61,-76],[-32,-97],[-64,-160],[-78,18],[-59,-13],[-108,-171],[-98,43],[-88,-68],[-35,-88],[-98,-132],[-95,68],[-108,-50],[-106,-47],[-30,-96],[100,-115],[-40,-50],[-97,8],[-61,-22],[-40,83],[-65,33],[-113,-52],[44,-146],[46,-100],[-46,-110],[-91,38],[-139,-30],[-106,10],[-34,29],[-78,-27],[-59,-76],[-46,-163],[67,-11],[113,-38],[72,-42],[80,-121],[-148,-110],[-81,-73],[-18,-133],[-33,-134],[-70,-29],[-114,29],[-13,-69],[-85,2],[-134,-16],[-176,-69],[9,-153],[-275,-229],[-123,-73],[-35,-93],[-111,-104],[-33,-6],[-24,86],[72,78],[6,181],[40,100],[-46,68],[-81,26],[-69,-95],[-79,1],[-80,-21],[-29,-135],[-64,-76],[-133,-77],[-100,-73],[-64,-133],[1,-51],[-52,-61],[-118,73],[-12,-101],[-102,-15],[-49,40],[-125,0],[-92,-123],[-155,-100],[-207,6],[-25,50],[32,105],[8,108],[83,139],[-14,111],[-80,11],[-94,-26],[-63,-114],[-37,-88],[12,-203],[-81,-150],[-77,-119],[41,-172],[88,-43],[127,-96],[23,-73],[-125,25],[-91,-50],[-101,91],[-45,23],[-86,-72],[-58,54],[-64,-68],[-26,-73],[-15,-126],[-1,-155],[-41,-77],[-59,-10],[-70,114],[-7,64],[20,205],[-52,29],[-87,-90],[-17,-62],[-107,-26],[-112,-60],[-71,44],[-43,83],[-92,-129],[-75,-77],[-94,-89],[-87,-55],[64,-64],[86,-3],[103,-119],[28,-125],[-166,57],[-150,-35],[-161,-68],[-206,26],[-209,-23],[-195,-99],[-72,-92],[-13,-113],[-93,-86],[-163,-55],[-93,6],[-104,71],[-38,129],[-37,64],[-3,90],[75,77],[109,48],[60,109],[87,232],[1,135],[125,72],[82,-74],[124,71],[76,73],[111,26],[89,107],[108,31],[220,-28],[87,-164],[76,37],[56,112],[-30,178],[163,102],[89,-15],[152,50],[-35,103],[78,90],[153,178],[68,141],[178,263],[130,203],[88,73],[62,79],[135,82],[82,111],[85,23],[233,96],[262,110],[171,22],[140,1],[-3,-147],[16,-116],[204,-43],[49,11],[46,91],[-68,82],[-50,44],[90,179],[74,250],[18,137],[145,128],[68,101],[143,95],[141,179],[261,158],[281,215],[220,196],[71,-63],[35,-31],[97,4],[79,29],[8,70],[-35,124],[6,147],[132,273],[188,285],[81,76],[130,68],[136,227],[141,136],[84,32],[-5,88],[-22,90],[23,184],[36,219],[41,419],[36,114],[68,132],[-60,115],[6,190],[53,197],[149,161],[61,85],[98,136],[65,113],[61,184],[-20,51],[-89,8],[-33,-16],[-210,-103],[-163,-104],[-184,-90],[-322,-169],[-82,10],[-89,86],[-40,158],[-42,41],[-126,63],[40,104],[-89,103],[-132,-89],[-20,-114],[9,-97],[-72,-111],[30,-132],[110,-274],[-81,-143],[-76,-33],[-163,62],[-147,343],[-162,326],[-109,114],[-99,22],[37,75],[-12,90],[-86,-4],[-32,-102],[-40,-99],[-103,-84],[-63,106],[-153,58],[-73,67],[-80,101],[59,77],[-55,145],[-177,-113],[-191,-172],[-82,-175],[-44,94],[-115,-55],[-75,-53],[-121,-84],[-104,-67],[-30,-146],[-159,-105],[-180,-113],[-44,115],[-201,-10],[-129,79],[158,77],[152,87],[53,213],[-35,278],[-95,194],[-77,153],[-46,153],[50,161],[128,179],[52,68],[78,44],[-62,143],[-90,159],[-11,93],[-143,289],[-56,134],[-30,91],[-76,169],[-128,211],[-71,14],[-38,-84],[-1,-98],[7,-97],[-25,-99],[-95,-8],[-103,1],[-63,-73],[-108,-50],[-217,-120],[-254,-67],[-280,-27],[-141,15],[-181,80],[-67,170],[27,52],[42,56],[-126,105],[-123,98],[-95,194],[-91,68],[-71,117],[-69,-5],[-185,107],[-129,160],[53,51],[49,21],[52,107],[-27,28],[-96,-20],[-86,-65],[-75,2],[-78,15],[-51,84],[47,58],[143,55],[119,141],[73,28],[-17,88],[-27,53],[9,125],[-49,144],[-21,25],[-77,90],[55,71],[68,93],[-73,63],[-57,109],[-109,37],[-53,-172],[-66,8],[-85,17],[-76,87],[6,171],[9,97],[-146,60],[-40,-6],[-80,183],[40,54],[76,36],[40,75],[-106,87],[-42,40],[-77,-31],[-68,-89],[-66,39],[-56,181],[61,221],[83,81],[-39,90],[137,67],[122,-45],[146,41],[-9,52],[-83,168],[-10,178],[73,161],[191,272],[168,276],[154,181],[40,145],[80,114],[111,52],[-24,127],[-10,103],[56,187],[114,225],[69,173],[147,171],[208,93],[127,21],[162,-76],[135,-17],[104,-138],[77,-11],[191,-186],[233,39],[120,118],[67,65],[21,98],[86,17],[114,126],[62,69],[94,176],[61,86],[-186,158],[-130,77],[107,91],[166,18],[132,-177],[160,-53],[81,-129],[273,36],[227,-10],[205,57],[105,137],[259,365],[15,144],[-120,324],[-36,129],[-19,295],[-192,234],[-76,104],[-215,48],[31,159],[71,79],[171,-98],[183,85],[178,149],[8,187],[-136,200],[-128,90],[-47,55],[-72,-28],[-102,-102],[-43,-109],[-126,-38],[-114,45],[-113,-52],[-94,-76],[-162,-32],[-114,-39],[-42,-101],[-272,-169],[-56,-97],[-26,-179],[-121,-100],[-61,197],[-19,120],[-74,81],[-82,-44],[5,-79],[-57,-76],[-37,-107],[-104,142],[-146,131],[-243,84],[-128,11],[-129,-45],[-154,26],[-143,-6],[-214,-86],[-232,-128],[-173,-30],[-258,90],[-470,113],[-372,83],[-158,129],[-61,198],[3,80],[64,105],[-22,59],[-137,139],[-100,67],[-35,70],[-155,187],[22,25],[225,-25],[137,79],[26,131],[93,77],[-82,82],[-141,32],[-137,-6],[-133,53],[-149,46],[-251,25],[-111,28],[-188,146],[-148,93],[-175,59],[-73,166]]]};
+	var geos_state = topojson.feature(state_topo, state_topo.objects.geos);
+	var geos_state_mesh = topojson.mesh(state_topo, state_topo.objects.geos);
+
+	var geos_cbsa = 
+	[{"cbsa":"10100","name":"Aberdeen, SD","lon":-98.69611,"lat":45.52156},{"cbsa":"10140","name":"Aberdeen, WA","lon":-123.77322,"lat":47.14989},{"cbsa":"10180","name":"Abilene, TX","lon":-99.71764,"lat":32.44975},{"cbsa":"10220","name":"Ada, OK","lon":-96.68419,"lat":34.72796},{"cbsa":"10260","name":"Adjuntas, PR","lon":-66.75352,"lat":18.17966},{"cbsa":"10300","name":"Adrian, MI","lon":-84.06638,"lat":41.89466},{"cbsa":"10380","name":"Aguadilla-Isabela, PR","lon":-66.95323,"lat":18.33543},{"cbsa":"10420","name":"Akron, OH","lon":-81.34942,"lat":41.14883},{"cbsa":"10460","name":"Alamogordo, NM","lon":-105.7416,"lat":32.61323},{"cbsa":"10500","name":"Albany, GA","lon":-84.17349,"lat":31.58975},{"cbsa":"10540","name":"Albany, OR","lon":-122.53518,"lat":44.48911},{"cbsa":"10580","name":"Albany-Schenectady-Troy, NY","lon":-73.94196,"lat":42.78845},{"cbsa":"10620","name":"Albemarle, NC","lon":-80.25104,"lat":35.31172},{"cbsa":"10660","name":"Albert Lea, MN","lon":-93.34886,"lat":43.67383},{"cbsa":"10700","name":"Albertville, AL","lon":-86.30632,"lat":34.36703},{"cbsa":"10740","name":"Albuquerque, NM","lon":-106.47157,"lat":35.12232},{"cbsa":"10760","name":"Alexander City, AL","lon":-85.7975,"lat":32.86234},{"cbsa":"10780","name":"Alexandria, LA","lon":-92.54155,"lat":31.33055},{"cbsa":"10820","name":"Alexandria, MN","lon":-95.45407,"lat":45.93379},{"cbsa":"10860","name":"Alice, TX","lon":-98.08998,"lat":27.73123},{"cbsa":"10900","name":"Allentown-Bethlehem-Easton, PA-NJ","lon":-75.40372,"lat":40.78934},{"cbsa":"10940","name":"Alma, MI","lon":-84.60472,"lat":43.29295},{"cbsa":"10980","name":"Alpena, MI","lon":-83.62607,"lat":45.03458},{"cbsa":"11020","name":"Altoona, PA","lon":-78.34882,"lat":40.48092},{"cbsa":"11060","name":"Altus, OK","lon":-99.41522,"lat":34.58805},{"cbsa":"11100","name":"Amarillo, TX","lon":-101.91041,"lat":35.24882},{"cbsa":"11140","name":"Americus, GA","lon":-84.22672,"lat":32.09704},{"cbsa":"11180","name":"Ames, IA","lon":-93.46507,"lat":42.0362},{"cbsa":"11220","name":"Amsterdam, NY","lon":-74.43992,"lat":42.9022},{"cbsa":"11260","name":"Anchorage, AK","lon":-149.54302,"lat":62.24288},{"cbsa":"11380","name":"Andrews, TX","lon":-102.63763,"lat":32.30471},{"cbsa":"11420","name":"Angola, IN","lon":-85.00108,"lat":41.64392},{"cbsa":"11460","name":"Ann Arbor, MI","lon":-83.83851,"lat":42.25283},{"cbsa":"11500","name":"Anniston-Oxford-Jacksonville, AL","lon":-85.82552,"lat":33.77144},{"cbsa":"11540","name":"Appleton, WI","lon":-88.37113,"lat":44.2888},{"cbsa":"11580","name":"Arcadia, FL","lon":-81.8098,"lat":27.18691},{"cbsa":"11620","name":"Ardmore, OK","lon":-97.28593,"lat":34.25089},{"cbsa":"11640","name":"Arecibo, PR","lon":-66.75706,"lat":18.41289},{"cbsa":"11660","name":"Arkadelphia, AR","lon":-93.17655,"lat":34.05084},{"cbsa":"11680","name":"Arkansas City-Winfield, KS","lon":-96.83768,"lat":37.23783},{"cbsa":"11700","name":"Asheville, NC","lon":-82.68276,"lat":35.60065},{"cbsa":"11740","name":"Ashland, OH","lon":-82.27062,"lat":40.84594},{"cbsa":"11780","name":"Ashtabula, OH","lon":-80.74857,"lat":41.70756},{"cbsa":"11820","name":"Astoria, OR","lon":-123.65622,"lat":45.99476},{"cbsa":"11860","name":"Atchison, KS","lon":-95.31388,"lat":39.53168},{"cbsa":"11900","name":"Athens, OH","lon":-82.04518,"lat":39.33403},{"cbsa":"11940","name":"Athens, TN","lon":-84.61783,"lat":35.42435},{"cbsa":"11980","name":"Athens, TX","lon":-95.85481,"lat":32.21246},{"cbsa":"12020","name":"Athens-Clarke County, GA","lon":-83.2137,"lat":33.94927},{"cbsa":"12060","name":"Atlanta-Sandy Springs-Roswell, GA","lon":-84.39952,"lat":33.69269},{"cbsa":"12100","name":"Atlantic City-Hammonton, NJ","lon":-74.66031,"lat":39.47788},{"cbsa":"12120","name":"Atmore, AL","lon":-87.16149,"lat":31.12624},{"cbsa":"12140","name":"Auburn, IN","lon":-84.99901,"lat":41.39773},{"cbsa":"12180","name":"Auburn, NY","lon":-76.55479,"lat":42.91772},{"cbsa":"12220","name":"Auburn-Opelika, AL","lon":-85.3549,"lat":32.60106},{"cbsa":"12260","name":"Augusta-Richmond County, GA-SC","lon":-81.98323,"lat":33.46099},{"cbsa":"12300","name":"Augusta-Waterville, ME","lon":-69.7675,"lat":44.40892},{"cbsa":"12380","name":"Austin, MN","lon":-92.75238,"lat":43.67141},{"cbsa":"12420","name":"Austin-Round Rock, TX","lon":-97.65448,"lat":30.26257},{"cbsa":"12460","name":"Bainbridge, GA","lon":-84.5792,"lat":30.8782},{"cbsa":"12540","name":"Bakersfield, CA","lon":-118.72976,"lat":35.34281},{"cbsa":"12580","name":"Baltimore-Columbia-Towson, MD","lon":-76.57961,"lat":39.33718},{"cbsa":"12620","name":"Bangor, ME","lon":-68.64947,"lat":45.40071},{"cbsa":"12660","name":"Baraboo, WI","lon":-89.94793,"lat":43.42637},{"cbsa":"12680","name":"Bardstown, KY","lon":-85.46602,"lat":37.80489},{"cbsa":"12700","name":"Barnstable Town, MA","lon":-70.28986,"lat":41.72331},{"cbsa":"12740","name":"Barre, VT","lon":-72.61427,"lat":44.27377},{"cbsa":"12780","name":"Bartlesville, OK","lon":-95.90445,"lat":36.71527},{"cbsa":"12820","name":"Bastrop, LA","lon":-91.80211,"lat":32.8201},{"cbsa":"12860","name":"Batavia, NY","lon":-78.19388,"lat":43.00081},{"cbsa":"12900","name":"Batesville, AR","lon":-91.57025,"lat":35.74167},{"cbsa":"12940","name":"Baton Rouge, LA","lon":-91.13268,"lat":30.57116},{"cbsa":"12980","name":"Battle Creek, MI","lon":-85.00576,"lat":42.24631},{"cbsa":"13020","name":"Bay City, MI","lon":-83.98995,"lat":43.70716},{"cbsa":"13060","name":"Bay City, TX","lon":-96.01141,"lat":28.82109},{"cbsa":"13100","name":"Beatrice, NE","lon":-96.68942,"lat":40.26177},{"cbsa":"13140","name":"Beaumont-Port Arthur, TX","lon":-94.0707,"lat":30.30488},{"cbsa":"13180","name":"Beaver Dam, WI","lon":-88.7075,"lat":43.41622},{"cbsa":"13220","name":"Beckley, WV","lon":-81.1608,"lat":37.90613},{"cbsa":"13260","name":"Bedford, IN","lon":-86.48326,"lat":38.84108},{"cbsa":"13300","name":"Beeville, TX","lon":-97.74104,"lat":28.41725},{"cbsa":"13340","name":"Bellefontaine, OH","lon":-83.7663,"lat":40.38849},{"cbsa":"13380","name":"Bellingham, WA","lon":-121.72064,"lat":48.82564},{"cbsa":"13420","name":"Bemidji, MN","lon":-94.93726,"lat":47.97354},{"cbsa":"13460","name":"Bend-Redmond, OR","lon":-121.22819,"lat":43.91487},{"cbsa":"13500","name":"Bennettsville, SC","lon":-79.67861,"lat":34.60201},{"cbsa":"13540","name":"Bennington, VT","lon":-73.0929,"lat":43.03553},{"cbsa":"13620","name":"Berlin, NH-VT","lon":-71.42158,"lat":44.69982},{"cbsa":"13660","name":"Big Rapids, MI","lon":-85.32462,"lat":43.64059},{"cbsa":"13700","name":"Big Spring, TX","lon":-101.47806,"lat":32.0886},{"cbsa":"13720","name":"Big Stone Gap, VA","lon":-82.50048,"lat":37.04223},{"cbsa":"13740","name":"Billings, MT","lon":-108.71755,"lat":45.78055},{"cbsa":"13780","name":"Binghamton, NY","lon":-76.02544,"lat":42.16483},{"cbsa":"13820","name":"Birmingham-Hoover, AL","lon":-86.81376,"lat":33.46376},{"cbsa":"13900","name":"Bismarck, ND","lon":-100.99104,"lat":46.72692},{"cbsa":"13940","name":"Blackfoot, ID","lon":-112.39831,"lat":43.21657},{"cbsa":"13980","name":"Blacksburg-Christiansburg-Radford, VA","lon":-80.53258,"lat":37.12094},{"cbsa":"14010","name":"Bloomington, IL","lon":-88.86174,"lat":40.41053},{"cbsa":"14020","name":"Bloomington, IN","lon":-86.67617,"lat":39.23479},{"cbsa":"14100","name":"Bloomsburg-Berwick, PA","lon":-76.45904,"lat":41.04438},{"cbsa":"14140","name":"Bluefield, WV-VA","lon":-81.35873,"lat":37.25095},{"cbsa":"14180","name":"Blytheville, AR","lon":-90.05431,"lat":35.7642},{"cbsa":"14220","name":"Bogalusa, LA","lon":-90.04029,"lat":30.85346},{"cbsa":"14260","name":"Boise City, ID","lon":-116.14315,"lat":43.01602},{"cbsa":"14300","name":"Bonham, TX","lon":-96.1067,"lat":33.59388},{"cbsa":"14340","name":"Boone, IA","lon":-93.9315,"lat":42.03652},{"cbsa":"14380","name":"Boone, NC","lon":-81.69595,"lat":36.23087},{"cbsa":"14420","name":"Borger, TX","lon":-101.35466,"lat":35.84007},{"cbsa":"14460","name":"Boston-Cambridge-Newton, MA-NH","lon":-71.1002,"lat":42.55728},{"cbsa":"14500","name":"Boulder, CO","lon":-105.35765,"lat":40.09252},{"cbsa":"14540","name":"Bowling Green, KY","lon":-86.40695,"lat":37.03849},{"cbsa":"14580","name":"Bozeman, MT","lon":-111.16985,"lat":45.54105},{"cbsa":"14620","name":"Bradford, PA","lon":-78.56888,"lat":41.80787},{"cbsa":"14660","name":"Brainerd, MN","lon":-94.24418,"lat":46.79924},{"cbsa":"14700","name":"Branson, MO","lon":-93.22353,"lat":36.69531},{"cbsa":"14720","name":"Breckenridge, CO","lon":-106.11674,"lat":39.63479},{"cbsa":"14740","name":"Bremerton-Silverdale, WA","lon":-122.67345,"lat":47.61333},{"cbsa":"14780","name":"Brenham, TX","lon":-96.40341,"lat":30.21436},{"cbsa":"14820","name":"Brevard, NC","lon":-82.79828,"lat":35.20172},{"cbsa":"14860","name":"Bridgeport-Stamford-Norwalk, CT","lon":-73.38906,"lat":41.26981},{"cbsa":"15020","name":"Brookhaven, MS","lon":-90.45401,"lat":31.53249},{"cbsa":"15060","name":"Brookings, OR","lon":-124.15629,"lat":42.45766},{"cbsa":"15100","name":"Brookings, SD","lon":-96.79061,"lat":44.36975},{"cbsa":"15140","name":"Brownsville, TN","lon":-89.28411,"lat":35.58312},{"cbsa":"15180","name":"Brownsville-Harlingen, TX","lon":-97.51395,"lat":26.13431},{"cbsa":"15220","name":"Brownwood, TX","lon":-98.99874,"lat":31.77453},{"cbsa":"15260","name":"Brunswick, GA","lon":-81.63477,"lat":31.31135},{"cbsa":"15340","name":"Bucyrus, OH","lon":-82.91997,"lat":40.85062},{"cbsa":"15380","name":"Buffalo-Cheektowaga-Niagara Falls, NY","lon":-78.73685,"lat":42.91121},{"cbsa":"15420","name":"Burley, ID","lon":-113.60951,"lat":42.41463},{"cbsa":"15460","name":"Burlington, IA-IL","lon":-91.05889,"lat":40.87266},{"cbsa":"15500","name":"Burlington, NC","lon":-79.39933,"lat":36.04357},{"cbsa":"15540","name":"Burlington-South Burlington, VT","lon":-73.03069,"lat":44.68734},{"cbsa":"15580","name":"Butte-Silver Bow, MT","lon":-112.65643,"lat":45.90252},{"cbsa":"15620","name":"Cadillac, MI","lon":-85.33644,"lat":44.33806},{"cbsa":"15660","name":"Calhoun, GA","lon":-84.87538,"lat":34.50349},{"cbsa":"15680","name":"California-Lexington Park, MD","lon":-76.60594,"lat":38.3014},{"cbsa":"15700","name":"Cambridge, MD","lon":-76.02339,"lat":38.46911},{"cbsa":"15740","name":"Cambridge, OH","lon":-81.494,"lat":40.05192},{"cbsa":"15780","name":"Camden, AR","lon":-92.70723,"lat":33.57697},{"cbsa":"15820","name":"Campbellsville, KY","lon":-85.3279,"lat":37.36659},{"cbsa":"15860","name":"Cañon City, CO","lon":-105.43984,"lat":38.47309},{"cbsa":"15900","name":"Canton, IL","lon":-90.20744,"lat":40.47252},{"cbsa":"15940","name":"Canton-Massillon, OH","lon":-81.2536,"lat":40.7187},{"cbsa":"15980","name":"Cape Coral-Fort Myers, FL","lon":-81.84071,"lat":26.57793},{"cbsa":"16020","name":"Cape Girardeau, MO-IL","lon":-89.76924,"lat":37.32424},{"cbsa":"16060","name":"Carbondale-Marion, IL","lon":-89.1906,"lat":37.76182},{"cbsa":"16100","name":"Carlsbad-Artesia, NM","lon":-104.30428,"lat":32.4715},{"cbsa":"16140","name":"Carroll, IA","lon":-94.86033,"lat":42.03617},{"cbsa":"16180","name":"Carson City, NV","lon":-119.74705,"lat":39.15134},{"cbsa":"16220","name":"Casper, WY","lon":-106.79853,"lat":42.96194},{"cbsa":"16260","name":"Cedar City, UT","lon":-113.28948,"lat":37.85919},{"cbsa":"16300","name":"Cedar Rapids, IA","lon":-91.6314,"lat":42.09143},{"cbsa":"16340","name":"Cedartown, GA","lon":-85.18802,"lat":34.00173},{"cbsa":"16380","name":"Celina, OH","lon":-84.6293,"lat":40.54031},{"cbsa":"16420","name":"Central City, KY","lon":-87.14269,"lat":37.21592},{"cbsa":"16460","name":"Centralia, IL","lon":-88.91886,"lat":38.64964},{"cbsa":"16500","name":"Centralia, WA","lon":-122.39194,"lat":46.57749},{"cbsa":"16540","name":"Chambersburg-Waynesboro, PA","lon":-77.7216,"lat":39.92734},{"cbsa":"16580","name":"Champaign-Urbana, IL","lon":-88.29454,"lat":40.22673},{"cbsa":"16620","name":"Charleston, WV","lon":-81.4915,"lat":38.27174},{"cbsa":"16660","name":"Charleston-Mattoon, IL","lon":-88.22912,"lat":39.42087},{"cbsa":"16700","name":"Charleston-North Charleston, SC","lon":-80.04338,"lat":33.0421},{"cbsa":"16740","name":"Charlotte-Concord-Gastonia, NC-SC","lon":-80.86706,"lat":35.18901},{"cbsa":"16820","name":"Charlottesville, VA","lon":-78.5764,"lat":37.8519},{"cbsa":"16860","name":"Chattanooga, TN-GA","lon":-85.35885,"lat":35.05192},{"cbsa":"16940","name":"Cheyenne, WY","lon":-104.68967,"lat":41.30713},{"cbsa":"16980","name":"Chicago-Naperville-Elgin, IL-IN-WI","lon":-87.96261,"lat":41.70249},{"cbsa":"17020","name":"Chico, CA","lon":-121.6006,"lat":39.66669},{"cbsa":"17060","name":"Chillicothe, OH","lon":-83.05697,"lat":39.33762},{"cbsa":"17140","name":"Cincinnati, OH-KY-IN","lon":-84.42713,"lat":39.0716},{"cbsa":"17200","name":"Claremont-Lebanon, NH-VT","lon":-72.16134,"lat":43.78357},{"cbsa":"17220","name":"Clarksburg, WV","lon":-80.43091,"lat":39.2886},{"cbsa":"17260","name":"Clarksdale, MS","lon":-90.60265,"lat":34.22915},{"cbsa":"17300","name":"Clarksville, TN-KY","lon":-87.56255,"lat":36.74656},{"cbsa":"17340","name":"Clearlake, CA","lon":-122.75343,"lat":39.09955},{"cbsa":"17380","name":"Cleveland, MS","lon":-90.8804,"lat":33.79552},{"cbsa":"17420","name":"Cleveland, TN","lon":-84.66704,"lat":35.13442},{"cbsa":"17460","name":"Cleveland-Elyria, OH","lon":-81.68389,"lat":41.37552},{"cbsa":"17500","name":"Clewiston, FL","lon":-81.16538,"lat":26.5537},{"cbsa":"17540","name":"Clinton, IA","lon":-90.5323,"lat":41.89791},{"cbsa":"17580","name":"Clovis, NM","lon":-103.34686,"lat":34.57426},{"cbsa":"17620","name":"Coamo, PR","lon":-66.36074,"lat":18.09732},{"cbsa":"17640","name":"Coco, PR","lon":-66.25547,"lat":18.00783},{"cbsa":"17660","name":"Coeur d'Alene, ID","lon":-116.7018,"lat":47.67442},{"cbsa":"17700","name":"Coffeyville, KS","lon":-95.74281,"lat":37.19253},{"cbsa":"17740","name":"Coldwater, MI","lon":-85.05923,"lat":41.91589},{"cbsa":"17780","name":"College Station-Bryan, TX","lon":-96.48901,"lat":30.75642},{"cbsa":"17820","name":"Colorado Springs, CO","lon":-104.65833,"lat":38.84265},{"cbsa":"17860","name":"Columbia, MO","lon":-92.30973,"lat":38.9914},{"cbsa":"17900","name":"Columbia, SC","lon":-81.04303,"lat":34.09188},{"cbsa":"17980","name":"Columbus, GA-AL","lon":-84.90867,"lat":32.44113},{"cbsa":"18020","name":"Columbus, IN","lon":-85.89741,"lat":39.20594},{"cbsa":"18060","name":"Columbus, MS","lon":-88.44329,"lat":33.47306},{"cbsa":"18100","name":"Columbus, NE","lon":-97.52076,"lat":41.57115},{"cbsa":"18140","name":"Columbus, OH","lon":-82.83679,"lat":39.96767},{"cbsa":"18180","name":"Concord, NH","lon":-71.68038,"lat":43.29741},{"cbsa":"18220","name":"Connersville, IN","lon":-85.17845,"lat":39.63997},{"cbsa":"18260","name":"Cookeville, TN","lon":-85.46678,"lat":36.27795},{"cbsa":"18300","name":"Coos Bay, OR","lon":-124.05941,"lat":43.17431},{"cbsa":"18380","name":"Cordele, GA","lon":-83.7673,"lat":31.92285},{"cbsa":"18420","name":"Corinth, MS","lon":-88.58013,"lat":34.88086},{"cbsa":"18460","name":"Cornelia, GA","lon":-83.53061,"lat":34.63081},{"cbsa":"18500","name":"Corning, NY","lon":-77.38378,"lat":42.26787},{"cbsa":"18580","name":"Corpus Christi, TX","lon":-97.47282,"lat":27.89768},{"cbsa":"18620","name":"Corsicana, TX","lon":-96.473,"lat":32.04687},{"cbsa":"18660","name":"Cortland, NY","lon":-76.07037,"lat":42.59514},{"cbsa":"18700","name":"Corvallis, OR","lon":-123.42891,"lat":44.49124},{"cbsa":"18740","name":"Coshocton, OH","lon":-81.91988,"lat":40.30199},{"cbsa":"18780","name":"Craig, CO","lon":-108.20751,"lat":40.61835},{"cbsa":"18820","name":"Crawfordsville, IN","lon":-86.89351,"lat":40.04049},{"cbsa":"18860","name":"Crescent City, CA","lon":-123.89715,"lat":41.74324},{"cbsa":"18880","name":"Crestview-Fort Walton Beach-Destin, FL","lon":-86.36549,"lat":30.6656},{"cbsa":"18900","name":"Crossville, TN","lon":-84.99839,"lat":35.95066},{"cbsa":"18980","name":"Cullman, AL","lon":-86.86746,"lat":34.13171},{"cbsa":"19000","name":"Cullowhee, NC","lon":-83.1409,"lat":35.28779},{"cbsa":"19060","name":"Cumberland, MD-WV","lon":-78.80379,"lat":39.53191},{"cbsa":"19100","name":"Dallas-Fort Worth-Arlington, TX","lon":-97.02543,"lat":32.81841},{"cbsa":"19140","name":"Dalton, GA","lon":-84.84808,"lat":34.79651},{"cbsa":"19180","name":"Danville, IL","lon":-87.73282,"lat":40.18341},{"cbsa":"19220","name":"Danville, KY","lon":-84.73357,"lat":37.51506},{"cbsa":"19260","name":"Danville, VA","lon":-79.39763,"lat":36.81103},{"cbsa":"19300","name":"Daphne-Fairhope-Foley, AL","lon":-87.72274,"lat":30.72767},{"cbsa":"19340","name":"Davenport-Moline-Rock Island, IA-IL","lon":-90.46572,"lat":41.39668},{"cbsa":"19380","name":"Dayton, OH","lon":-84.14203,"lat":39.8295},{"cbsa":"19420","name":"Dayton, TN","lon":-84.92414,"lat":35.60924},{"cbsa":"19460","name":"Decatur, AL","lon":-87.10223,"lat":34.491},{"cbsa":"19500","name":"Decatur, IL","lon":-88.96166,"lat":39.86004},{"cbsa":"19540","name":"Decatur, IN","lon":-84.93658,"lat":40.74578},{"cbsa":"19580","name":"Defiance, OH","lon":-84.49072,"lat":41.32399},{"cbsa":"19620","name":"Del Rio, TX","lon":-101.15216,"lat":29.89249},{"cbsa":"19660","name":"Deltona-Daytona Beach-Ormond Beach, FL","lon":-81.21979,"lat":29.17403},{"cbsa":"19700","name":"Deming, NM","lon":-107.74983,"lat":32.18217},{"cbsa":"19740","name":"Denver-Aurora-Lakewood, CO","lon":-104.89496,"lat":39.43385},{"cbsa":"19760","name":"DeRidder, LA","lon":-93.34346,"lat":30.64829},{"cbsa":"19780","name":"Des Moines-West Des Moines, IA","lon":-93.9404,"lat":41.5478},{"cbsa":"19820","name":"Detroit-Warren-Dearborn, MI","lon":-83.23208,"lat":42.71913},{"cbsa":"19860","name":"Dickinson, ND","lon":-102.6551,"lat":46.81074},{"cbsa":"19940","name":"Dixon, IL","lon":-89.2997,"lat":41.74623},{"cbsa":"19980","name":"Dodge City, KS","lon":-99.88813,"lat":37.6918},{"cbsa":"20020","name":"Dothan, AL","lon":-85.46145,"lat":31.25288},{"cbsa":"20060","name":"Douglas, GA","lon":-82.84958,"lat":31.54917},{"cbsa":"20100","name":"Dover, DE","lon":-75.56832,"lat":39.0862},{"cbsa":"20140","name":"Dublin, GA","lon":-82.85073,"lat":32.52853},{"cbsa":"20180","name":"DuBois, PA","lon":-78.47424,"lat":41.00001},{"cbsa":"20220","name":"Dubuque, IA","lon":-90.8818,"lat":42.46858},{"cbsa":"20260","name":"Duluth, MN-WI","lon":-92.40817,"lat":47.33378},{"cbsa":"20300","name":"Dumas, TX","lon":-101.89303,"lat":35.83769},{"cbsa":"20340","name":"Duncan, OK","lon":-97.8515,"lat":34.48551},{"cbsa":"20380","name":"Dunn, NC","lon":-78.87007,"lat":35.36856},{"cbsa":"20420","name":"Durango, CO","lon":-107.84332,"lat":37.28654},{"cbsa":"20460","name":"Durant, OK","lon":-96.26023,"lat":33.96235},{"cbsa":"20500","name":"Durham-Chapel Hill, NC","lon":-79.09953,"lat":35.99098},{"cbsa":"20540","name":"Dyersburg, TN","lon":-89.41394,"lat":36.05918},{"cbsa":"20580","name":"Eagle Pass, TX","lon":-100.31471,"lat":28.74263},{"cbsa":"20660","name":"Easton, MD","lon":-76.10358,"lat":38.77025},{"cbsa":"20700","name":"East Stroudsburg, PA","lon":-75.33949,"lat":41.05822},{"cbsa":"20740","name":"Eau Claire, WI","lon":-91.28237,"lat":44.93898},{"cbsa":"20780","name":"Edwards, CO","lon":-106.69538,"lat":39.62802},{"cbsa":"20820","name":"Effingham, IL","lon":-88.58981,"lat":39.05974},{"cbsa":"20900","name":"El Campo, TX","lon":-96.22231,"lat":29.27793},{"cbsa":"20940","name":"El Centro, CA","lon":-115.36578,"lat":33.03934},{"cbsa":"20980","name":"El Dorado, AR","lon":-92.59733,"lat":33.17126},{"cbsa":"21020","name":"Elizabeth City, NC","lon":-76.31105,"lat":36.29474},{"cbsa":"21060","name":"Elizabethtown-Fort Knox, KY","lon":-85.97391,"lat":37.73761},{"cbsa":"21120","name":"Elk City, OK","lon":-99.68124,"lat":35.26874},{"cbsa":"21140","name":"Elkhart-Goshen, IN","lon":-85.85873,"lat":41.59748},{"cbsa":"21180","name":"Elkins, WV","lon":-79.87555,"lat":38.775},{"cbsa":"21220","name":"Elko, NV","lon":-115.53379,"lat":40.92168},{"cbsa":"21260","name":"Ellensburg, WA","lon":-120.67935,"lat":47.12446},{"cbsa":"21300","name":"Elmira, NY","lon":-76.75963,"lat":42.14101},{"cbsa":"21340","name":"El Paso, TX","lon":-105.54166,"lat":31.51334},{"cbsa":"21380","name":"Emporia, KS","lon":-96.15259,"lat":38.45593},{"cbsa":"21420","name":"Enid, OK","lon":-97.78266,"lat":36.37911},{"cbsa":"21460","name":"Enterprise, AL","lon":-85.98807,"lat":31.40201},{"cbsa":"21500","name":"Erie, PA","lon":-80.03295,"lat":41.99255},{"cbsa":"21540","name":"Escanaba, MI","lon":-86.92335,"lat":45.91745},{"cbsa":"21580","name":"Española, NM","lon":-106.69301,"lat":36.50954},{"cbsa":"21640","name":"Eufaula, AL-GA","lon":-85.33693,"lat":31.86914},{"cbsa":"21660","name":"Eugene, OR","lon":-122.84641,"lat":43.9388},{"cbsa":"21700","name":"Eureka-Arcata-Fortuna, CA","lon":-123.8756,"lat":40.69935},{"cbsa":"21740","name":"Evanston, WY","lon":-110.54734,"lat":41.28767},{"cbsa":"21780","name":"Evansville, IN-KY","lon":-87.57949,"lat":37.97129},{"cbsa":"21820","name":"Fairbanks, AK","lon":-146.56414,"lat":64.80774},{"cbsa":"21840","name":"Fairfield, IA","lon":-91.94871,"lat":41.03182},{"cbsa":"21860","name":"Fairmont, MN","lon":-94.551,"lat":43.6743},{"cbsa":"21900","name":"Fairmont, WV","lon":-80.24294,"lat":39.50962},{"cbsa":"21980","name":"Fallon, NV","lon":-118.33626,"lat":39.58048},{"cbsa":"22020","name":"Fargo, ND-MN","lon":-96.96577,"lat":46.91776},{"cbsa":"22060","name":"Faribault-Northfield, MN","lon":-93.29667,"lat":44.35434},{"cbsa":"22100","name":"Farmington, MO","lon":-90.47232,"lat":37.81029},{"cbsa":"22140","name":"Farmington, NM","lon":-108.32062,"lat":36.50856},{"cbsa":"22180","name":"Fayetteville, NC","lon":-78.98014,"lat":35.03719},{"cbsa":"22220","name":"Fayetteville-Springdale-Rogers, AR-MO","lon":-94.12164,"lat":36.19617},{"cbsa":"22260","name":"Fergus Falls, MN","lon":-95.70781,"lat":46.40872},{"cbsa":"22280","name":"Fernley, NV","lon":-119.18938,"lat":39.02061},{"cbsa":"22300","name":"Findlay, OH","lon":-83.66634,"lat":41.00177},{"cbsa":"22340","name":"Fitzgerald, GA","lon":-83.22029,"lat":31.75973},{"cbsa":"22380","name":"Flagstaff, AZ","lon":-111.77053,"lat":35.8387},{"cbsa":"22420","name":"Flint, MI","lon":-83.70686,"lat":43.02167},{"cbsa":"22500","name":"Florence, SC","lon":-79.80825,"lat":34.15198},{"cbsa":"22520","name":"Florence-Muscle Shoals, AL","lon":-87.72399,"lat":34.80845},{"cbsa":"22540","name":"Fond du Lac, WI","lon":-88.4888,"lat":43.75366},{"cbsa":"22580","name":"Forest City, NC","lon":-81.92018,"lat":35.40242},{"cbsa":"22620","name":"Forrest City, AR","lon":-90.74868,"lat":35.02206},{"cbsa":"22660","name":"Fort Collins, CO","lon":-105.46135,"lat":40.66655},{"cbsa":"22700","name":"Fort Dodge, IA","lon":-94.18174,"lat":42.42792},{"cbsa":"22780","name":"Fort Leonard Wood, MO","lon":-92.20761,"lat":37.82451},{"cbsa":"22800","name":"Fort Madison-Keokuk, IA-IL-MO","lon":-91.41339,"lat":40.47423},{"cbsa":"22820","name":"Fort Morgan, CO","lon":-103.8089,"lat":40.2628},{"cbsa":"22840","name":"Fort Payne, AL","lon":-85.80421,"lat":34.45996},{"cbsa":"22860","name":"Fort Polk South, LA","lon":-93.18374,"lat":31.1081},{"cbsa":"22900","name":"Fort Smith, AR-OK","lon":-94.56609,"lat":35.19042},{"cbsa":"23060","name":"Fort Wayne, IN","lon":-85.21669,"lat":41.00539},{"cbsa":"23140","name":"Frankfort, IN","lon":-86.47523,"lat":40.30204},{"cbsa":"23180","name":"Frankfort, KY","lon":-84.9329,"lat":38.12411},{"cbsa":"23240","name":"Fredericksburg, TX","lon":-98.94677,"lat":30.31824},{"cbsa":"23300","name":"Freeport, IL","lon":-89.66268,"lat":42.35167},{"cbsa":"23340","name":"Fremont, NE","lon":-96.6539,"lat":41.57782},{"cbsa":"23380","name":"Fremont, OH","lon":-83.14405,"lat":41.35728},{"cbsa":"23420","name":"Fresno, CA","lon":-119.64847,"lat":36.75833},{"cbsa":"23460","name":"Gadsden, AL","lon":-86.03446,"lat":34.04498},{"cbsa":"23500","name":"Gaffney, SC","lon":-81.62027,"lat":35.04869},{"cbsa":"23540","name":"Gainesville, FL","lon":-82.47616,"lat":29.68841},{"cbsa":"23580","name":"Gainesville, GA","lon":-83.82026,"lat":34.31729},{"cbsa":"23620","name":"Gainesville, TX","lon":-97.21276,"lat":33.63938},{"cbsa":"23660","name":"Galesburg, IL","lon":-90.21327,"lat":40.93154},{"cbsa":"23700","name":"Gallup, NM","lon":-108.26175,"lat":35.58061},{"cbsa":"23780","name":"Garden City, KS","lon":-100.9708,"lat":38.02654},{"cbsa":"23820","name":"Gardnerville Ranchos, NV","lon":-119.6167,"lat":38.91215},{"cbsa":"23860","name":"Georgetown, SC","lon":-79.33266,"lat":33.43325},{"cbsa":"23900","name":"Gettysburg, PA","lon":-77.21764,"lat":39.87157},{"cbsa":"23940","name":"Gillette, WY","lon":-105.54826,"lat":44.24844},{"cbsa":"23980","name":"Glasgow, KY","lon":-85.82172,"lat":36.97466},{"cbsa":"24020","name":"Glens Falls, NY","lon":-73.64887,"lat":43.4434},{"cbsa":"24060","name":"Glenwood Springs, CO","lon":-107.66001,"lat":39.50515},{"cbsa":"24100","name":"Gloversville, NY","lon":-74.42156,"lat":43.11353},{"cbsa":"24140","name":"Goldsboro, NC","lon":-78.00395,"lat":35.36401},{"cbsa":"24220","name":"Grand Forks, ND-MN","lon":-96.84424,"lat":47.83586},{"cbsa":"24260","name":"Grand Island, NE","lon":-98.27912,"lat":41.03312},{"cbsa":"24300","name":"Grand Junction, CO","lon":-108.46665,"lat":39.01829},{"cbsa":"24330","name":"Grand Rapids, MN","lon":-93.63168,"lat":47.50942},{"cbsa":"24340","name":"Grand Rapids-Wyoming, MI","lon":-85.48822,"lat":42.99886},{"cbsa":"24380","name":"Grants, NM","lon":-107.99945,"lat":34.91257},{"cbsa":"24420","name":"Grants Pass, OR","lon":-123.55513,"lat":42.36582},{"cbsa":"24460","name":"Great Bend, KS","lon":-98.75638,"lat":38.47894},{"cbsa":"24500","name":"Great Falls, MT","lon":-111.34714,"lat":47.30822},{"cbsa":"24540","name":"Greeley, CO","lon":-104.39287,"lat":40.55482},{"cbsa":"24580","name":"Green Bay, WI","lon":-88.07661,"lat":44.77303},{"cbsa":"24620","name":"Greeneville, TN","lon":-82.84559,"lat":36.17587},{"cbsa":"24640","name":"Greenfield Town, MA","lon":-72.59182,"lat":42.58326},{"cbsa":"24660","name":"Greensboro-High Point, NC","lon":-79.79155,"lat":36.02574},{"cbsa":"24700","name":"Greensburg, IN","lon":-85.50102,"lat":39.3071},{"cbsa":"24740","name":"Greenville, MS","lon":-90.94785,"lat":33.28373},{"cbsa":"24780","name":"Greenville, NC","lon":-77.37476,"lat":35.59392},{"cbsa":"24820","name":"Greenville, OH","lon":-84.61946,"lat":40.13382},{"cbsa":"24860","name":"Greenville-Anderson-Mauldin, SC","lon":-82.41344,"lat":34.68514},{"cbsa":"24900","name":"Greenwood, MS","lon":-90.107,"lat":33.4982},{"cbsa":"24940","name":"Greenwood, SC","lon":-82.30178,"lat":34.19039},{"cbsa":"24980","name":"Grenada, MS","lon":-89.8016,"lat":33.76989},{"cbsa":"25020","name":"Guayama, PR","lon":-66.08334,"lat":18.01304},{"cbsa":"25060","name":"Gulfport-Biloxi-Pascagoula, MS","lon":-89.01322,"lat":30.49385},{"cbsa":"25100","name":"Guymon, OK","lon":-101.49011,"lat":36.74789},{"cbsa":"25180","name":"Hagerstown-Martinsburg, MD-WV","lon":-77.90017,"lat":39.54712},{"cbsa":"25200","name":"Hailey, ID","lon":-114.1989,"lat":43.32359},{"cbsa":"25220","name":"Hammond, LA","lon":-90.4055,"lat":30.62678},{"cbsa":"25260","name":"Hanford-Corcoran, CA","lon":-119.81552,"lat":36.07509},{"cbsa":"25300","name":"Hannibal, MO","lon":-91.57002,"lat":39.6608},{"cbsa":"25420","name":"Harrisburg-Carlisle, PA","lon":-77.1013,"lat":40.32659},{"cbsa":"25460","name":"Harrison, AR","lon":-93.16434,"lat":36.08471},{"cbsa":"25500","name":"Harrisonburg, VA","lon":-78.87587,"lat":38.51059},{"cbsa":"25540","name":"Hartford-West Hartford-East Hartford, CT","lon":-72.57729,"lat":41.7347},{"cbsa":"25580","name":"Hastings, NE","lon":-98.50118,"lat":40.52449},{"cbsa":"25620","name":"Hattiesburg, MS","lon":-89.22872,"lat":31.18744},{"cbsa":"25700","name":"Hays, KS","lon":-99.3172,"lat":38.91462},{"cbsa":"25720","name":"Heber, UT","lon":-111.16812,"lat":40.33093},{"cbsa":"25740","name":"Helena, MT","lon":-112.29605,"lat":46.81271},{"cbsa":"25760","name":"Helena-West Helena, AR","lon":-90.84819,"lat":34.42825},{"cbsa":"25780","name":"Henderson, NC","lon":-78.40791,"lat":36.36486},{"cbsa":"25820","name":"Hereford, TX","lon":-102.60528,"lat":34.96515},{"cbsa":"25840","name":"Hermiston-Pendleton, OR","lon":-119.06561,"lat":45.52476},{"cbsa":"25860","name":"Hickory-Lenoir-Morganton, NC","lon":-81.45451,"lat":35.81278},{"cbsa":"25880","name":"Hillsdale, MI","lon":-84.59302,"lat":41.88778},{"cbsa":"25900","name":"Hilo, HI","lon":-155.52117,"lat":19.60124},{"cbsa":"25940","name":"Hilton Head Island-Bluffton-Beaufort, SC","lon":-80.87709,"lat":32.41027},{"cbsa":"25980","name":"Hinesville, GA","lon":-81.6014,"lat":31.79568},{"cbsa":"26020","name":"Hobbs, NM","lon":-103.41247,"lat":32.79208},{"cbsa":"26090","name":"Holland, MI","lon":-85.88824,"lat":42.59139},{"cbsa":"26140","name":"Homosassa Springs, FL","lon":-82.47809,"lat":28.84868},{"cbsa":"26220","name":"Hood River, OR","lon":-121.65133,"lat":45.51927},{"cbsa":"26260","name":"Hope, AR","lon":-93.50425,"lat":33.70257},{"cbsa":"26300","name":"Hot Springs, AR","lon":-93.15037,"lat":34.57665},{"cbsa":"26340","name":"Houghton, MI","lon":-88.59584,"lat":47.16337},{"cbsa":"26380","name":"Houma-Thibodaux, LA","lon":-90.66096,"lat":29.47707},{"cbsa":"26420","name":"Houston-The Woodlands-Sugar Land, TX","lon":-95.3995,"lat":29.78605},{"cbsa":"26460","name":"Hudson, NY","lon":-73.63225,"lat":42.24991},{"cbsa":"26500","name":"Huntingdon, PA","lon":-77.98131,"lat":40.41702},{"cbsa":"26540","name":"Huntington, IN","lon":-85.48809,"lat":40.8294},{"cbsa":"26580","name":"Huntington-Ashland, WV-KY-OH","lon":-82.37909,"lat":38.3813},{"cbsa":"26620","name":"Huntsville, AL","lon":-86.7343,"lat":34.78308},{"cbsa":"26660","name":"Huntsville, TX","lon":-95.36579,"lat":30.90389},{"cbsa":"26700","name":"Huron, SD","lon":-98.27794,"lat":44.41462},{"cbsa":"26740","name":"Hutchinson, KS","lon":-98.08603,"lat":37.953},{"cbsa":"26780","name":"Hutchinson, MN","lon":-94.27235,"lat":44.82372},{"cbsa":"26820","name":"Idaho Falls, ID","lon":-112.42765,"lat":43.62261},{"cbsa":"26860","name":"Indiana, PA","lon":-79.08699,"lat":40.65221},{"cbsa":"26900","name":"Indianapolis-Carmel-Anderson, IN","lon":-86.20622,"lat":39.7475},{"cbsa":"26940","name":"Indianola, MS","lon":-90.58873,"lat":33.60218},{"cbsa":"26960","name":"Ionia, MI","lon":-85.07433,"lat":42.9452},{"cbsa":"26980","name":"Iowa City, IA","lon":-91.64941,"lat":41.5107},{"cbsa":"27020","name":"Iron Mountain, MI-WI","lon":-88.07613,"lat":45.94619},{"cbsa":"27060","name":"Ithaca, NY","lon":-76.47357,"lat":42.45182},{"cbsa":"27100","name":"Jackson, MI","lon":-84.42306,"lat":42.24866},{"cbsa":"27140","name":"Jackson, MS","lon":-90.22039,"lat":32.31733},{"cbsa":"27160","name":"Jackson, OH","lon":-82.61834,"lat":39.01968},{"cbsa":"27180","name":"Jackson, TN","lon":-88.85309,"lat":35.60981},{"cbsa":"27220","name":"Jackson, WY-ID","lon":-110.64922,"lat":43.91777},{"cbsa":"27260","name":"Jacksonville, FL","lon":-81.79216,"lat":30.23653},{"cbsa":"27300","name":"Jacksonville, IL","lon":-90.28483,"lat":39.69382},{"cbsa":"27340","name":"Jacksonville, NC","lon":-77.42755,"lat":34.73032},{"cbsa":"27380","name":"Jacksonville, TX","lon":-95.16557,"lat":31.83741},{"cbsa":"27420","name":"Jamestown, ND","lon":-98.95893,"lat":46.97922},{"cbsa":"27460","name":"Jamestown-Dunkirk-Fredonia, NY","lon":-79.36664,"lat":42.22818},{"cbsa":"27500","name":"Janesville-Beloit, WI","lon":-89.07194,"lat":42.6712},{"cbsa":"27540","name":"Jasper, IN","lon":-87.03477,"lat":38.37938},{"cbsa":"27580","name":"Jayuya, PR","lon":-66.58807,"lat":18.21051},{"cbsa":"27600","name":"Jefferson, GA","lon":-83.56664,"lat":34.13409},{"cbsa":"27620","name":"Jefferson City, MO","lon":-92.09182,"lat":38.64006},{"cbsa":"27660","name":"Jennings, LA","lon":-92.81399,"lat":30.2682},{"cbsa":"27700","name":"Jesup, GA","lon":-81.91676,"lat":31.55147},{"cbsa":"27740","name":"Johnson City, TN","lon":-82.33452,"lat":36.25354},{"cbsa":"27780","name":"Johnstown, PA","lon":-78.71378,"lat":40.49468},{"cbsa":"27860","name":"Jonesboro, AR","lon":-90.64838,"lat":35.69824},{"cbsa":"27900","name":"Joplin, MO","lon":-94.33998,"lat":37.05685},{"cbsa":"27920","name":"Junction City, KS","lon":-96.75245,"lat":39.00241},{"cbsa":"27940","name":"Juneau, AK","lon":-134.173,"lat":58.44909},{"cbsa":"27980","name":"Kahului-Wailuku-Lahaina, HI","lon":-156.57335,"lat":20.86738},{"cbsa":"28020","name":"Kalamazoo-Portage, MI","lon":-85.78393,"lat":42.24867},{"cbsa":"28060","name":"Kalispell, MT","lon":-114.04932,"lat":48.29491},{"cbsa":"28100","name":"Kankakee, IL","lon":-87.86175,"lat":41.13763},{"cbsa":"28140","name":"Kansas City, MO-KS","lon":-94.44446,"lat":38.93693},{"cbsa":"28180","name":"Kapaa, HI","lon":-159.59575,"lat":22.03978},{"cbsa":"28260","name":"Kearney, NE","lon":-99.03123,"lat":40.73492},{"cbsa":"28300","name":"Keene, NH","lon":-72.25118,"lat":42.9195},{"cbsa":"28340","name":"Kendallville, IN","lon":-85.41741,"lat":41.39852},{"cbsa":"28380","name":"Kennett, MO","lon":-90.09066,"lat":36.27256},{"cbsa":"28420","name":"Kennewick-Richland, WA","lon":-119.25406,"lat":46.36373},{"cbsa":"28500","name":"Kerrville, TX","lon":-99.34928,"lat":30.06116},{"cbsa":"28540","name":"Ketchikan, AK","lon":-130.93635,"lat":55.58658},{"cbsa":"28580","name":"Key West, FL","lon":-81.12008,"lat":25.27257},{"cbsa":"28620","name":"Kill Devil Hills, NC","lon":-75.98464,"lat":35.78909},{"cbsa":"28660","name":"Killeen-Temple, TX","lon":-97.78769,"lat":31.20812},{"cbsa":"28700","name":"Kingsport-Bristol-Bristol, TN-VA","lon":-82.4428,"lat":36.60768},{"cbsa":"28740","name":"Kingston, NY","lon":-74.25829,"lat":41.88819},{"cbsa":"28780","name":"Kingsville, TX","lon":-97.70789,"lat":27.11762},{"cbsa":"28820","name":"Kinston, NC","lon":-77.64153,"lat":35.23838},{"cbsa":"28860","name":"Kirksville, MO","lon":-92.57255,"lat":40.28915},{"cbsa":"28900","name":"Klamath Falls, OR","lon":-121.65006,"lat":42.68626},{"cbsa":"28940","name":"Knoxville, TN","lon":-84.1374,"lat":36.04461},{"cbsa":"29020","name":"Kokomo, IN","lon":-86.11685,"lat":40.48364},{"cbsa":"29060","name":"Laconia, NH","lon":-71.42258,"lat":43.51766},{"cbsa":"29100","name":"La Crosse-Onalaska, WI-MN","lon":-91.31956,"lat":43.7793},{"cbsa":"29180","name":"Lafayette, LA","lon":-92.06019,"lat":30.02399},{"cbsa":"29200","name":"Lafayette-West Lafayette, IN","lon":-86.92974,"lat":40.51439},{"cbsa":"29260","name":"La Grande, OR","lon":-118.00895,"lat":45.31042},{"cbsa":"29300","name":"LaGrange, GA","lon":-85.0285,"lat":33.03334},{"cbsa":"29340","name":"Lake Charles, LA","lon":-93.25955,"lat":30.01725},{"cbsa":"29380","name":"Lake City, FL","lon":-82.62169,"lat":30.22449},{"cbsa":"29420","name":"Lake Havasu City-Kingman, AZ","lon":-113.75819,"lat":35.70465},{"cbsa":"29460","name":"Lakeland-Winter Haven, FL","lon":-81.69736,"lat":27.94868},{"cbsa":"29500","name":"Lamesa, TX","lon":-101.94772,"lat":32.74256},{"cbsa":"29540","name":"Lancaster, PA","lon":-76.24767,"lat":40.04262},{"cbsa":"29620","name":"Lansing-East Lansing, MI","lon":-84.60661,"lat":42.71369},{"cbsa":"29660","name":"Laramie, WY","lon":-105.72403,"lat":41.65475},{"cbsa":"29700","name":"Laredo, TX","lon":-99.33174,"lat":27.76103},{"cbsa":"29740","name":"Las Cruces, NM","lon":-106.83282,"lat":32.35263},{"cbsa":"29780","name":"Las Vegas, NM","lon":-104.81569,"lat":35.48039},{"cbsa":"29820","name":"Las Vegas-Henderson-Paradise, NV","lon":-115.01459,"lat":36.21513},{"cbsa":"29860","name":"Laurel, MS","lon":-89.14416,"lat":31.81807},{"cbsa":"29900","name":"Laurinburg, NC","lon":-79.48029,"lat":34.84123},{"cbsa":"29940","name":"Lawrence, KS","lon":-95.29269,"lat":38.88476},{"cbsa":"29980","name":"Lawrenceburg, TN","lon":-87.39535,"lat":35.21759},{"cbsa":"30020","name":"Lawton, OK","lon":-98.43473,"lat":34.52391},{"cbsa":"30060","name":"Lebanon, MO","lon":-92.59056,"lat":37.65865},{"cbsa":"30140","name":"Lebanon, PA","lon":-76.45785,"lat":40.36719},{"cbsa":"30220","name":"Levelland, TX","lon":-102.34317,"lat":33.60771},{"cbsa":"30260","name":"Lewisburg, PA","lon":-77.06211,"lat":40.96303},{"cbsa":"30280","name":"Lewisburg, TN","lon":-86.76551,"lat":35.46809},{"cbsa":"30300","name":"Lewiston, ID-WA","lon":-116.94325,"lat":46.26923},{"cbsa":"30340","name":"Lewiston-Auburn, ME","lon":-70.20688,"lat":44.16584},{"cbsa":"30380","name":"Lewistown, PA","lon":-77.61686,"lat":40.61038},{"cbsa":"30420","name":"Lexington, NE","lon":-99.82269,"lat":40.75919},{"cbsa":"30460","name":"Lexington-Fayette, KY","lon":-84.4325,"lat":38.09057},{"cbsa":"30580","name":"Liberal, KS","lon":-100.85108,"lat":37.1933},{"cbsa":"30620","name":"Lima, OH","lon":-84.10584,"lat":40.77152},{"cbsa":"30660","name":"Lincoln, IL","lon":-89.36774,"lat":40.12466},{"cbsa":"30700","name":"Lincoln, NE","lon":-96.87075,"lat":40.81986},{"cbsa":"30780","name":"Little Rock-North Little Rock-Conway, AR","lon":-92.39722,"lat":34.75725},{"cbsa":"30820","name":"Lock Haven, PA","lon":-77.63798,"lat":41.234},{"cbsa":"30860","name":"Logan, UT-ID","lon":-111.76907,"lat":41.8898},{"cbsa":"30880","name":"Logan, WV","lon":-81.93538,"lat":37.83144},{"cbsa":"30900","name":"Logansport, IN","lon":-86.34637,"lat":40.76155},{"cbsa":"30940","name":"London, KY","lon":-84.04739,"lat":36.92143},{"cbsa":"30980","name":"Longview, TX","lon":-94.82934,"lat":32.37249},{"cbsa":"31020","name":"Longview, WA","lon":-122.68102,"lat":46.19325},{"cbsa":"31060","name":"Los Alamos, NM","lon":-106.30732,"lat":35.8695},{"cbsa":"31080","name":"Los Angeles-Long Beach-Anaheim, CA","lon":-118.14932,"lat":34.22097},{"cbsa":"31140","name":"Louisville/Jefferson County, KY-IN","lon":-85.67089,"lat":38.3367},{"cbsa":"31180","name":"Lubbock, TX","lon":-101.64478,"lat":33.46829},{"cbsa":"31220","name":"Ludington, MI","lon":-86.25,"lat":43.99519},{"cbsa":"31260","name":"Lufkin, TX","lon":-94.61101,"lat":31.25458},{"cbsa":"31300","name":"Lumberton, NC","lon":-79.1038,"lat":34.64034},{"cbsa":"31340","name":"Lynchburg, VA","lon":-79.21981,"lat":37.36511},{"cbsa":"31380","name":"Macomb, IL","lon":-90.67776,"lat":40.45675},{"cbsa":"31420","name":"Macon-Bibb County, GA","lon":-83.71483,"lat":32.85762},{"cbsa":"31460","name":"Madera, CA","lon":-119.76243,"lat":37.21816},{"cbsa":"31500","name":"Madison, IN","lon":-85.4378,"lat":38.7855},{"cbsa":"31540","name":"Madison, WI","lon":-89.59212,"lat":43.0801},{"cbsa":"31580","name":"Madisonville, KY","lon":-87.54113,"lat":37.30841},{"cbsa":"31620","name":"Magnolia, AR","lon":-93.22721,"lat":33.21412},{"cbsa":"31660","name":"Malone, NY","lon":-74.30372,"lat":44.59276},{"cbsa":"31680","name":"Malvern, AR","lon":-92.9458,"lat":34.31756},{"cbsa":"31700","name":"Manchester-Nashua, NH","lon":-71.71595,"lat":42.91532},{"cbsa":"31740","name":"Manhattan, KS","lon":-96.50669,"lat":39.34437},{"cbsa":"31820","name":"Manitowoc, WI","lon":-87.80959,"lat":44.11992},{"cbsa":"31860","name":"Mankato-North Mankato, MN","lon":-94.1357,"lat":44.15456},{"cbsa":"31900","name":"Mansfield, OH","lon":-82.53677,"lat":40.77482},{"cbsa":"31930","name":"Marietta, OH","lon":-81.4953,"lat":39.45554},{"cbsa":"31940","name":"Marinette, WI-MI","lon":-87.83104,"lat":45.46655},{"cbsa":"31980","name":"Marion, IN","lon":-85.6547,"lat":40.5159},{"cbsa":"32000","name":"Marion, NC","lon":-82.04908,"lat":35.68159},{"cbsa":"32020","name":"Marion, OH","lon":-83.15984,"lat":40.58744},{"cbsa":"32100","name":"Marquette, MI","lon":-87.64141,"lat":46.43141},{"cbsa":"32140","name":"Marshall, MN","lon":-95.83861,"lat":44.41367},{"cbsa":"32180","name":"Marshall, MO","lon":-93.2019,"lat":39.13678},{"cbsa":"32220","name":"Marshall, TX","lon":-94.37076,"lat":32.54791},{"cbsa":"32260","name":"Marshalltown, IA","lon":-92.99895,"lat":42.03583},{"cbsa":"32280","name":"Martin, TN","lon":-88.71807,"lat":36.29818},{"cbsa":"32300","name":"Martinsville, VA","lon":-79.87391,"lat":36.68266},{"cbsa":"32340","name":"Maryville, MO","lon":-94.88335,"lat":40.36098},{"cbsa":"32380","name":"Mason City, IA","lon":-93.26107,"lat":43.20363},{"cbsa":"32420","name":"Mayagüez, PR","lon":-67.30675,"lat":18.17488},{"cbsa":"32460","name":"Mayfield, KY","lon":-88.6511,"lat":36.72319},{"cbsa":"32500","name":"Maysville, KY","lon":-83.82396,"lat":38.59511},{"cbsa":"32540","name":"McAlester, OK","lon":-95.74803,"lat":34.92378},{"cbsa":"32580","name":"McAllen-Edinburg-Mission, TX","lon":-98.18139,"lat":26.39669},{"cbsa":"32620","name":"McComb, MS","lon":-90.66051,"lat":31.17449},{"cbsa":"32660","name":"McMinnville, TN","lon":-85.77915,"lat":35.67837},{"cbsa":"32700","name":"McPherson, KS","lon":-97.64783,"lat":38.39174},{"cbsa":"32740","name":"Meadville, PA","lon":-80.10621,"lat":41.68474},{"cbsa":"32780","name":"Medford, OR","lon":-122.72834,"lat":42.43214},{"cbsa":"32820","name":"Memphis, TN-MS-AR","lon":-89.81543,"lat":35.00766},{"cbsa":"32860","name":"Menomonie, WI","lon":-91.89644,"lat":44.94661},{"cbsa":"32900","name":"Merced, CA","lon":-120.71732,"lat":37.19198},{"cbsa":"32940","name":"Meridian, MS","lon":-88.66346,"lat":32.41302},{"cbsa":"32980","name":"Merrill, WI","lon":-89.73465,"lat":45.33748},{"cbsa":"33020","name":"Mexico, MO","lon":-91.84162,"lat":39.21595},{"cbsa":"33060","name":"Miami, OK","lon":-94.81044,"lat":36.83558},{"cbsa":"33100","name":"Miami-Fort Lauderdale-West Palm Beach, FL","lon":-80.50479,"lat":26.15622},{"cbsa":"33140","name":"Michigan City-La Porte, IN","lon":-86.73998,"lat":41.54606},{"cbsa":"33180","name":"Middlesborough, KY","lon":-83.67436,"lat":36.73071},{"cbsa":"33220","name":"Midland, MI","lon":-84.38794,"lat":43.64682},{"cbsa":"33260","name":"Midland, TX","lon":-101.99107,"lat":32.08965},{"cbsa":"33300","name":"Milledgeville, GA","lon":-83.08996,"lat":33.19833},{"cbsa":"33340","name":"Milwaukee-Waukesha-West Allis, WI","lon":-88.17279,"lat":43.17655},{"cbsa":"33420","name":"Mineral Wells, TX","lon":-98.31319,"lat":32.75311},{"cbsa":"33460","name":"Minneapolis-St. Paul-Bloomington, MN-WI","lon":-93.34557,"lat":45.06504},{"cbsa":"33500","name":"Minot, ND","lon":-101.20777,"lat":48.31874},{"cbsa":"33540","name":"Missoula, MT","lon":-113.92336,"lat":47.03648},{"cbsa":"33580","name":"Mitchell, SD","lon":-97.96673,"lat":43.67467},{"cbsa":"33620","name":"Moberly, MO","lon":-92.49704,"lat":39.44013},{"cbsa":"33660","name":"Mobile, AL","lon":-88.20662,"lat":30.77909},{"cbsa":"33700","name":"Modesto, CA","lon":-120.99799,"lat":37.55867},{"cbsa":"33740","name":"Monroe, LA","lon":-92.28456,"lat":32.68675},{"cbsa":"33780","name":"Monroe, MI","lon":-83.53778,"lat":41.9283},{"cbsa":"33860","name":"Montgomery, AL","lon":-86.40308,"lat":32.36077},{"cbsa":"33940","name":"Montrose, CO","lon":-108.26876,"lat":38.40245},{"cbsa":"33980","name":"Morehead City, NC","lon":-76.65454,"lat":34.82731},{"cbsa":"34020","name":"Morgan City, LA","lon":-91.4442,"lat":29.70498},{"cbsa":"34060","name":"Morgantown, WV","lon":-79.80398,"lat":39.52716},{"cbsa":"34100","name":"Morristown, TN","lon":-83.38196,"lat":36.11082},{"cbsa":"34140","name":"Moscow, ID","lon":-116.71169,"lat":46.81563},{"cbsa":"34180","name":"Moses Lake, WA","lon":-119.45153,"lat":47.20589},{"cbsa":"34220","name":"Moultrie, GA","lon":-83.76883,"lat":31.18843},{"cbsa":"34260","name":"Mountain Home, AR","lon":-92.33692,"lat":36.28722},{"cbsa":"34300","name":"Mountain Home, ID","lon":-115.46951,"lat":43.35382},{"cbsa":"34340","name":"Mount Airy, NC","lon":-80.68768,"lat":36.41477},{"cbsa":"34380","name":"Mount Pleasant, MI","lon":-84.84663,"lat":43.64065},{"cbsa":"34420","name":"Mount Pleasant, TX","lon":-94.96656,"lat":33.21677},{"cbsa":"34460","name":"Mount Sterling, KY","lon":-83.74878,"lat":38.05163},{"cbsa":"34500","name":"Mount Vernon, IL","lon":-88.92403,"lat":38.30018},{"cbsa":"34540","name":"Mount Vernon, OH","lon":-82.42289,"lat":40.39903},{"cbsa":"34580","name":"Mount Vernon-Anacortes, WA","lon":-121.73276,"lat":48.47939},{"cbsa":"34620","name":"Muncie, IN","lon":-85.39705,"lat":40.22764},{"cbsa":"34660","name":"Murray, KY","lon":-88.27217,"lat":36.62088},{"cbsa":"34700","name":"Muscatine, IA","lon":-91.11276,"lat":41.4839},{"cbsa":"34740","name":"Muskegon, MI","lon":-86.15193,"lat":43.29129},{"cbsa":"34780","name":"Muskogee, OK","lon":-95.37967,"lat":35.61629},{"cbsa":"34820","name":"Myrtle Beach-Conway-North Myrtle Beach, SC-NC","lon":-78.66396,"lat":33.98657},{"cbsa":"34860","name":"Nacogdoches, TX","lon":-94.61595,"lat":31.61617},{"cbsa":"34900","name":"Napa, CA","lon":-122.33057,"lat":38.50633},{"cbsa":"34940","name":"Naples-Immokalee-Marco Island, FL","lon":-81.3476,"lat":26.11067},{"cbsa":"34980","name":"Nashville-Davidson--Murfreesboro--Franklin, TN","lon":-86.72449,"lat":36.08915},{"cbsa":"35020","name":"Natchez, MS-LA","lon":-91.52671,"lat":31.46015},{"cbsa":"35060","name":"Natchitoches, LA","lon":-93.09626,"lat":31.72319},{"cbsa":"35100","name":"New Bern, NC","lon":-77.08091,"lat":35.0995},{"cbsa":"35140","name":"Newberry, SC","lon":-81.59948,"lat":34.28987},{"cbsa":"35220","name":"New Castle, IN","lon":-85.3965,"lat":39.93108},{"cbsa":"35260","name":"New Castle, PA","lon":-80.33428,"lat":40.99126},{"cbsa":"35300","name":"New Haven-Milford, CT","lon":-72.93139,"lat":41.41054},{"cbsa":"35380","name":"New Orleans-Metairie, LA","lon":-89.94768,"lat":29.90479},{"cbsa":"35420","name":"New Philadelphia-Dover, OH","lon":-81.47451,"lat":40.44137},{"cbsa":"35440","name":"Newport, OR","lon":-123.86805,"lat":44.64191},{"cbsa":"35460","name":"Newport, TN","lon":-83.1215,"lat":35.92543},{"cbsa":"35500","name":"Newton, IA","lon":-93.05376,"lat":41.68603},{"cbsa":"35580","name":"New Ulm, MN","lon":-94.72759,"lat":44.24215},{"cbsa":"35620","name":"New York-Newark-Jersey City, NY-NJ-PA","lon":-74.08437,"lat":40.92033},{"cbsa":"35660","name":"Niles-Benton Harbor, MI","lon":-86.41227,"lat":41.95464},{"cbsa":"35700","name":"Nogales, AZ","lon":-110.84651,"lat":31.52596},{"cbsa":"35740","name":"Norfolk, NE","lon":-97.49019,"lat":42.0435},{"cbsa":"35820","name":"North Platte, NE","lon":-100.77551,"lat":41.23429},{"cbsa":"35840","name":"North Port-Sarasota-Bradenton, FL","lon":-82.32249,"lat":27.34777},{"cbsa":"35860","name":"North Vernon, IN","lon":-85.62769,"lat":38.99683},{"cbsa":"35900","name":"North Wilkesboro, NC","lon":-81.16367,"lat":36.20583},{"cbsa":"35940","name":"Norwalk, OH","lon":-82.59857,"lat":41.14653},{"cbsa":"35980","name":"Norwich-New London, CT","lon":-72.10182,"lat":41.48707},{"cbsa":"36020","name":"Oak Harbor, WA","lon":-122.5494,"lat":48.16376},{"cbsa":"36100","name":"Ocala, FL","lon":-82.05677,"lat":29.21034},{"cbsa":"36140","name":"Ocean City, NJ","lon":-74.80056,"lat":39.14891},{"cbsa":"36220","name":"Odessa, TX","lon":-102.54294,"lat":31.86899},{"cbsa":"36260","name":"Ogden-Clearfield, UT","lon":-112.81593,"lat":41.43261},{"cbsa":"36300","name":"Ogdensburg-Massena, NY","lon":-75.06871,"lat":44.49648},{"cbsa":"36340","name":"Oil City, PA","lon":-79.75784,"lat":41.40116},{"cbsa":"36380","name":"Okeechobee, FL","lon":-80.88887,"lat":27.38676},{"cbsa":"36420","name":"Oklahoma City, OK","lon":-97.50404,"lat":35.4296},{"cbsa":"36460","name":"Olean, NY","lon":-78.67895,"lat":42.24842},{"cbsa":"36500","name":"Olympia-Tumwater, WA","lon":-122.83314,"lat":46.92673},{"cbsa":"36540","name":"Omaha-Council Bluffs, NE-IA","lon":-95.99907,"lat":41.29025},{"cbsa":"36580","name":"Oneonta, NY","lon":-75.03246,"lat":42.63433},{"cbsa":"36620","name":"Ontario, OR-ID","lon":-117.58842,"lat":43.22611},{"cbsa":"36660","name":"Opelousas, LA","lon":-92.00552,"lat":30.59882},{"cbsa":"36700","name":"Orangeburg, SC","lon":-80.80032,"lat":33.43909},{"cbsa":"36740","name":"Orlando-Kissimmee-Sanford, FL","lon":-81.3632,"lat":28.43452},{"cbsa":"36780","name":"Oshkosh-Neenah, WI","lon":-88.64469,"lat":44.06887},{"cbsa":"36820","name":"Oskaloosa, IA","lon":-92.64093,"lat":41.33523},{"cbsa":"36830","name":"Othello, WA","lon":-118.56054,"lat":46.98345},{"cbsa":"36840","name":"Ottawa, KS","lon":-95.28624,"lat":38.56427},{"cbsa":"36860","name":"Ottawa-Peru, IL","lon":-89.17364,"lat":41.3571},{"cbsa":"36900","name":"Ottumwa, IA","lon":-92.40982,"lat":40.87922},{"cbsa":"36940","name":"Owatonna, MN","lon":-93.22602,"lat":44.02235},{"cbsa":"36980","name":"Owensboro, KY","lon":-87.06986,"lat":37.69953},{"cbsa":"37020","name":"Owosso, MI","lon":-84.14688,"lat":42.95348},{"cbsa":"37060","name":"Oxford, MS","lon":-89.48479,"lat":34.35668},{"cbsa":"37080","name":"Oxford, NC","lon":-78.65275,"lat":36.3041},{"cbsa":"37100","name":"Oxnard-Thousand Oaks-Ventura, CA","lon":-119.08493,"lat":34.45473},{"cbsa":"37120","name":"Ozark, AL","lon":-85.61096,"lat":31.43172},{"cbsa":"37140","name":"Paducah, KY-IL","lon":-88.67213,"lat":37.13811},{"cbsa":"37220","name":"Pahrump, NV","lon":-116.47175,"lat":38.04213},{"cbsa":"37260","name":"Palatka, FL","lon":-81.74419,"lat":29.60884},{"cbsa":"37300","name":"Palestine, TX","lon":-95.6525,"lat":31.81346},{"cbsa":"37340","name":"Palm Bay-Melbourne-Titusville, FL","lon":-80.73227,"lat":28.29348},{"cbsa":"37420","name":"Pampa, TX","lon":-100.81292,"lat":35.40082},{"cbsa":"37460","name":"Panama City, FL","lon":-85.46522,"lat":30.14017},{"cbsa":"37500","name":"Paragould, AR","lon":-90.55876,"lat":36.11754},{"cbsa":"37540","name":"Paris, TN","lon":-88.301,"lat":36.33177},{"cbsa":"37580","name":"Paris, TX","lon":-95.57095,"lat":33.66709},{"cbsa":"37620","name":"Parkersburg-Vienna, WV","lon":-81.46288,"lat":39.13907},{"cbsa":"37660","name":"Parsons, KS","lon":-95.29766,"lat":37.1913},{"cbsa":"37740","name":"Payson, AZ","lon":-110.8118,"lat":33.79994},{"cbsa":"37780","name":"Pecos, TX","lon":-103.693,"lat":31.32294},{"cbsa":"37800","name":"Pella, IA","lon":-93.09946,"lat":41.33445},{"cbsa":"37860","name":"Pensacola-Ferry Pass-Brent, FL","lon":-87.15592,"lat":30.68746},{"cbsa":"37900","name":"Peoria, IL","lon":-89.51593,"lat":40.78913},{"cbsa":"37940","name":"Peru, IN","lon":-86.04533,"lat":40.76951},{"cbsa":"37980","name":"Philadelphia-Camden-Wilmington, PA-NJ-DE-MD","lon":-75.30339,"lat":39.9047},{"cbsa":"38060","name":"Phoenix-Mesa-Scottsdale, AZ","lon":-112.07055,"lat":33.1858},{"cbsa":"38100","name":"Picayune, MS","lon":-89.58948,"lat":30.76896},{"cbsa":"38180","name":"Pierre, SD","lon":-100.37006,"lat":44.50302},{"cbsa":"38220","name":"Pine Bluff, AR","lon":-91.94989,"lat":34.07735},{"cbsa":"38240","name":"Pinehurst-Southern Pines, NC","lon":-79.48204,"lat":35.31104},{"cbsa":"38260","name":"Pittsburg, KS","lon":-94.85186,"lat":37.50731},{"cbsa":"38300","name":"Pittsburgh, PA","lon":-79.83104,"lat":40.43901},{"cbsa":"38340","name":"Pittsfield, MA","lon":-73.20618,"lat":42.37061},{"cbsa":"38380","name":"Plainview, TX","lon":-101.82681,"lat":34.07045},{"cbsa":"38420","name":"Platteville, WI","lon":-90.70611,"lat":42.86764},{"cbsa":"38460","name":"Plattsburgh, NY","lon":-73.67828,"lat":44.74607},{"cbsa":"38500","name":"Plymouth, IN","lon":-86.26179,"lat":41.32486},{"cbsa":"38540","name":"Pocatello, ID","lon":-112.22466,"lat":42.66862},{"cbsa":"38580","name":"Point Pleasant, WV-OH","lon":-82.17606,"lat":38.79809},{"cbsa":"38620","name":"Ponca City, OK","lon":-97.1438,"lat":36.81803},{"cbsa":"38660","name":"Ponce, PR","lon":-66.6836,"lat":18.05798},{"cbsa":"38700","name":"Pontiac, IL","lon":-88.5578,"lat":40.89169},{"cbsa":"38740","name":"Poplar Bluff, MO","lon":-90.40673,"lat":36.71645},{"cbsa":"38780","name":"Portales, NM","lon":-103.48007,"lat":34.02121},{"cbsa":"38820","name":"Port Angeles, WA","lon":-123.92772,"lat":48.04912},{"cbsa":"38840","name":"Port Clinton, OH","lon":-83.10987,"lat":41.53728},{"cbsa":"38860","name":"Portland-South Portland, ME","lon":-70.45614,"lat":43.69739},{"cbsa":"38900","name":"Portland-Vancouver-Hillsboro, OR-WA","lon":-122.47859,"lat":45.59817},{"cbsa":"38920","name":"Port Lavaca, TX","lon":-96.60474,"lat":28.5035},{"cbsa":"38940","name":"Port St. Lucie, FL","lon":-80.45022,"lat":27.22018},{"cbsa":"39020","name":"Portsmouth, OH","lon":-82.99329,"lat":38.80404},{"cbsa":"39060","name":"Pottsville, PA","lon":-76.21629,"lat":40.70571},{"cbsa":"39140","name":"Prescott, AZ","lon":-112.55398,"lat":34.5997},{"cbsa":"39220","name":"Price, UT","lon":-110.58851,"lat":39.64818},{"cbsa":"39260","name":"Prineville, OR","lon":-120.3565,"lat":44.14227},{"cbsa":"39300","name":"Providence-Warwick, RI-MA","lon":-71.39976,"lat":41.7181},{"cbsa":"39340","name":"Provo-Orem, UT","lon":-112.35233,"lat":39.86453},{"cbsa":"39380","name":"Pueblo, CO","lon":-104.51255,"lat":38.17346},{"cbsa":"39420","name":"Pullman, WA","lon":-117.52303,"lat":46.90132},{"cbsa":"39460","name":"Punta Gorda, FL","lon":-81.91193,"lat":26.90578},{"cbsa":"39500","name":"Quincy, IL-MO","lon":-91.38586,"lat":40.02828},{"cbsa":"39540","name":"Racine, WI","lon":-88.06146,"lat":42.74743},{"cbsa":"39580","name":"Raleigh, NC","lon":-78.46069,"lat":35.75726},{"cbsa":"39660","name":"Rapid City, SD","lon":-102.89979,"lat":44.19174},{"cbsa":"39700","name":"Raymondville, TX","lon":-97.65711,"lat":26.47044},{"cbsa":"39740","name":"Reading, PA","lon":-75.92604,"lat":40.41626},{"cbsa":"39780","name":"Red Bluff, CA","lon":-122.23383,"lat":40.12551},{"cbsa":"39820","name":"Redding, CA","lon":-122.04054,"lat":40.76385},{"cbsa":"39860","name":"Red Wing, MN","lon":-92.72251,"lat":44.4098},{"cbsa":"39900","name":"Reno, NV","lon":-119.65916,"lat":40.61906},{"cbsa":"39940","name":"Rexburg, ID","lon":-111.51728,"lat":44.14067},{"cbsa":"39980","name":"Richmond, IN","lon":-85.00995,"lat":39.86416},{"cbsa":"40060","name":"Richmond, VA","lon":-77.47333,"lat":37.46197},{"cbsa":"40080","name":"Richmond-Berea, KY","lon":-84.29348,"lat":37.57251},{"cbsa":"40100","name":"Rio Grande City, TX","lon":-98.73826,"lat":26.56224},{"cbsa":"40140","name":"Riverside-San Bernardino-Ontario, CA","lon":-116.12967,"lat":34.5517},{"cbsa":"40180","name":"Riverton, WY","lon":-108.63043,"lat":43.04055},{"cbsa":"40220","name":"Roanoke, VA","lon":-79.94619,"lat":37.28623},{"cbsa":"40260","name":"Roanoke Rapids, NC","lon":-77.54164,"lat":36.32643},{"cbsa":"40300","name":"Rochelle, IL","lon":-89.32036,"lat":42.04259},{"cbsa":"40340","name":"Rochester, MN","lon":-92.33803,"lat":43.95601},{"cbsa":"40380","name":"Rochester, NY","lon":-77.50784,"lat":42.96589},{"cbsa":"40420","name":"Rockford, IL","lon":-89.04237,"lat":42.33164},{"cbsa":"40460","name":"Rockingham, NC","lon":-79.74757,"lat":35.00605},{"cbsa":"40540","name":"Rock Springs, WY","lon":-108.87931,"lat":41.65972},{"cbsa":"40580","name":"Rocky Mount, NC","lon":-77.79857,"lat":35.94134},{"cbsa":"40620","name":"Rolla, MO","lon":-91.79241,"lat":37.87732},{"cbsa":"40660","name":"Rome, GA","lon":-85.2144,"lat":34.26309},{"cbsa":"40700","name":"Roseburg, OR","lon":-123.16639,"lat":43.27975},{"cbsa":"40740","name":"Roswell, NM","lon":-104.46695,"lat":33.36319},{"cbsa":"40760","name":"Ruidoso, NM","lon":-105.45907,"lat":33.74529},{"cbsa":"40780","name":"Russellville, AR","lon":-93.23461,"lat":35.21106},{"cbsa":"40820","name":"Ruston, LA","lon":-92.66457,"lat":32.60158},{"cbsa":"40860","name":"Rutland, VT","lon":-73.03686,"lat":43.58029},{"cbsa":"40900","name":"Sacramento--Roseville--Arden-Arcade, CA","lon":-120.99745,"lat":38.78034},{"cbsa":"40940","name":"Safford, AZ","lon":-109.88748,"lat":32.93232},{"cbsa":"40980","name":"Saginaw, MI","lon":-84.05291,"lat":43.33494},{"cbsa":"41060","name":"St. Cloud, MN","lon":-94.47216,"lat":45.58578},{"cbsa":"41100","name":"St. George, UT","lon":-113.50475,"lat":37.28037},{"cbsa":"41140","name":"St. Joseph, MO-KS","lon":-94.7835,"lat":39.83394},{"cbsa":"41180","name":"St. Louis, MO-IL","lon":-90.35019,"lat":38.73514},{"cbsa":"41220","name":"St. Marys, GA","lon":-81.67036,"lat":30.93042},{"cbsa":"41260","name":"St. Marys, PA","lon":-78.64919,"lat":41.42543},{"cbsa":"41400","name":"Salem, OH","lon":-80.77709,"lat":40.76853},{"cbsa":"41420","name":"Salem, OR","lon":-122.90307,"lat":44.90326},{"cbsa":"41460","name":"Salina, KS","lon":-97.64995,"lat":38.95854},{"cbsa":"41500","name":"Salinas, CA","lon":-121.23835,"lat":36.21693},{"cbsa":"41540","name":"Salisbury, MD-DE","lon":-75.47305,"lat":38.41345},{"cbsa":"41620","name":"Salt Lake City, UT","lon":-113.01057,"lat":40.47052},{"cbsa":"41660","name":"San Angelo, TX","lon":-100.67259,"lat":31.36382},{"cbsa":"41700","name":"San Antonio-New Braunfels, TX","lon":-98.60216,"lat":29.42863},{"cbsa":"41740","name":"San Diego-Carlsbad, CA","lon":-116.73547,"lat":33.03388},{"cbsa":"41760","name":"Sandpoint, ID","lon":-116.6013,"lat":48.30007},{"cbsa":"41780","name":"Sandusky, OH","lon":-82.63822,"lat":41.37433},{"cbsa":"41820","name":"Sanford, NC","lon":-79.17165,"lat":35.4749},{"cbsa":"41860","name":"San Francisco-Oakland-Hayward, CA","lon":-122.16705,"lat":37.78109},{"cbsa":"41900","name":"San Germán, PR","lon":-67.06203,"lat":18.05662},{"cbsa":"41940","name":"San Jose-Sunnyvale-Santa Clara, CA","lon":-121.37506,"lat":36.9093},{"cbsa":"41980","name":"San Juan-Carolina-Caguas, PR","lon":-66.10929,"lat":18.27608},{"cbsa":"42020","name":"San Luis Obispo-Paso Robles-Arroyo Grande, CA","lon":-120.4042,"lat":35.38696},{"cbsa":"42100","name":"Santa Cruz-Watsonville, CA","lon":-122.00108,"lat":37.05609},{"cbsa":"42140","name":"Santa Fe, NM","lon":-105.97636,"lat":35.50697},{"cbsa":"42180","name":"Santa Isabel, PR","lon":-66.38862,"lat":17.99548},{"cbsa":"42200","name":"Santa Maria-Santa Barbara, CA","lon":-120.0151,"lat":34.67137},{"cbsa":"42220","name":"Santa Rosa, CA","lon":-122.88737,"lat":38.52852},{"cbsa":"42300","name":"Sault Ste. Marie, MI","lon":-84.56283,"lat":46.30033},{"cbsa":"42340","name":"Savannah, GA","lon":-81.3018,"lat":32.13058},{"cbsa":"42380","name":"Sayre, PA","lon":-76.51549,"lat":41.78868},{"cbsa":"42420","name":"Scottsbluff, NE","lon":-103.73837,"lat":42.15949},{"cbsa":"42460","name":"Scottsboro, AL","lon":-85.99902,"lat":34.77967},{"cbsa":"42540","name":"Scranton--Wilkes-Barre--Hazleton, PA","lon":-75.89558,"lat":41.32306},{"cbsa":"42620","name":"Searcy, AR","lon":-91.74548,"lat":35.25601},{"cbsa":"42660","name":"Seattle-Tacoma-Bellevue, WA","lon":-121.85418,"lat":47.55648},{"cbsa":"42680","name":"Sebastian-Vero Beach, FL","lon":-80.60675,"lat":27.6941},{"cbsa":"42700","name":"Sebring, FL","lon":-81.34103,"lat":27.34279},{"cbsa":"42740","name":"Sedalia, MO","lon":-93.28506,"lat":38.72819},{"cbsa":"42780","name":"Selinsgrove, PA","lon":-77.07043,"lat":40.77005},{"cbsa":"42820","name":"Selma, AL","lon":-87.10652,"lat":32.32607},{"cbsa":"42860","name":"Seneca, SC","lon":-83.0661,"lat":34.75341},{"cbsa":"42900","name":"Seneca Falls, NY","lon":-76.82368,"lat":42.78048},{"cbsa":"42940","name":"Sevierville, TN","lon":-83.52395,"lat":35.78462},{"cbsa":"42980","name":"Seymour, IN","lon":-86.0374,"lat":38.90622},{"cbsa":"43020","name":"Shawano, WI","lon":-88.7491,"lat":44.85092},{"cbsa":"43060","name":"Shawnee, OK","lon":-96.94843,"lat":35.20677},{"cbsa":"43100","name":"Sheboygan, WI","lon":-87.94566,"lat":43.72109},{"cbsa":"43140","name":"Shelby, NC","lon":-81.55597,"lat":35.33404},{"cbsa":"43180","name":"Shelbyville, TN","lon":-86.45908,"lat":35.51412},{"cbsa":"43220","name":"Shelton, WA","lon":-123.19207,"lat":47.34801},{"cbsa":"43260","name":"Sheridan, WY","lon":-106.87974,"lat":44.7903},{"cbsa":"43300","name":"Sherman-Denison, TX","lon":-96.67775,"lat":33.62703},{"cbsa":"43320","name":"Show Low, AZ","lon":-110.3214,"lat":35.39973},{"cbsa":"43340","name":"Shreveport-Bossier City, LA","lon":-93.66893,"lat":32.48952},{"cbsa":"43380","name":"Sidney, OH","lon":-84.20473,"lat":40.33147},{"cbsa":"43420","name":"Sierra Vista-Douglas, AZ","lon":-109.75104,"lat":31.87909},{"cbsa":"43460","name":"Sikeston, MO","lon":-89.56857,"lat":37.05285},{"cbsa":"43500","name":"Silver City, NM","lon":-108.38262,"lat":32.73875},{"cbsa":"43580","name":"Sioux City, IA-NE-SD","lon":-96.37276,"lat":42.57887},{"cbsa":"43620","name":"Sioux Falls, SD","lon":-96.99004,"lat":43.49965},{"cbsa":"43660","name":"Snyder, TX","lon":-100.91627,"lat":32.74614},{"cbsa":"43700","name":"Somerset, KY","lon":-84.57716,"lat":37.10381},{"cbsa":"43740","name":"Somerset, PA","lon":-79.02837,"lat":39.97257},{"cbsa":"43760","name":"Sonora, CA","lon":-119.95513,"lat":38.02749},{"cbsa":"43780","name":"South Bend-Mishawaka, IN-MI","lon":-86.13424,"lat":41.77364},{"cbsa":"43900","name":"Spartanburg, SC","lon":-81.84713,"lat":34.83816},{"cbsa":"43940","name":"Spearfish, SD","lon":-103.79211,"lat":44.35863},{"cbsa":"43980","name":"Spencer, IA","lon":-95.15096,"lat":43.08247},{"cbsa":"44020","name":"Spirit Lake, IA","lon":-95.15088,"lat":43.37783},{"cbsa":"44060","name":"Spokane-Spokane Valley, WA","lon":-117.57181,"lat":48.19372},{"cbsa":"44100","name":"Springfield, IL","lon":-89.6967,"lat":39.82939},{"cbsa":"44140","name":"Springfield, MA","lon":-72.64598,"lat":42.23017},{"cbsa":"44180","name":"Springfield, MO","lon":-93.17707,"lat":37.3618},{"cbsa":"44220","name":"Springfield, OH","lon":-83.7838,"lat":39.91674},{"cbsa":"44260","name":"Starkville, MS","lon":-88.87932,"lat":33.42499},{"cbsa":"44300","name":"State College, PA","lon":-77.82023,"lat":40.91939},{"cbsa":"44340","name":"Statesboro, GA","lon":-81.74289,"lat":32.39695},{"cbsa":"44420","name":"Staunton-Waynesboro, VA","lon":-79.12931,"lat":38.16325},{"cbsa":"44460","name":"Steamboat Springs, CO","lon":-106.99151,"lat":40.4855},{"cbsa":"44500","name":"Stephenville, TX","lon":-98.21778,"lat":32.23607},{"cbsa":"44540","name":"Sterling, CO","lon":-103.11011,"lat":40.72464},{"cbsa":"44580","name":"Sterling, IL","lon":-89.91394,"lat":41.75634},{"cbsa":"44620","name":"Stevens Point, WI","lon":-89.5017,"lat":44.47615},{"cbsa":"44660","name":"Stillwater, OK","lon":-96.97543,"lat":36.07718},{"cbsa":"44700","name":"Stockton-Lodi, CA","lon":-121.27113,"lat":37.93459},{"cbsa":"44740","name":"Storm Lake, IA","lon":-95.151,"lat":42.73546},{"cbsa":"44780","name":"Sturgis, MI","lon":-85.5281,"lat":41.91446},{"cbsa":"44860","name":"Sulphur Springs, TX","lon":-95.56432,"lat":33.14946},{"cbsa":"44900","name":"Summerville, GA","lon":-85.34525,"lat":34.47524},{"cbsa":"44920","name":"Summit Park, UT","lon":-110.95621,"lat":40.86832},{"cbsa":"44940","name":"Sumter, SC","lon":-80.38213,"lat":33.91598},{"cbsa":"44980","name":"Sunbury, PA","lon":-76.70913,"lat":40.85185},{"cbsa":"45000","name":"Susanville, CA","lon":-120.59439,"lat":40.6734},{"cbsa":"45020","name":"Sweetwater, TX","lon":-100.40618,"lat":32.3037},{"cbsa":"45060","name":"Syracuse, NY","lon":-76.03362,"lat":43.15451},{"cbsa":"45140","name":"Tahlequah, OK","lon":-94.99949,"lat":35.90657},{"cbsa":"45180","name":"Talladega-Sylacauga, AL","lon":-86.20387,"lat":33.17346},{"cbsa":"45220","name":"Tallahassee, FL","lon":-84.2862,"lat":30.40418},{"cbsa":"45300","name":"Tampa-St. Petersburg-Clearwater, FL","lon":-82.40829,"lat":28.15426},{"cbsa":"45340","name":"Taos, NM","lon":-105.63096,"lat":36.57824},{"cbsa":"45380","name":"Taylorville, IL","lon":-89.27752,"lat":39.54591},{"cbsa":"45460","name":"Terre Haute, IN","lon":-87.34342,"lat":39.39315},{"cbsa":"45500","name":"Texarkana, TX-AR","lon":-94.21429,"lat":33.4738},{"cbsa":"45520","name":"The Dalles, OR","lon":-121.16765,"lat":45.15986},{"cbsa":"45540","name":"The Villages, FL","lon":-82.08086,"lat":28.70478},{"cbsa":"45580","name":"Thomaston, GA","lon":-84.29969,"lat":32.88089},{"cbsa":"45620","name":"Thomasville, GA","lon":-83.91932,"lat":30.86395},{"cbsa":"45660","name":"Tiffin, OH","lon":-83.12768,"lat":41.12379},{"cbsa":"45700","name":"Tifton, GA","lon":-83.52672,"lat":31.45712},{"cbsa":"45740","name":"Toccoa, GA","lon":-83.29303,"lat":34.55398},{"cbsa":"45780","name":"Toledo, OH","lon":-83.78176,"lat":41.49878},{"cbsa":"45820","name":"Topeka, KS","lon":-95.80296,"lat":39.04374},{"cbsa":"45860","name":"Torrington, CT","lon":-73.24536,"lat":41.79242},{"cbsa":"45900","name":"Traverse City, MI","lon":-85.55172,"lat":44.72556},{"cbsa":"45940","name":"Trenton, NJ","lon":-74.70201,"lat":40.2831},{"cbsa":"45980","name":"Troy, AL","lon":-85.94087,"lat":31.8023},{"cbsa":"46020","name":"Truckee-Grass Valley, CA","lon":-120.76823,"lat":39.30153},{"cbsa":"46060","name":"Tucson, AZ","lon":-111.78953,"lat":32.09746},{"cbsa":"46100","name":"Tullahoma-Manchester, TN","lon":-86.11595,"lat":35.29788},{"cbsa":"46140","name":"Tulsa, OK","lon":-96.16629,"lat":36.25036},{"cbsa":"46180","name":"Tupelo, MS","lon":-88.68458,"lat":34.26468},{"cbsa":"46220","name":"Tuscaloosa, AL","lon":-87.72173,"lat":33.16794},{"cbsa":"46300","name":"Twin Falls, ID","lon":-114.5714,"lat":42.43611},{"cbsa":"46340","name":"Tyler, TX","lon":-95.26922,"lat":32.37533},{"cbsa":"46380","name":"Ukiah, CA","lon":-123.39147,"lat":39.44028},{"cbsa":"46460","name":"Union City, TN-KY","lon":-89.15997,"lat":36.41581},{"cbsa":"46500","name":"Urbana, OH","lon":-83.76966,"lat":40.13776},{"cbsa":"46520","name":"Urban Honolulu, HI","lon":-157.97469,"lat":21.4588},{"cbsa":"46540","name":"Utica-Rome, NY","lon":-75.18136,"lat":43.33742},{"cbsa":"46620","name":"Uvalde, TX","lon":-99.76229,"lat":29.3574},{"cbsa":"46660","name":"Valdosta, GA","lon":-83.24198,"lat":30.82925},{"cbsa":"46700","name":"Vallejo-Fairfield, CA","lon":-121.93306,"lat":38.27022},{"cbsa":"46740","name":"Valley, AL","lon":-85.39185,"lat":32.91366},{"cbsa":"46780","name":"Van Wert, OH","lon":-84.58608,"lat":40.85554},{"cbsa":"46820","name":"Vermillion, SD","lon":-96.9756,"lat":42.91462},{"cbsa":"46860","name":"Vernal, UT","lon":-109.5182,"lat":40.12632},{"cbsa":"46900","name":"Vernon, TX","lon":-99.24102,"lat":34.08086},{"cbsa":"46980","name":"Vicksburg, MS","lon":-90.87861,"lat":32.18522},{"cbsa":"47020","name":"Victoria, TX","lon":-97.19505,"lat":28.72782},{"cbsa":"47080","name":"Vidalia, GA","lon":-82.41209,"lat":32.14222},{"cbsa":"47180","name":"Vincennes, IN","lon":-87.41827,"lat":38.69086},{"cbsa":"47220","name":"Vineland-Bridgeton, NJ","lon":-75.11105,"lat":39.37346},{"cbsa":"47240","name":"Vineyard Haven, MA","lon":-70.65383,"lat":41.39791},{"cbsa":"47260","name":"Virginia Beach-Norfolk-Newport News, VA-NC","lon":-76.45292,"lat":36.83444},{"cbsa":"47300","name":"Visalia-Porterville, CA","lon":-118.8008,"lat":36.21987},{"cbsa":"47340","name":"Wabash, IN","lon":-85.79407,"lat":40.84571},{"cbsa":"47380","name":"Waco, TX","lon":-97.08998,"lat":31.42643},{"cbsa":"47420","name":"Wahpeton, ND-MN","lon":-96.78393,"lat":46.29627},{"cbsa":"47460","name":"Walla Walla, WA","lon":-118.24896,"lat":46.25715},{"cbsa":"47540","name":"Wapakoneta, OH","lon":-84.22214,"lat":40.56096},{"cbsa":"47580","name":"Warner Robins, GA","lon":-83.63682,"lat":32.40769},{"cbsa":"47620","name":"Warren, PA","lon":-79.27404,"lat":41.81381},{"cbsa":"47660","name":"Warrensburg, MO","lon":-93.80632,"lat":38.744},{"cbsa":"47700","name":"Warsaw, IN","lon":-85.86068,"lat":41.24415},{"cbsa":"47780","name":"Washington, IN","lon":-87.07252,"lat":38.70254},{"cbsa":"47820","name":"Washington, NC","lon":-76.85923,"lat":35.49406},{"cbsa":"47900","name":"Washington-Arlington-Alexandria, DC-VA-MD-WV","lon":-77.47405,"lat":38.83342},{"cbsa":"47920","name":"Washington Court House, OH","lon":-83.45609,"lat":39.56024},{"cbsa":"47940","name":"Waterloo-Cedar Falls, IA","lon":-92.47111,"lat":42.53623},{"cbsa":"47980","name":"Watertown, SD","lon":-97.1886,"lat":44.97791},{"cbsa":"48020","name":"Watertown-Fort Atkinson, WI","lon":-88.7758,"lat":43.02077},{"cbsa":"48060","name":"Watertown-Fort Drum, NY","lon":-75.93115,"lat":44.04805},{"cbsa":"48100","name":"Wauchula, FL","lon":-81.80968,"lat":27.4932},{"cbsa":"48140","name":"Wausau, WI","lon":-89.75908,"lat":44.8983},{"cbsa":"48180","name":"Waycross, GA","lon":-82.36589,"lat":31.1375},{"cbsa":"48220","name":"Weatherford, OK","lon":-99.0014,"lat":35.63865},{"cbsa":"48260","name":"Weirton-Steubenville, WV-OH","lon":-80.70446,"lat":40.38786},{"cbsa":"48300","name":"Wenatchee, WA","lon":-120.26596,"lat":47.81863},{"cbsa":"48460","name":"West Plains, MO","lon":-91.88654,"lat":36.77419},{"cbsa":"48500","name":"West Point, MS","lon":-88.7819,"lat":33.65582},{"cbsa":"48540","name":"Wheeling, WV-OH","lon":-80.84121,"lat":39.97449},{"cbsa":"48580","name":"Whitewater-Elkhorn, WI","lon":-88.54226,"lat":42.66847},{"cbsa":"48620","name":"Wichita, KS","lon":-97.3982,"lat":37.62506},{"cbsa":"48660","name":"Wichita Falls, TX","lon":-98.49148,"lat":33.77493},{"cbsa":"48700","name":"Williamsport, PA","lon":-77.06521,"lat":41.34388},{"cbsa":"48780","name":"Williston, ND","lon":-103.48009,"lat":48.34351},{"cbsa":"48820","name":"Willmar, MN","lon":-95.00455,"lat":45.15265},{"cbsa":"48900","name":"Wilmington, NC","lon":-77.90124,"lat":34.46634},{"cbsa":"48940","name":"Wilmington, OH","lon":-83.80826,"lat":39.4149},{"cbsa":"48980","name":"Wilson, NC","lon":-77.91896,"lat":35.7052},{"cbsa":"49020","name":"Winchester, VA-WV","lon":-78.47395,"lat":39.27227},{"cbsa":"49080","name":"Winnemucca, NV","lon":-118.11181,"lat":41.40638},{"cbsa":"49100","name":"Winona, MN","lon":-91.77917,"lat":43.98685},{"cbsa":"49180","name":"Winston-Salem, NC","lon":-80.34551,"lat":36.07623},{"cbsa":"49220","name":"Wisconsin Rapids-Marshfield, WI","lon":-90.04153,"lat":44.45535},{"cbsa":"49260","name":"Woodward, OK","lon":-99.26488,"lat":36.4227},{"cbsa":"49300","name":"Wooster, OH","lon":-81.8878,"lat":40.82902},{"cbsa":"49340","name":"Worcester, MA-CT","lon":-71.92734,"lat":42.22282},{"cbsa":"49380","name":"Worthington, MN","lon":-95.75328,"lat":43.6742},{"cbsa":"49420","name":"Yakima, WA","lon":-120.73844,"lat":46.45709},{"cbsa":"49460","name":"Yankton, SD","lon":-97.39494,"lat":43.00895},{"cbsa":"49620","name":"York-Hanover, PA","lon":-76.726,"lat":39.91997},{"cbsa":"49660","name":"Youngstown-Warren-Boardman, OH-PA","lon":-80.56792,"lat":41.238},{"cbsa":"49700","name":"Yuba City, CA","lon":-121.51849,"lat":39.15473},{"cbsa":"49740","name":"Yuma, AZ","lon":-113.9059,"lat":32.76931},{"cbsa":"49780","name":"Zanesville, OH","lon":-81.94454,"lat":39.96587},{"cbsa":"49820","name":"Zapata, TX","lon":-99.16859,"lat":27.00077}]
+	;
+
+	function seq4(container, i){
+
+	    //one time setup
+	    var wrap = d3.select(container).classed("chart-view big-chart",true);
+
+	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
+	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas");
+
+	    var t94 = geos_cbsa.filter(function(d){return naics00.hasOwnProperty(d.cbsa)});
+
+	    var plus = d3.interpolateRgb("#ffffff", palette.primary.blue);
+	    var minus = d3.interpolateRgb("#ffffff", palette.primary.red);
+
+	    var main_fill = function(d){
+	        var col = "#dddddd";
+	        try{
+	            var v = naics00[d].actual;
+	            if(v >= 0.3){
+	                col = plus(0.9);
+	            }
+	            else if(v >= 0.1){
+	                col = plus(0.6);
+	            }
+	            else if(v >= 0){
+	                col = plus(0.3);
+	            }
+	            else if(v >= -0.1){
+	                col = minus(0.3);
+	            }
+	            else if(v >= -0.3){
+	                col = minus(0.6);
+	            }
+	            else if(v < -0.3){
+	                col = minus(0.9);
+	            }
+	        }
+	        catch(e){
+	            col = "#dddddd";
+	        }
+	        
+	        return col;
+	    };
+
+	    var main_map = map(wrap.append("div").node());
+	    var legend = wrap.append("p").classed("legend",true).html("To do: add legend<br />Blue = increase in density, Red = decrease");
+
+	    var state_layer = main_map.add_states(geos_state, function(d){return d.properties.geo_id}).attr({fill:"#ffffff", stroke:"#aaaaaa"});
+	    
+	    var cbsa_layer = main_map.add_points(t94, function(d){return d.cbsa}, function(d){return [d.lon, d.lat]})
+	                                .attr({fill:main_fill, "fill-opacity":"0.85", "stroke-width":"1", stroke: function(c){return d3.color(main_fill(c)).darker()}, r:"6", "pointer-events":"all"})
+	                                .labels(function(cbsa){return metro_names[cbsa]}, [7,5], {"font-size":"15px", "opacity":"0"});
+	                                //.tooltips(function(cbsa){return "<p>" + metro_names[cbsa] + "</p>"});
+
+	    main_map.print();
+
+	    var labels = cbsa_layer.labels();
+	    var points = cbsa_layer.points();
+
+	    function redraw(){
+	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
+	        
+	    }
+
+	    //register resize callback. initialize
+	    on_resize(redraw, true);
+
+	    //set extent
+
+	    //redraw
+
+
+	    var views = [
+	        {
+	            text:["Although metropolitan America saw a notable increase in job density as a whole, this trend was not widespread across metro areas."],
+	            enter:function(){
+	                wrap.style("opacity","1");
+	            },
+	            step: function(s){
+	                if(s > 0){
+	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 1});
+	                }
+	            },
+	            exit:function(){
+	                wrap.style("opacity",null);
+	            }
+	        },
+	        {
+	            text:["Out of 94 large metro areas, only 48 posted increases in perceived job density during the period."],
+	            step: function(s){
+	                if(s > 0){
+	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 0.25});
+	                    labels.style("opacity", "0");
+	                }
+	            }
+	        },
+	        {
+	            text: ["Talk about some places (here >= +40% density gain)", "It may be better to talk about 1-2 at a time to avoid labeling issues (especially relevant on mobile)."],
+	            step: function(s){
+	                if(s > 0){
+	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 0.25});
+	                    labels.style("opacity", function(d){
+	                        return naics00[d.key].actual > 0.4 ? 1 : 0;
+	                    });
+	                }
+	            }
+	        },
+	        {
+	            text: ["Meanwhile 46 saw perceived job density decline"],
+	            step: function(s){
+	                if(s > 0){
+	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
+	                    labels.style("opacity", "0");
+	                }
+	            }
+	        },
+	        {
+	            text: ["Talk about big declines in density (here <= -30%)"],
+	            step: function(s){
+	                if(s > 0){
+	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
+	                    labels.style("opacity", function(d){
+	                        return naics00[d.key].actual < -0.3 ? 1 : 0;
+	                    });
+	                }
+	            }
+	        }
+
+	    ];
+
+	    //static, non-scrollytelling
+	    if(arguments.length > 1){
+	        panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
+	    }
+
+	    return views;
+
+	}
+
+	function seq5(container, i){
+
+	    var data = sector_counts.slice(0).filter(function(d){return d.naics != "00"}).sort(function(a,b){return d3.descending(a.p, b.p)});
+
+	    //one time setup
+	    var wrap = d3.select(container).classed("chart-view",true);
+
+	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
+	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Several sectors of the economy saw widespread increases in job density");
+
+	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
+
+	    var g_x_axis = svg.append("g").classed("axis-group",true);
+	    var g_back = svg.append("g");
+	    var g_trend = svg.append("g");
+
+	    var groups = g_trend.selectAll("g").data(data).enter().append("g");
+
+	    var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
+	                                                .attr("stroke", function(d){return d.ge < d.p ? palette.secondary.orange : palette.secondary.blue})
+	                                                .attr("stroke-width","1px")
+	                                                ;
+
+	    var group_circles = groups.selectAll("circle").data(function(d){return [d]})
+	                                .enter().append("circle").attr("r",4.5).attr("cx","0").attr("cy","0")
+	                                .attr("fill",function(d,i){return i==0 ? palette.primary.blue : palette.primary.blue})
+	                                .attr("stroke",function(d,i){return  i==0 ? palette.primary.blue : palette.primary.blue})
+	                                .attr("stroke-width","1.5px")
+	                                ;
+
+	    var scale_x = d3.scaleLinear().domain([0, 94]);
+	    var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return v});
+
+	    var aspect = 2/3;
+	    var padding = {top:50, right:25, bottom: 5, left: 105 };
+	    var axis_title = svg.append("text").attr("y",20).attr("x",padding.left-5);
+	    axis_title.append("tspan").text("Number of metro areas");
+	    //axis_title.append("tspan").text(" where job density growth exceeded expectations");
+
+
+	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
+	                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
+	                        .style("shape-rendering","crispEdges");
+
+	    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
+	                              .attr("x", "0")
+	                              .attr("dx","-10")
+	                              .attr("dy","5").attr("text-anchor","end")
+	                              ;
+
+	    var current_value_prop = "p";
+	    var group_h;
+	    var translate = function(d,i){
+	        var v = d[current_value_prop];
+	        var x = scale_x(v);
+	        var y = (i*group_h) + (group_h/2);
+	        return "translate(" + x + "," + y + ")";
+	    };
+
+	    function redraw(){
+	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
+	        var h = w * aspect;
+	        if(h < 400){h = 400;}
+	        scale_x.range([padding.left, w - padding.right]);
+	        
+	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
+
+	        groups.interrupt().transition().duration(0).attr("transform", translate);
+
+	        svg.attr("viewBox", "0 0 " + w + " " + h);
+	        
+	        g_x_axis.attr("transform", "translate(0," + padding.top + ")");
+	        g_trend.attr("transform", "translate(0," + padding.top + ")");
+
+	        gridlines.attr("d", function(d){
+	            var x = Math.floor(scale_x(d))+0.5;
+	            return "M" + x + "," + padding.top + " l0," + (h - padding.top - padding.bottom);
+	        });
+
+	        axis_x(g_x_axis);
+
+	        //[expected, actual]
+	        //group_circles.attr("cx", function(d,i){return i==0 ? scale_x(d) : scale_x(d)}).attr("cy", group_h2);
+	        
+	        group_connectors.attr("y1", 0).attr("y2", 0)
+	                        .attr("x1", "0")
+	                        .attr("x2", "0")
+	                        ;
+
+	        //group_labels.attr("y", group_h2)
+	        //            .attr("x", label_x);
+	        
+	    }
+
+	    //register resize callback. initialize
+	    on_resize(redraw, true);
+
+	    //set extent
+
+	    //redraw
+
+	    function show_p(){
+	        current_value_prop = "p";
+	        groups.interrupt().transition().duration(1200).attr("transform", translate);
+	        group_connectors.interrupt()
+	                        .transition().duration(1200)
+	                        .attr("x2","0");
+	    }
+
+	    function show_ge(){
+	        current_value_prop = "ge";
+	        groups.interrupt().transition().duration(1200).attr("transform", translate);
+	        group_connectors.interrupt()
+	                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
+	                        .transition().duration(1200)
+	                        .attr("x2", function(d){return (scale_x(d.p) - scale_x(d.ge))})
+	                        .on("end", function(d){d3.select(this).style("opacity","0");})                        
+	                        ;
+	    }
+
+
+	    var views = [
+	        {
+	            text:["Across the 94 large metro areas, six sectors of the economy saw widespread increases in perceived job density from 2004 to 2015. Health care led the way with increases in 72 metro areas while professional jobs rounded out the group with increases in 58."],
+	            enter:function(){
+	                wrap.style("opacity",1);
+	                groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25});
+	                show_p();  
+	            },
+	            step: function(s){
+	                if(s > 0 && current_value_prop != "p"){
+	                    show_p();
+	                    groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25});
+	                }
+	            },
+	            exit:function(){
+	                wrap.style("opacity",0.25);
+	            }
+	        },
+	        {
+	            text:["Gains in job density were least widespread in manufacturing, local services, and information—less than 20 metro areas saw increases in density in these sectors."],
+	            enter:function(){
+	                groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
+	                show_p();  
+	            },
+	            step: function(s){
+	                if(s > 0 && current_value_prop != "p"){
+	                    show_p();
+	                    groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
+	                }
+	            },
+	            exit:function(){
+	            }
+	        },
+	        {
+	            text: ["For most sectors, however, it was uncommon for actual gains in density to outpace expected gains in job density. This indicates that the pattern of job densification from 2004 to 2015 was isolated to a limited number of metro areas and sectors.", "In fact, the four metro areas mentioned earlier—New York, Chicago, San Francisco, and Seattle—accounted for about 90 percent of the increase in job density seen among all 94 large metro areas during this period."],
+	            enter: function(){
+	                current_value_prop = "ge";
+	                groups.style("opacity",1);
+	                show_ge();
+	            },
+	            step: function(s){
+	                if(s > 0 && current_value_prop != "ge"){
+	                    current_value_prop = "ge";
+	                    groups.style("opacity",1);
+	                    show_ge();
+	                }
+	            },
+	            exit:function(){
+
+	            }
+	        }
+	    ];
+
+	    //static, non-scrollytelling
+	    if(arguments.length > 1){
+	        panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
+	    }
+
+	    return views;
+
+	}
+
+	function seq6(container, i){
+
+	    //var data = county_counts.slice(0).filter(function(d){return d.naics != "00"}).sort(function(a,b){return d3.descending(a.p, b.p)});
+
+	    //one time setup
+	    var wrap = d3.select(container).classed("chart-view",true).style("background","#dddddd");
+
+	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
+	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("[variation within metro areas]");
+
+
+	    function redraw(){
+
+	        
+	    }
+
+	    //register resize callback. initialize
+	    on_resize(redraw, true);
+
+	    //set extent
+
+	    //redraw
+
+
+
+	    var views = [
+	        {
+	            text:["Looking within metro areas we see a similar pattern—that is, much of the job densification trends seemed to be driven by a small set of already-dense parts of metro areas. While 64 percent of metro areas with core urban counties saw an increase in perceived job density in such counties, just 25 percent of metro areas saw perceived job density increase in their exurban counties."],
+	            enter:function(){
+	                wrap.style("opacity",1);
+	            },
+	            step: function(s){
+
+	            },
+	            exit:function(){
+	                wrap.style("opacity",0.25);
+	            }
+	        },
+	        {
+	            text:["Need data for this [I don't have what I need to calculate the weighted averages]"]
+
+	        },
+	        {
+	            text: ["Increases in job density however were seldom as great as would be expected. For example, only 30 percent of metro areas with core urban counties saw greater-than-expected increases from 2004 to 2015, indicating that jobs tended to spread out to less-dense parts of these counties. "]
+	        }
+	    ];
+
+	    //static, non-scrollytelling
+	    if(arguments.length > 1){
+	        panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
 	    }
 
 	    return views;
@@ -11062,8 +12953,12 @@
 	  //browser degradation
 	  if(compat.browser()){
 	    sequence(container, seq0, 4);
-	    sequence(container, seq0$1, 2);
-	    sequence(container, seq3, 2);
+	    sequence(container, seq1, 2);
+	    sequence(container, seq2, 2);
+	    sequence(container, seq3, 4);
+	    sequence(container, seq4, 4);
+	    sequence(container, seq5, 3);
+	    sequence(container, seq6, 3);
 	  }
 
 
