@@ -9,7 +9,8 @@ import geos_cbsa from '../../../js-modules/geos-cbsa';
 export default function seq4(container, i){
 
     //one time setup
-    var wrap = d3.select(container).classed("chart-view big-chart",true);
+    var wrap = d3.select(container).attr("id","sequence-1").classed("chart-view big-chart",true);
+    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>")
 
     var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
     wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas");
@@ -124,7 +125,7 @@ export default function seq4(container, i){
             }
         },
         {
-            text: ["Talk about big declines in density (here <= -30%)"],
+            text: ["Talk about big declines in density (here <= -30%). Also highlight places where actual change exceeded expected, and vice versa."],
             step: function(s){
                 if(s > 0){
                     points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
@@ -139,7 +140,6 @@ export default function seq4(container, i){
 
     //static, non-scrollytelling
     if(arguments.length > 1){
-        panel_number.style("display","block");
         var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
         var j = -1;
         while(++j <= i){

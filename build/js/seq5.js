@@ -8,6 +8,7 @@ export default function seq5(container, i){
 
     //one time setup
     var wrap = d3.select(container).classed("chart-view",true);
+    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>")
 
     var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
     wrap.append("div").classed("sticky-chart-title",true).append("p").html("Several sectors of the economy saw widespread increases in job density");
@@ -156,30 +157,11 @@ export default function seq5(container, i){
             },
             exit:function(){
             }
-        },
-        {
-            text: ["For most sectors, however, it was uncommon for actual gains in density to outpace expected gains in job density. This indicates that the pattern of job densification from 2004 to 2015 was isolated to a limited number of metro areas and sectors.", "In fact, the four metro areas mentioned earlier—New York, Chicago, San Francisco, and Seattle—accounted for about 90 percent of the increase in job density seen among all 94 large metro areas during this period."],
-            enter: function(){
-                current_value_prop = "ge";
-                groups.style("opacity",1);
-                show_ge();
-            },
-            step: function(s){
-                if(s > 0 && current_value_prop != "ge"){
-                    current_value_prop = "ge";
-                    groups.style("opacity",1);
-                    show_ge();
-                }
-            },
-            exit:function(){
-
-            }
         }
     ]
 
     //static, non-scrollytelling
     if(arguments.length > 1){
-        panel_number.style("display","block");
         var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
         var j = -1;
         while(++j <= i){

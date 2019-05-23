@@ -9,8 +9,9 @@ export default function seq6(container, i){
     //one time setup
     var wrap = d3.select(container).classed("chart-view",true).style("background","#dddddd");
 
-    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
-    wrap.append("div").classed("sticky-chart-title",true).append("p").html("[variation within metro areas]");
+    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>")
+
+    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Changes by county type");
 
 
     function redraw(){
@@ -51,7 +52,6 @@ export default function seq6(container, i){
 
     //static, non-scrollytelling
     if(arguments.length > 1){
-        panel_number.style("display","block");
         var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
         var j = -1;
         while(++j <= i){

@@ -61,6 +61,34 @@
 		return d;
 	}
 
+	function on_resize(callback, init){
+	    var viewport = {};
+
+	    function set_dims(){
+	        viewport.w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+	        viewport.h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0); 
+
+	        //viewport.h = !!document.documentElement.clientHeight ? document.documentElement.clientHeight : window.innerHeight || 0; 
+	    }
+
+	    //initialize dimensions
+	    set_dims();
+
+	    //run callback right away
+	    if(arguments.length > 1 && !!init){
+	        callback.call(viewport);
+	    }
+
+	    function redraw(){
+	        set_dims();
+	        callback.call(viewport);
+	    }
+
+	    window.addEventListener("resize", redraw);
+
+	    return redraw;
+	}
+
 	// Notes:
 	// enter, exit, step occur in dom order which should not result in any unexpected behavior (enter() on element 2 is called after the enter() on element 1, etc.)
 	// but, depending on how fast the user scrolls back (reversing) up the page, multiple exit events could fire in the same scroll event
@@ -115,6 +143,15 @@
 
 	    function scroll_event(){
 
+	        //var call_stack = [];
+	        //each case, 1-4 gets a closure, fn
+	        //call_stack.push({
+	        //    element_order: [for normal scrolling, this is the dom order. for case 2 (exit), the reverse dom order],
+	        //    event_order: [for non-mutually exclusive events, the order to sort calls into: 0) enter then 1) step. not essential for the mutually exclusive exit event],
+	        //    fn: closure (e.g. for case 1, bundle both the enter and step calls into one closure)
+	        //})
+	        //after forEach loop, sort stack (first by element_order, then by event_order), and then call all closures sequentially
+
 	        scroll_stack.forEach(function(o){
 	            var px_threshold = vh * (1 - o.threshold); 
 	            var box = o.el.getBoundingClientRect();
@@ -134,17 +171,17 @@
 	                has_stepped = 0;
 	            }
 
-	            //case 1: enter for the first time / re-enter after an exit
+	            //case 1: enter (for the first time) / re-enter (after an exit)
 	            if(en && !o.has_entered){
 	                o.enter.call(o.el);
-	                o.step.call(o.el, has_stepped);
+	                o.step.call(o.el, has_stepped, "enter");
 	            }
 	            //case 2: exit (scrolling back up) -- scrolling past in normal flow is not an exit
 	            else if(!en && o.has_entered){
 	                has_stepped = 0;
 
 	                var exit_closure = function(){
-	                    o.step.call(o.el, has_stepped);
+	                    o.step.call(o.el, has_stepped, "exit");
 	                    o.exit.call(o.el);
 	                };
 
@@ -155,14 +192,14 @@
 	            //case 3 (stepping): in view
 	            //not mutually exclusive of case 1
 	            if(en && !ex){
-	                o.step.call(o.el, has_stepped);
+	                o.step.call(o.el, has_stepped, "scrolling");
 	            }
 
 	            //case 4 (last step): scrolling past, run last step to finish out any transition
 	            //not mutually exclusive of case 1
 	            if(en && ex && o.has_stepped != 1){
 	                has_stepped = 1;
-	                o.step.call(o.el, has_stepped);
+	                o.step.call(o.el, has_stepped, "passed");
 	            }
 
 	            //record this so enter() and exit() can be refired
@@ -171,6 +208,7 @@
 	            o.has_stepped = has_stepped;
 	        });
 	        //unused for now -- not clear it is desirable to run all exits() after all enter() and step() calls
+	        // >>> to do: create a single stack that orders every call properly
 	        //cycle through exit stack in reverse order -- when multiple elements exit in the same call, exit the first DOM elements last, ensuring proper "rolling back" of events
 	        //while(--i >= 0){
 	        //    exit_stack[i]();
@@ -260,7 +298,7 @@
 
 	function sequence(container, setup, num_views, threshold){
 	    
-	    var wrap = d3.select(container).append("div").style("margin-bottom","40vh");
+	    var wrap = d3.select(container).append("div").classed("sequence-wrap",true);
 	    
 	    var views;
 
@@ -293,28 +331,6 @@
 	        });
 	    }
 
-	}
-
-	function on_resize(callback, init){
-	    var viewport = {};
-
-	    function set_dims(){
-	        viewport.w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-	        viewport.h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0); 
-	    }
-
-	    //initialize dimensions
-	    set_dims();
-
-	    //run callback right away
-	    if(arguments.length > 1 && !!init){
-	        callback.call(viewport);
-	    }
-
-	    window.addEventListener("resize", function(){
-	        set_dims();
-	        callback.call(viewport);
-	    });
 	}
 
 	var seq0data = 
@@ -11276,17 +11292,155 @@
 		lightgray: "#eeeeee"
 	};
 
-	function seq0(container, i){
+	function setup_sectors(wrap_){
+	    var wrap = wrap_.append("div").classed("chart-view",true).style("position","absolute").style("top","0px").style("visibility","hidden");
+	    
+	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
 
+	    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.actual, b.actual)});
+
+	    var svg = wrap.append("div").style("max-width","800px").append("svg").attr("viewBox", "0 0 320 240");
+
+	    var g_x_axis = svg.append("g").classed("axis-group",true);
+	    var g_back = svg.append("g");
+	    var g_trend = svg.append("g");
+
+	    var groups = g_trend.selectAll("g").data(data).enter().append("g");
+
+	    var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
+	                                .attr("stroke", function(d){return d.expected > d.actual ? palette.secondary.blue : palette.secondary.blue})
+	                                .attr("stroke-width","1px")
+	                                ;
+
+	    var group_circles = groups.selectAll("circle").data(function(d){return [d]})
+	                .enter().append("circle").attr("r",4.5).attr("cx","0").attr("cy","0")
+	                .attr("fill", palette.primary.blue)
+	                .attr("stroke", palette.primary.blue)
+	                .attr("stroke-width","1.5px")
+	                ;
+	    
+	    var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
+	    var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
+
+	    var scale_x = d3.scaleLinear().domain([-0.4, 0.6]).nice();
+	    var axis_x = d3.axisTop(scale_x).ticks(5, "+,.0%");
+	    var padding = {top:50, right:25, bottom: 5, left: 15 };
+
+	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
+	                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
+	                        .style("shape-rendering","crispEdges");
+
+	    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
+	                              .attr("x","0").attr("y","0")
+	                              .attr("dx","-10")
+	                              .attr("dy","5").attr("text-anchor","end")
+	                              ;
+
+	    var current_value_prop = "actual";
+	    var group_h = 20;
+
+	    function translate(d,i){
+	        var v = d[current_value_prop];
+	        var x = scale_x(v);
+	        var y = (i*group_h) + (group_h/2);
+	        return "translate(" + x + "," + y + ")";
+	    }
+
+	    function show_actual(){
+	        current_value_prop = "actual";
+	        groups.interrupt().transition().duration(1200).attr("transform", translate);
+	        group_connectors.interrupt()
+	                        .transition().duration(1200)
+	                        .attr("x2","0");
+	    }
+
+	    function show_expected(){
+	        current_value_prop = "expected";
+	        groups.interrupt().transition().duration(1200).attr("transform", translate);
+	        group_connectors.interrupt()
+	                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
+	                        .transition().duration(1200)
+	                        .attr("x2", function(d){return (scale_x(d.actual) - scale_x(d.expected))})
+	                        //.on("end", function(d){d3.select(this).style("opacity","0")})                        
+	                        ;
+	    }
+
+	    function redraw(){
+	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
+	        var h = this.h - 300;
+	        //var h = w * aspect;
+	        if(h < 400){h = 400;}
+	        scale_x.range([padding.left, w - padding.right]);
+	        
+	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
+
+	        groups.interrupt().transition().duration(0).attr("transform", translate);
+
+	        svg.attr("viewBox", "0 0 " + w + " " + h);
+	        
+	        g_x_axis.attr("transform", "translate(0," + padding.top + ")");
+	        g_trend.attr("transform", "translate(0," + padding.top + ")");
+
+	        gridlines.attr("d", function(d){
+	            var x = Math.floor(scale_x(d))+0.5;
+	            return "M" + x + "," + padding.top + " l0," + (h - padding.top - padding.bottom);
+	        });
+
+	        axis_x(g_x_axis);
+	        
+	        group_connectors.attr("y1", 0).attr("y2", 0)
+	                        .attr("x1", "0")
+	                        .attr("x2", "0")
+	                        ;
+	        
+	    }    
+
+	    //register resize callback. initialize
+	    var redraw_ = on_resize(redraw, true);
+
+
+	    function step(n, s){
+	        wrap.style("opacity",1);
+	        if(n==0){
+	            title.html("Most sectors saw job density increase from 2004 to 2015"); 
+	            groups.style("opacity","1");
+	            show_actual();
+	        }
+	        else if(n==1){
+	            title.html("Most sectors saw job density increase from 2004 to 2015"); 
+	            show_actual();
+	            groups.style("opacity", function(d){return d.actual > 0.4 ? "1" : "0.15"});
+	        }
+	        else if(n==2){
+	            title.html("Expected job density change from 2004 to 2015"); 
+	            show_expected();
+	            groups.style("opacity", "1");
+	        }
+	    }
+
+
+	    return {
+	        step: step,
+	        enter: function(){
+	            redraw_();
+	            wrap.style("position","relative").style("visibility","visible");
+	        },
+	        exit: function(){
+	            wrap.style("position","absolute").style("visibility","hidden").style("top","0px");
+	        }
+	    };
+
+
+	}
+
+
+	function setup_lines(wrap_){
 	    var data = seq0data.changes;
 
-	    //one time setup
-	    var wrap = d3.select(container).classed("chart-view",true);
-
-	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
-	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Metropolitan America saw a large increase in job density from 2004 to 2015");
-
-	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
+	    var wrap = wrap_.append("div").classed("chart-view",true);
+	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Metropolitan America saw a large increase in job density from 2004 to 2015"); 
+	    
+	    var svg = wrap.append("div").style("max-width","800px").append("svg").attr("viewBox", "0 0 320 240");
 
 	    var g_y_axis = svg.append("g").classed("axis-group",true);
 	    var g_x_axis = svg.append("g").classed("axis-group",true);
@@ -11294,42 +11448,54 @@
 	    var g_trend = svg.append("g");
 	    var g_anno = svg.append("g");
 
-	    var t_ = g_anno.selectAll("g.text-group").data([["94 metro areas"], ["New York", "Chicago", "San Francisco", "Seattle"], ["Other 90"]]).enter().append("g").classed("text-group",true).style("opacity","0");
+	    var t_ = g_anno.selectAll("g.text-group").data([["94 metro areas"], ["New York", "Chicago", "San Francisco", "Seattle"], ["Other 90"], ["Expected:","94 metro areas"]])
+	                                             .enter().append("g").classed("text-group",true).style("opacity","0");
 	    var ts_ = t_.selectAll("text").data(function(d){return d}).enter().append("text").attr("y", function(d,i){return i*16}).text(function(d){return d}).style("font-size","15px").attr("dy","8");
 
-	    var lines = g_trend.selectAll("path").data(["99999", "99998", "99997"])
+	    function dmap(key_){
+	        var key = arguments.length == 0 || key_ == null ? "actual" : key_;
+	        return function(d){
+	            return {cbsa:d.cbsa, year:d.year, value:d[key]}
+	        }
+	    }
+	    var values = [
+	        data["99999"].map(dmap()),
+	        data["99998"].map(dmap()),
+	        data["99997"].map(dmap()),
+	        data["99999"].map(dmap("expected")),
+	    ];
+
+	    var lines = g_trend.selectAll("path").data(values)
 	                       .enter().append("path")
 	                       .attr("stroke-width","2px")
 	                       .style("opacity","0")
 	                       .attr("fill","none")
-	                       .attr("stroke", function(d,i){return i==0 ? palette.primary.blue : i==1 ? palette.primary.yellow : palette.primary.green});
-
-	    var line_all = lines.filter(function(d,i){return i==0});
-	    var line_4 = lines.filter(function(d,i){return i==1});
-	    var line_other = lines.filter(function(d,i){return i==2});
+	                       .attr("stroke", function(d,i){
+	                           return i==0 || i==3 ? palette.primary.blue : i==1 ? palette.primary.yellow : palette.primary.green
+	                        })
+	                        .attr("stroke-dasharray", function(d,i){return i==3 ? "2,2" : null})
+	                        ;
 
 	    var great_recession = g_back.append("rect").attr("fill","#dddddd").style("opacity","0");
 	    
 	    var years = d3.range(2004, 2016);
-	    var all_data_extent = d3.extent(data["99999"].concat(data["99998"], data["99997"]), function(d){return d.actual});
 	    
-	    var scale_y = d3.scaleLinear().domain(all_data_extent).nice();
+	    var scale_y = d3.scaleLinear().domain([0, 0.4]).nice();
 	    var scale_x = d3.scaleLinear().domain([2004, 2015]);
 
 	    var line = d3.line().x(function(d){return scale_x(d.year)})
-	                        .y(function(d){return scale_y(d.actual)})
+	                        .y(function(d){return scale_y(d.value)})
 	                        ;
 
 	    var axis_y = d3.axisLeft(scale_y).ticks(4, "+,.0%");
 	    var axis_x = d3.axisBottom(scale_x).tickValues([2005, 2010, 2015]).tickFormat(function(v){return v});
-
-	    var aspect = 1/2;
 	    var padding = {top:20, right:125, bottom: 40, left: 60 };
 
 	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 750 ? 750 : this.w);
-	        var h = w < 480 ? w : w * aspect;
-
+	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
+	        var h = this.h - 300;
+	        //var h = w * aspect;
+	        if(h < 400){h = 400;}
 	        svg.attr("viewBox", "0 0 " + w + " " + h);
 	        
 	        g_x_axis.attr("transform", "translate(0," + (h-padding.bottom) + ")");
@@ -11339,7 +11505,11 @@
 	        scale_y.range([h - padding.bottom, 0 + padding.top]);
 
 	        t_.attr("transform", function(d,i){
-	            var v = (i == 0 ? 0.3 : (i == 1 ? 0.42 : 0.1));
+	            var v;
+	            if(i == 0){v = 0.3;}
+	            else if(i == 1){v = 0.4;}
+	            else if(i == 2){v = 0.1;}
+	            else if(i == 3){v = 0.2;}
 	            var y = scale_y(v);
 	            return "translate(" + (w-padding.right+3) + ", " + y + ")";
 	        });
@@ -11360,437 +11530,153 @@
 	        axis_x(g_x_axis);
 	        axis_y(g_y_axis);
 
-	        lines.attr("d", function(d){return line(data[d])});
-
-	    }
-
-	    //register resize callback. initialize
-	    on_resize(redraw, true);
-
-	    //set extent
-
-	    //redraw
-	    function show_text(j){t_.filter(function(d,i){return i==j}).style("opacity",1);}
-	    function hide_text(j){t_.filter(function(d,i){return i==j}).style("opacity",0);}
-
-
-	    var views = [
-	        {
-	            text:["The perceived job density of all 94 large metro areas taken together increased nearly 30 percent, indicating job growth was highly concentrated in dense urban areas from 2004 to 2015."],
-	            enter:function(){
-	                wrap.style("opacity","1");
-	                line_all.style("opacity", 1);
-	                show_text(0);
-	                //console.log("enter blue");
-	            },
-	            exit:function(){
-	                wrap.style("opacity",null);
-	                line_all.style("opacity", 0);
-	                hide_text(0);
-	                //console.log("exit blue");
-	            }
-	        },
-
-	        {
-	            text:["During the Great Recession from 2007 to 2009, the average perceived job density increased more than 10 percent as suburban and exurban areas shed their jobs faster than denser urban areas. Perceived job density has steadily increased since 2009."],
-	            enter:function(){
-	                wrap.style("opacity",1);
-	                great_recession.style("opacity",1);
-	                //console.log("enter recession highlight");
-	            },
-	            exit:function(){
-	                great_recession.style("opacity",0);
-	                //console.log("exit recession highlight");
-	            }
-	        },
-
-	        {
-	            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle."],
-	            enter:function(){
-	                wrap.style("opacity",1);
-	                line_4.style("opacity", 1);
-	                show_text(1);
-	                //console.log("enter yellow");
-	            },
-	            exit:function(){
-	                line_4.style("opacity", 0);
-	                hide_text(1);
-	                //console.log("exit yellow");
-	            }
-	        },
-
-	        {
-	            text:["In contrast, job density in the other 90 large metro areas increased only 9 percent on average. However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
-	            enter:function(){
-	                wrap.style("opacity",1);
-	                line_other.style("opacity", 1);
-	                show_text(2);
-	                //console.log("enter green");
-	            },
-	            step:function(s){
-
-	            },
-	            exit:function(){
-	                line_other.style("opacity", 0);
-	                hide_text(2);
-	                //console.log("exit green");
-	            }
-	        }
-	    ];
-
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        panel_number.style("display","block");
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
-
-	    return views;
-
-	}
-
-	function seq1(container, i){
-
-	    //one time setup
-	    var wrap = d3.select(container).classed("chart-view",true).style("background-color","#dddddd");
-
-	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
-	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Actual versus expected perceived job density [shift share graphic]");
-
-
-	    function redraw(){
-
-	        
-	    }
-
-	    //register resize callback. initialize
-	    on_resize(redraw, true);
-
-	    //set extent
-
-	    //redraw
-
-
-	    var views = [
-	        {
-	            text:["What we mean by expected job density"],
-	            enter:function(){
-	                wrap.style("opacity","1");
-	            },
-	            exit:function(){
-	                wrap.style("opacity",null);
-	            }
-	        },
-	        {
-	            text:["What this means intuitively: when expected density outpaces actual density change, the geographic distribution of jobs has shifted toward lower density areas."]
-	        },
-	        {
-	            text:["Example?"]
-	        }
-	    ];
-
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        panel_number.style("display","block");
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
-
-	    return views;
-
-	}
-
-	function seq2(container, i){
-
-	    var data = seq0data.changes["99999"];
-
-	    //one time setup
-	    var wrap = d3.select(container).classed("chart-view",true);
-
-	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
-	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Jobs in metropolitan America grew denser than expected from 2004 to 2015");
-
-	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-
-	    var g_y_axis = svg.append("g").classed("axis-group",true);
-	    var g_x_axis = svg.append("g").classed("axis-group",true);
-	    var g_back = svg.append("g");
-	    var g_trend = svg.append("g");
-
-	    var lines = g_trend.selectAll("path").data([data.map(function(d){return {year:d.year, change:d.expected} }), 
-	                                                data.map(function(d){return {year:d.year, change:d.actual  } })])
-	                                        .enter().append("path")
-	                                        .attr("stroke-width","2px")
-	                                        .style("opacity","0")
-	                                        .attr("fill","none")
-	                                        .attr("stroke", function(d,i){return i==0 ? palette.secondary.blue : palette.primary.blue})
-	                                        .attr("stroke-dasharray", function(d,i){return i==0 ? "3,3" : null});
-
-	    var line_expected = lines.filter(function(d,i){return i==0});
-	    var line_actual = lines.filter(function(d,i){return i==1});
-
-	    var great_recession = g_back.append("rect").attr("fill","#cccccc").style("opacity","0");
-	    
-	    var years = d3.range(2004, 2016);
-	    
-	    var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
-	    var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
-
-	    var scale_y = d3.scaleLinear().domain([min, max]).nice();
-	    var scale_x = d3.scaleLinear().domain([2004, 2015]);
-
-	    var line = d3.line().x(function(d){return scale_x(d.year)}).y(function(d){return scale_y(d.change)});
-
-	    var axis_y = d3.axisLeft(scale_y).ticks(4, "+,.0%");
-	    var axis_x = d3.axisBottom(scale_x).tickValues([2005, 2010, 2015]).tickFormat(function(v){return v});
-
-	    var aspect = 1/2;
-	    var padding = {top:20, right:25, bottom: 40, left: 60 };
-
-	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 750 ? 750 : this.w);
-	        var h = w < 480 ? w : w * aspect;
-
-	        svg.attr("viewBox", "0 0 " + w + " " + h);
-	        
-	        g_x_axis.attr("transform", "translate(0," + (h-padding.bottom+5) + ")");
-	        g_y_axis.attr("transform", "translate(" + (padding.left-5) + ",0)");
-
-	        scale_x.range([padding.left, w - padding.right]);
-	        scale_y.range([h - padding.bottom, 0 + padding.top]);
-
-	        var grid_lines_ = g_back.selectAll("line").data(scale_y.ticks());
-	        grid_lines_.exit().remove();
-	        var grid_lines = grid_lines_.enter().append("line").merge(grid_lines_).attr("stroke-dasharray","2,4").attr("stroke","#ffffff")
-	                                            .attr("x1", scale_x(2004)-4).attr("x2", scale_x(2015))
-	                                            .attr("y1", function(d){return Math.floor(scale_y(d))+0.5})
-	                                            .attr("y2", function(d){return Math.floor(scale_y(d))+0.5})
-	                                            ;
-
-	        great_recession.attr("x", scale_x(2007)).attr("y", padding.top)
-	                       .attr("width", scale_x(2009) - scale_x(2007))
-	                       .attr("height", h - padding.top - padding.bottom + 5);
-
-	        axis_x(g_x_axis);
-	        axis_y(g_y_axis);
-
 	        lines.attr("d", function(d){return line(d)});
 
 	    }
 
 	    //register resize callback. initialize
-	    on_resize(redraw, true);
+	    var redraw_ = on_resize(redraw, true);
 
-	    //set extent
-
-	    //redraw
-
-
-	    var views = [
-	        {
-	            text:["This is the expected change in job density—what we would have expected to see if each office and factory added jobs at its industry-wide average rate"],
-	            enter:function(){
-	                wrap.style("opacity",1);
-	                line_expected.style("opacity", 1);
-	                //console.log("enter blue");
-	            },
-	            exit:function(){
-	                wrap.style("opacity",null);
-	                line_expected.style("opacity", 0);
-	                //console.log("exit blue");
+	    function step(n, s){
+	        console.log("step " + n);
+	        wrap.style("opacity",1);
+	        lines.style("opacity", function(d,i){
+	            if(n !== 3){
+	                return i <= n ? "1" : "0";
 	            }
-	        },
-
-	        {
-	            text:["This is what we actually saw, indicating that, on average, new and existing jobs shifted to more dense locations within metro areas"],
-	            enter:function(){
-	                wrap.style("opacity",1);
-	                line_actual.style("opacity",1);
-	            },
-	            exit:function(){
-	                line_actual.style("opacity", 0);
+	            else{
+	                return i == n ? "1" : "0.25";
 	            }
-	        }
-	    ];
-
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        panel_number.style("display","block");
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
+	        });
+	        t_.style("opacity", function(d,i){
+	            if(n !== 3){
+	                return i <= n ? "1" : "0";
 	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
+	            else{
+	                return i == n ? "1" : "0.25";
 	            }
-	        }
-	    }
-
-	    return views;
-
-	}
-
-	function seq3(container, i){
-
-	    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.actual, b.actual)});
-
-	    //one time setup
-	    var wrap = d3.select(container).classed("chart-view",true);
-
-	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
-	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase and exceeded expectations");
-
-	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-
-	    wrap.append("p").classed("legend",true)
-	        .html('<span class="actual-density-change">Actual job density change</span><br /><span class="expected-density-change">Expected job density change</span>');
-
-	    var g_x_axis = svg.append("g").classed("axis-group",true);
-	    var g_back = svg.append("g");
-	    var g_trend = svg.append("g");
-
-	    var groups = g_trend.selectAll("g").data(data).enter().append("g");
-
-	    var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
-	                                                .attr("stroke", function(d){return d.actual < d.expected ? palette.secondary.orange : palette.secondary.blue})
-	                                                .attr("stroke-width","1px");
-	    var group_circles = groups.selectAll("circle").data(function(d){return [d.expected, d.actual]})
-	                                .enter().append("circle").attr("r",4.5)
-	                                .attr("fill",function(d,i){return i==0 ? "#ffffff" : palette.primary.blue})
-	                                .attr("stroke",function(d,i){return  i==0 ? palette.primary.blue : palette.primary.blue})
-	                                .attr("stroke-width","1.5px")
-	                                ;
-	    
-	    var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
-	    var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
-
-	    var scale_x = d3.scaleLinear().domain([-0.4, 0.6]).nice();
-	    var axis_x = d3.axisTop(scale_x).ticks(5, "+,.0%");
-
-	    var aspect = 2/3;
-	    var padding = {top:50, right:25, bottom: 5, left: 15 };
-
-	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
-	                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
-	                        .style("shape-rendering","crispEdges");
-
-	    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
-	                              .attr("x", padding.left)
-	                              .attr("dx","-10")
-	                              .attr("dy","5").attr("text-anchor","end")
-	                              ;
-
-	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-	        var h = w * aspect;
-	        if(h < 400){h = 400;}        
-	        var group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
-	        var group_h2 = Math.floor(group_h/2) + 0.5;
-	        groups.attr("transform", function(d,i){return "translate(0," + (i*group_h) + ")"});
-
-	        svg.attr("viewBox", "0 0 " + w + " " + h);
-	        
-	        g_x_axis.attr("transform", "translate(0," + padding.top + ")");
-	        g_trend.attr("transform", "translate(0," + padding.top + ")");
-
-	        scale_x.range([padding.left, w - padding.right]);
-
-	        gridlines.attr("d", function(d){
-	            var x = Math.floor(scale_x(d))+0.5;
-	            return "M" + x + "," + padding.top + " l0," + (h - padding.top - padding.bottom);
+	        });
+	        great_recession.style("opacity", function(d,i){
+	            return n > 0 ? "1" : "0";
 	        });
 
-	        axis_x(g_x_axis);
-
-	        //[expected, actual]
-	        group_circles.attr("cx", function(d,i){return i==0 ? scale_x(d) : scale_x(d)}).attr("cy", group_h2);
-	        group_connectors.attr("y1", group_h2).attr("y2", group_h2)
-	                        .attr("x1", function(d){return scale_x(d.expected)})
-	                        .attr("x2", function(d){return scale_x(d.actual)})
-	                        ;
-
-	        group_labels.attr("y", group_h2)
-	                    .attr("x", function(d){
-	                        var min = Math.min(d.expected, d.actual);
-	                        return scale_x(min);
-	                    });
-	        
+	        if(n == 0){title.text("Metropolitan America saw a large increase in job density from 2004 to 2015");}
+	        else if(n == 0.5){title.text("Great Recession headline ...");}
+	        else if(n == 1){title.text("Very dense places headline");}
+	        else if(n == 2){title.text("Other places headline");}
+	        else if(n == 3){title.text("Actual density increased greater than expected in the 94 metro areas [headline tk]");}
 	    }
 
-	    //register resize callback. initialize
-	    on_resize(redraw, true);
 
-	    //set extent
+	    return {
+	        step: step,
+	        enter: function(){
+	            redraw_();
+	            wrap.style("opacity","1");
+	        },
+	        exit: function(){
+	            lines.style("opacity","0");
+	            t_.style("opacity","0");
+	            wrap.style("opacity",null);
+	        },
+	        show: function(){
+	            wrap.style("position","relative").style("visibility","visible");
+	        },
+	        hide: function(){
+	            wrap.style("position","absolute").style("visibility","hidden").style("top","0px");
+	        }
+	    };
+	}
 
-	    //redraw
+	function seq0(container, i){
+
+	    var wrap = d3.select(container).attr("id", "sequence-0").append("div").style("position","relative");
+	    wrap.append("p").classed("meta-header meta-header-1", true).html("<span>Average changes in job density</span>");
+
+	    //one time setup
+	    var lines = setup_lines(wrap);
+	    var sectors = setup_sectors(wrap);
+
+
+	    var current_view = null;
+	    function show_view(n, s, step_code){
+	        if(step_code != "exit" && n !== current_view){
+	            
+	        
+	            if(current_view < 4){
+	                lines.step(n, s);
+	            }
+	            else{
+	                sectors.step(n-4, s);
+	            }
+
+
+	            current_view = n;
+
+	        }
+	    }
 
 
 	    var views = [
 	        {
-	            text:['Only manufacturing and wholesale were expected to decline in density from 2004 to 2015'],
-	            enter:function(){
-	                wrap.style("opacity","1");
-	            },
-	            step: function(s){
-	                if(s > 0){
-	                    groups.style("opacity", function(d){return d.naics == "31" || d.naics == "42" ? "1" : "0.15"});
-	                    //console.log("1 - STEP");
-	                }
+	            text:["The perceived job density of all 94 large metro areas taken together increased nearly 30 percent, indicating job growth was highly concentrated in dense urban areas from 2004 to 2015."],
+	            step:function(s, c){show_view(0, s, c);},
+	            enter: function(){
+	                lines.enter();
 	            },
 	            exit:function(){
-	                wrap.style("opacity",null);
+	                lines.exit();
+	                current_view = null;
+	            }
+	        },
+
+	        {
+	            text:["During the Great Recession from 2007 to 2009, the average perceived job density increased more than 10 percent as suburban and exurban areas shed their jobs faster than denser urban areas. Perceived job density has steadily increased since 2009."],
+	            step:function(s, c){show_view(0.5, s, c);},
+	        },
+
+	        {
+	            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle."],
+	            step:function(s, c){show_view(1, s, c);}
+	        },
+
+	        {
+	            text:["In contrast, job density in the other 90 large metro areas increased only 9 percent on average. However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
+	            step:function(s, c){show_view(2, s, c);}
+	        },
+
+	        {
+	            text:["This is the expected change in job density—what we would have expected to see if each office and factory added jobs at its industry-wide average rate"],
+	            step:function(s, c){show_view(3, s, c);}
+	        },
+
+	        {
+	            text:["All but two sectors saw job density increas... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent a maximus quam. Integer suscipit tempor justo. Nullam a metus augue. Phasellus sit amet turpis ac."],
+	            enter:function(){
+	                lines.hide();
+	                lines.exit();
+	                sectors.enter();
+	            },
+	            step:function(s, c){show_view(4, s, c);},
+	            exit:function(){
+	                lines.show();
+	                lines.enter();
+	                sectors.exit();
 	            }
 	        },
 	        {
-	            text:["In the end, it was manufacturing and logistics which became less dense"],
-	            step: function(s){
-	                if(s > 0){
-	                    groups.style("opacity", function(d){return d.naics == "31" || d.naics == "48" ? "1" : "0.15"});
-	                    //console.log("2 - STEP");
-	                }
-	            }
+	            text:["Four sectors ..."],
+	            step:function(s, c){show_view(5, s, c);},
 	        },
 	        {
-	            text: ["12 of 16 major sectors of the economy actually saw greater-than-expected increases in job density"],
-	            step: function(s){
-	                if(s > 0){
-	                    groups.style("opacity", function(d){ return d.actual > d.expected ? "1" : "0.15"});
-	                    //console.log("3 - STEP");
-	                }
-	            }
-	        },
-	        {
-	            text: ["While four saw perceived job density change by less than expected."],
-	            step: function(s){
-	                if(s > 0){
-	                    groups.style("opacity", function(d){ return d.actual < d.expected ? "1" : "0.15"});
-	                    //console.log("3 - STEP");
-	                }
-	            }
+	            text:["In most sectors, the expected change in job density was less than the actual change."],
+	            step:function(s, c){show_view(6, s, c);},
 	        }
 	    ];
 
 	    //static, non-scrollytelling
 	    if(arguments.length > 1){
-	        panel_number.style("display","block");
+	        //panel_number.style("display","block");
 	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
 	        var j = -1;
 	        while(++j <= i){
@@ -12529,7 +12415,8 @@
 	function seq4(container, i){
 
 	    //one time setup
-	    var wrap = d3.select(container).classed("chart-view big-chart",true);
+	    var wrap = d3.select(container).attr("id","sequence-1").classed("chart-view big-chart",true);
+	    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>");
 
 	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas");
@@ -12642,7 +12529,7 @@
 	            }
 	        },
 	        {
-	            text: ["Talk about big declines in density (here <= -30%)"],
+	            text: ["Talk about big declines in density (here <= -30%). Also highlight places where actual change exceeded expected, and vice versa."],
 	            step: function(s){
 	                if(s > 0){
 	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
@@ -12657,7 +12544,6 @@
 
 	    //static, non-scrollytelling
 	    if(arguments.length > 1){
-	        panel_number.style("display","block");
 	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
 	        var j = -1;
 	        while(++j <= i){
@@ -12680,6 +12566,7 @@
 
 	    //one time setup
 	    var wrap = d3.select(container).classed("chart-view",true);
+	    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>");
 
 	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Several sectors of the economy saw widespread increases in job density");
@@ -12783,17 +12670,6 @@
 	                        .attr("x2","0");
 	    }
 
-	    function show_ge(){
-	        current_value_prop = "ge";
-	        groups.interrupt().transition().duration(1200).attr("transform", translate);
-	        group_connectors.interrupt()
-	                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
-	                        .transition().duration(1200)
-	                        .attr("x2", function(d){return (scale_x(d.p) - scale_x(d.ge))})
-	                        .on("end", function(d){d3.select(this).style("opacity","0");})                        
-	                        ;
-	    }
-
 
 	    var views = [
 	        {
@@ -12827,30 +12703,11 @@
 	            },
 	            exit:function(){
 	            }
-	        },
-	        {
-	            text: ["For most sectors, however, it was uncommon for actual gains in density to outpace expected gains in job density. This indicates that the pattern of job densification from 2004 to 2015 was isolated to a limited number of metro areas and sectors.", "In fact, the four metro areas mentioned earlier—New York, Chicago, San Francisco, and Seattle—accounted for about 90 percent of the increase in job density seen among all 94 large metro areas during this period."],
-	            enter: function(){
-	                current_value_prop = "ge";
-	                groups.style("opacity",1);
-	                show_ge();
-	            },
-	            step: function(s){
-	                if(s > 0 && current_value_prop != "ge"){
-	                    current_value_prop = "ge";
-	                    groups.style("opacity",1);
-	                    show_ge();
-	                }
-	            },
-	            exit:function(){
-
-	            }
 	        }
 	    ];
 
 	    //static, non-scrollytelling
 	    if(arguments.length > 1){
-	        panel_number.style("display","block");
 	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
 	        var j = -1;
 	        while(++j <= i){
@@ -12874,8 +12731,9 @@
 	    //one time setup
 	    var wrap = d3.select(container).classed("chart-view",true).style("background","#dddddd");
 
-	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
-	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("[variation within metro areas]");
+	    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>");
+
+	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Changes by county type");
 
 
 	    function redraw(){
@@ -12916,7 +12774,6 @@
 
 	    //static, non-scrollytelling
 	    if(arguments.length > 1){
-	        panel_number.style("display","block");
 	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
 	        var j = -1;
 	        while(++j <= i){
@@ -12946,16 +12803,13 @@
 	    dims.w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 	    dims.h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 	  }
-	  get_dims();
 
-	  window.addEventListener("resize", get_dims);
+	  on_resize(get_dims, true);
 
 	  //browser degradation
 	  if(compat.browser()){
-	    sequence(container, seq0, 4);
-	    sequence(container, seq1, 2);
-	    sequence(container, seq2, 2);
-	    sequence(container, seq3, 4);
+	    sequence(container, seq0, 7);
+
 	    sequence(container, seq4, 4);
 	    sequence(container, seq5, 3);
 	    sequence(container, seq6, 3);

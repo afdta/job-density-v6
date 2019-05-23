@@ -12,7 +12,7 @@ import scrolly from "../../../js-modules/d3-scrolly.js";
 
 export default function sequence(container, setup, num_views, threshold){
     
-    var wrap = d3.select(container).append("div").style("margin-bottom","40vh");
+    var wrap = d3.select(container).append("div").classed("sequence-wrap",true);
     
     var views;
 

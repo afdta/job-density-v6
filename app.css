@@ -19,7 +19,7 @@ p.panel-number{
 
 div.scrolling-panel{
     min-height:90vh;
-    max-width:500px;
+    max-width:400px;
     margin:0px auto;
     padding:100px 15px;
     position:relative;
@@ -55,11 +55,10 @@ div.scrolling-panel > p > span{
 .chart-view{
     min-height:400px;
     min-width:300px;
-    max-width:800px;
+    max-width:900px;
     margin:0px auto;
     opacity:0.4;
     z-index:0;
-    border-top:1px solid #aaaaaa;
 }
 
 .chart-view.big-chart{
@@ -72,15 +71,21 @@ div.scrolling-panel > p > span{
     line-height:1.7em;
 }
 
+.sequence-wrap{
+    max-width:1400px;
+    margin:0px auto 40vh auto;
+    
+}
 
 .sticky-el{
     padding:15px;
+    border-top:1px solid #aaaaaa;
 }
 
 .sticky-chart-title{
     max-width:800px;
-    padding:5px 0px 5px 0px;
-    margin:0px auto;
+    padding:5px 0px 15px 0px;
+    margin:0px;
 }
 
 .sticky-chart-title > *{
@@ -128,4 +133,57 @@ div.scrolling-panel > p > span{
     display:inline-block;
     border-top:1px solid #aaaaaa;
     line-height:1.7em;
+}
+
+.meta-header{
+    margin:0px 0px 10px 0px;
+}
+
+.meta-header > *{
+    padding:5px 10px;
+    line-height:1em;
+    font-size:16px;
+    font-weight:bold;
+    color:#eeeeee;
+    border-radius:7px;
+    display:inline-block;
+
+    text-decoration:none;
+    border:none;
+    border-width:0px;
+    border-color:transparent;
+}
+
+.meta-header-1 > *{
+    background-color:#0D73D6;
+}
+
+.meta-header-2 > *{
+    background-color:#02B6ED;
+}
+
+.meta-header-3 > *{
+    background-color:#02E3DD;
+    color:#333333;
+}
+
+
+@media (min-width:0px){
+    div.scrolling-panel{
+        margin:0px auto;
+    }
+
+    .chart-view{
+        margin:0px auto;
+    }
+}
+
+@media (min-width:1380px){
+    div.scrolling-panel{
+        margin:0px auto 0px 980px;
+    }
+
+    .chart-view{
+        margin:0px auto 0px 0px;
+    }
 }

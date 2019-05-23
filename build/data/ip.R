@@ -7,8 +7,10 @@ file <- here("Job density data extract 20190503.xlsx")
 data <- read_xlsx(file) %>% rename(cbsa_old = cbsa) %>% mutate(cbsa = ifelse(cbsa_old == 19430, 19380, cbsa_old))
 dayton <- filter(data, cbsa != cbsa_old)
 
+df0 <- as.data.frame(table(data$type, data$cntyfips)) %>% filter(Var1=="TOTAL")
+
 #totals
-tots <- data %>% filter(cbsa > 90000, type=="TOTAL", naics=="00") %>% select("cbsa","year","measure","density","pchange")
+tots <- data %>% filter(cbsa > 90000, type=="TOTAL", naics=="00") %>% select("cbsa", "year","measure","density","pchange")
             
 tots_change <- tots %>% select(-density) %>% spread(key=measure, value=pchange) %>% split(.$cbsa)
 tots_density <- tots %>% select(-pchange) %>% spread(key=measure, value=density) %>% split(.$cbsa)
@@ -21,7 +23,8 @@ sector15_ <- data %>% filter(type=="TOTAL", year==2015, !(cbsa %in% c(99997, 999
 
 sector15counts <- sector15_ %>% mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0)) %>% filter(cbsa < 90000) %>% group_by(naics) %>% summarise(p=sum(p_), ge=sum(ge_))
 
-countycounts <- data %>% filter(cbsa < 90000, type=="TOTAL", naics=="00") %>% select("cbsa","year","measure","density","pchange")
+countycounts <- data %>% filter(cbsa < 90000, naics=="00", year==2015, cntyfips=="00000") %>% select("cbsa", "year", "type", "measure","pchange") %>% spread(measure, pchange) %>%
+                        mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0))
 
 #check on intermediate outputs
 #table(sector15counts$p_, sector15counts$naics)

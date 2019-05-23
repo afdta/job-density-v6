@@ -4,6 +4,8 @@ function on_resize(callback, init){
     function set_dims(){
         viewport.w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         viewport.h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0); 
+
+        //viewport.h = !!document.documentElement.clientHeight ? document.documentElement.clientHeight : window.innerHeight || 0; 
     }
 
     //initialize dimensions
@@ -14,10 +16,14 @@ function on_resize(callback, init){
         callback.call(viewport);
     }
 
-    window.addEventListener("resize", function(){
+    function redraw(){
         set_dims();
         callback.call(viewport);
-    });
+    }
+
+    window.addEventListener("resize", redraw);
+
+    return redraw;
 }
 
 export default on_resize;
