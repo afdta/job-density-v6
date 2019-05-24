@@ -80,6 +80,9 @@ div.scrolling-panel > p > span{
 .sticky-el{
     padding:15px;
     border-top:1px solid #aaaaaa;
+    position:relative;
+    position:-webkit-sticky;
+    position:sticky;
 }
 
 .sticky-chart-title{
