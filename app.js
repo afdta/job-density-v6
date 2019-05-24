@@ -105,7 +105,7 @@
 	    var browser_support = false;
 
 	    try{
-	        browser_support = CSS.supports('(position: sticky)');
+	        browser_support = CSS.supports('(position: sticky)') || CSS.supports('(position: -webkit-sticky)');
 	    }
 	    catch(e){
 	        browser_support = false;
