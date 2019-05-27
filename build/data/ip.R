@@ -3,7 +3,10 @@ library(readxl)
 library(here)
 library(jsonlite)
 
-file <- here("Job_density_data_extract_20190521.xlsx")
+#to do: revise with latest data
+# check counts against increase/greater_inc variables
+
+file <- here("Job density data extract 20190503.xlsx")
 data <- read_xlsx(file) %>% rename(cbsa_old = cbsa) %>% mutate(cbsa = ifelse(cbsa_old == 19430, 19380, cbsa_old))
 dayton <- filter(data, cbsa != cbsa_old)
 
@@ -21,16 +24,17 @@ sector15_ <- data %>% filter(type=="TOTAL", year==2015, !(cbsa %in% c(99997, 999
 
 sector15counts <- sector15_ %>% mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0)) %>% filter(cbsa < 90000) %>% group_by(naics) %>% summarise(p=sum(p_), ge=sum(ge_))
 
-countycounts <- data %>% filter(cbsa < 90000, naics=="00", year==2015, cntyfips=="00000") %>% select("cbsa", "year", "type", "measure","pchange") %>% spread(measure, pchange) %>%
-                        mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0))
+county_ <- data %>% filter(cbsa < 90000, naics=="00", year==2015, cntyfips=="00000") %>% select("cbsa", "type", "measure","pchange") %>% spread(measure, pchange) 
+table(county_$type)
+
+countycounts <- county_ %>% mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0)) %>% group_by(type) %>% summarise(p=sum(p_), ge=sum(ge_), n=n())
 
 #check on intermediate outputs
 #table(sector15counts$p_, sector15counts$naics)
 #table(sector15counts$ge_, sector15counts$naics)
 
-
-
 sector15 <- sector15_ %>% split(.$cbsa)
+county <- county_ %>% split(.$cbsa)
 
 tots15 <- data %>% filter(type=="TOTAL", year==2015, !(cbsa %in% c(99997, 99998)), naics=="00") %>% 
   select(cbsa, naics, measure, pchange) %>% 
@@ -42,9 +46,11 @@ sector_names <- unique(data[c("naics", "sector")]) %>% spread(naics, sector) %>%
 
 sector_json <- toJSON(sector15, digits=5, na="null", pretty=TRUE)
 sector_names_json <- toJSON(sector_names, pretty=TRUE)
+county_json <- toJSON(county, digits=5, na="null", pretty=TRUE)
 tots_json <- toJSON(tots15, digits=5, na="null", pretty=TRUE)
 names_json <- unique(data[c("cbsa", "cbsaname")]) %>% spread(key=cbsa, value=cbsaname) %>% unbox() %>% toJSON(pretty=TRUE)
 sector_counts_json <- toJSON(sector15counts, digits=5, pretty=TRUE)
+county_counts_json <- toJSON(countycounts, digits=5, pretty=TRUE)
 
 counts <- as.data.frame(table(sector15_$cbsa))
 
@@ -53,9 +59,11 @@ writeLines(c(
              "var sector_data = ", sector_json, ";",
              "var sector_counts = ", sector_counts_json, ";",
              "var sector_names = ", sector_names_json, ";",
+             "var county_data = ", county_json, ";",
+             "var county_counts = ", county_counts_json, ";",
              "var naics00 = ", tots_json, ";",
              "var metro_names = ", names_json, ";",
-             "export {seq0data, sector_data, sector_counts, sector_names, naics00, metro_names}", ";"
+             "export {seq0data, sector_data, sector_counts, sector_names, county_data, county_counts, naics00, metro_names}", ";"
              ),
             here("../js/data.js"))
 
