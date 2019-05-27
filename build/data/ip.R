@@ -3,11 +3,9 @@ library(readxl)
 library(here)
 library(jsonlite)
 
-file <- here("Job density data extract 20190503.xlsx")
+file <- here("Job_density_data_extract_20190521.xlsx")
 data <- read_xlsx(file) %>% rename(cbsa_old = cbsa) %>% mutate(cbsa = ifelse(cbsa_old == 19430, 19380, cbsa_old))
 dayton <- filter(data, cbsa != cbsa_old)
-
-df0 <- as.data.frame(table(data$type, data$cntyfips)) %>% filter(Var1=="TOTAL")
 
 #totals
 tots <- data %>% filter(cbsa > 90000, type=="TOTAL", naics=="00") %>% select("cbsa", "year","measure","density","pchange")
