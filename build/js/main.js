@@ -1,8 +1,9 @@
 import degradation from "../../../js-modules/degradation.js";
 import on_resize from './on_resize.js';
 
-import sequence from "./sequence.js";
+import sequence from "./sequence2.js";
 import seq0 from "./seq0.js";
+import seq1 from "./seq1.js";
 
 import seq4 from "./seq4.js";
 import seq5 from "./seq5.js";
@@ -26,11 +27,8 @@ function main(){
 
   //browser degradation
   if(compat.browser()){
-    sequence(container, seq0, 7);
-
-    sequence(container, seq4, 4);
-    sequence(container, seq5, 3);
-    sequence(container, seq6, 3);
+    sequence(container, [seq0, seq1], '<p id="group-seqs-1" class="meta-header meta-header-1"><span>Average changes in job density</span></p>');
+    sequence(container, [seq4, seq5, seq6], '<p id="group-seqs-2" class="meta-header meta-header-2"><span>How widespread...</span></p>');
   }
 
 

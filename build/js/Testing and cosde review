@@ -1,0 +1,3 @@
+CODE REVIEW
+
+Backend code review: underlying logic of scrollytelling framework. cover all cases: t=0, t=1, t=n+2.  Each transition, t -> t+1, occurs in forward or backward direction. Build out logic tables for all forward and backward cases and validate out-of-order sequences are impossible. Map out plan for more straightforward, sorted, call stack in next version. 

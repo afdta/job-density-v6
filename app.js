@@ -92,14 +92,12 @@
 	// Notes:
 	// enter, exit, step occur in dom order which should not result in any unexpected behavior (enter() on element 2 is called after the enter() on element 1, etc.)
 	// but, depending on how fast the user scrolls back (reversing) up the page, multiple exit events could fire in the same scroll event
-	// in this instance, the exit event for content/views further down the page may fire last (as discussed below, each exit() also fires a step(0))
+	// in this instance, the exit event for content/views further down the page may fire last (as discussed below, each exit() also fires a step(0, "exit"))
 	// e.g. in a page structure with views A >> B >> C >> D, quickly scolling up the page may fire exit events in this order: C(), D(), A(), B().
 	// in other words, be careful about what you rely on exit() events to do. the preference is for the exit event to simply "reverse" 
 	// the enter event though this may not always be practical. when not practical, you can use the step event to indicate the "active" view.
-	// note the special case: when the user exits a view (reverses out of) step(0) is called. this is relevant because B_step() may be called after A_step()
-	// when vew A is really in view (because view B has exited and B_step(0) is called). this means that a view should not be considered active when the 
-	// has_stepped proportion is 0. likewise, you could argue that cases when the has_stepped proportion == 1 should be ignored, but this is less of a 
-	// practical issue because the step() functions for subsequent active views will be called. it is exiting behavior that can be problematic
+	// note the special case: when the user exits a view (reverses out of), step(0, "exit") is called. this means that a view should not be considered active when the 
+	// has_stepped proportion is 0.
 
 	function scrolly_supported(){
 	    var browser_support = false;
@@ -116,11 +114,14 @@
 
 	// Credit: This module was inspired by Russell Goldenberg's enter-view module [License: https://github.com/russellgoldenberg/enter-view/blob/master/LICENSE]
 
-	function scrolly(element, top_){
+	function scrolly(element, top_, default_threshold_){
 	    
 	    var sticky_el = d3.select(element);
 	    
 	    sticky_el.style("position", "sticky").style("top", arguments.length > 1 && top_ != null ? (top_+"px") : "0px").classed("sticky-el",true);
+
+	    //place actual graphics here
+	    var views_wrap = sticky_el.append("div").style("position","relative");
 
 	    //harmonized requestAnimationFrame to call listener
 	    var animation_frame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
@@ -139,7 +140,39 @@
 	    var vh;
 	    var vw;
 
-	    //to do: move px threshold outside of loop -- allow threshold to be specified as arg to scrolly
+	    var default_threshold = default_threshold_ != null ? default_threshold_ : 0.15;
+
+	    var current_view_id = null;
+	    var active_view_id = null;
+	    var all_views = {};
+	    function show_active_view(){
+
+	        var av;
+	        if(active_view_id === null){
+	            //if no view active... a) and no view initialized -> default to v0, b) otherwise keep current view
+	            av = current_view_id === null ? "v0" : current_view_id;
+	        }
+	        else{
+	            //if an active view, show it
+	            av = active_view_id;
+	        }
+
+	        if(current_view_id !== av){
+	            for(var v in all_views){
+	                if(all_views.hasOwnProperty(v)){
+	                    if(v === av){
+	                        //show
+	                        all_views[v].style("position","relative").style("visibility","visible").style("z-index","10").style("top","0px").style("pointer-events",null);
+	                    }
+	                    else{
+	                        //hide
+	                        all_views[v].style("position","absolute").style("visibility","hidden").style("z-index","1").style("top","0px").style("pointer-events","none");
+	                    }
+	                }
+	            }
+	            current_view_id = av;
+	        }       
+	    }
 
 	    function scroll_event(){
 
@@ -152,11 +185,14 @@
 	        //})
 	        //after forEach loop, sort stack (first by element_order, then by event_order), and then call all closures sequentially
 
+	        active_view_id = null;
+
 	        scroll_stack.forEach(function(o){
 	            var px_threshold = vh * (1 - o.threshold); 
 	            var box = o.el.getBoundingClientRect();
 	            var h = box.bottom - box.top;
-	            
+
+	            var action_code = null;            
 	            var en = box.top < px_threshold;
 	            var ex = box.bottom < px_threshold;
 
@@ -173,15 +209,17 @@
 
 	            //case 1: enter (for the first time) / re-enter (after an exit)
 	            if(en && !o.has_entered){
+	                action_code = "enter";
 	                o.enter.call(o.el);
-	                o.step.call(o.el, has_stepped, "enter");
+	                o.step.call(o.el, has_stepped, action_code);
 	            }
 	            //case 2: exit (scrolling back up) -- scrolling past in normal flow is not an exit
 	            else if(!en && o.has_entered){
 	                has_stepped = 0;
+	                action_code = "exit";
 
 	                var exit_closure = function(){
-	                    o.step.call(o.el, has_stepped, "exit");
+	                    o.step.call(o.el, has_stepped, action_code);
 	                    o.exit.call(o.el);
 	                };
 
@@ -192,14 +230,20 @@
 	            //case 3 (stepping): in view
 	            //not mutually exclusive of case 1
 	            if(en && !ex){
-	                o.step.call(o.el, has_stepped, "scrolling");
+	                action_code = has_stepped == 1 ? "passed" : "scrolling";
+	                o.step.call(o.el, has_stepped, action_code);
 	            }
 
 	            //case 4 (last step): scrolling past, run last step to finish out any transition
 	            //not mutually exclusive of case 1
 	            if(en && ex && o.has_stepped != 1){
 	                has_stepped = 1;
-	                o.step.call(o.el, has_stepped, "passed");
+	                action_code = "passed";
+	                o.step.call(o.el, has_stepped, action_code);
+	            }
+
+	            if(action_code == "scrolling"){
+	                active_view_id = o.id;
 	            }
 
 	            //record this so enter() and exit() can be refired
@@ -215,6 +259,8 @@
 	        //}
 
 	        is_scrolling = false;
+
+	        show_active_view();
 	    }
 
 	    function on_scroll(){
@@ -235,44 +281,59 @@
 	    //API exposed to user of module
 	    var methods = {};
 
-	    // add a waypoint/marker
-	    // fns is an object with "enter", "exit", and "step" functions
+	    //add a view
+	    var nviews = -1;
+	    methods.view = function(){
+	        var view_wrap = views_wrap.append("div");
+	        
+	        nviews++;
+	        var id = "v" + nviews;
+	        all_views[id] = view_wrap;
 
-	    methods.marker = function(el, fns, threshold_){
+	        var m = {};
 
-	        var threshold = arguments.length < 3 || threshold_ == null ? 0 : threshold_;
-	        var enter = fns.hasOwnProperty("enter") && typeof fns.enter === "function" ? fns.enter : function(){};
-	        var exit = fns.hasOwnProperty("exit") && typeof fns.exit === "function" ? fns.exit : function(){};
-	        var step = fns.hasOwnProperty("step") && typeof fns.step === "function" ? fns.step : function(){};
+	        // add a waypoint/marker
+	        // fns is an object with "enter", "exit", and/or "step" functions
+	        m.waypoint = function(el, fns, threshold_){
 
-	        var pkg = {
-	            el: el,
-	            threshold: threshold,
-	            enter: enter,
-	            exit: exit,
-	            step: step,
-	            has_entered: false,
-	            has_exited: false,
-	            has_stepped: 0
+	            var threshold = arguments.length < 3 || threshold_ == null ? default_threshold : threshold_;
+	            var enter = fns.hasOwnProperty("enter") && typeof fns.enter === "function" ? fns.enter : function(){};
+	            var exit = fns.hasOwnProperty("exit") && typeof fns.exit === "function" ? fns.exit : function(){};
+	            var step = fns.hasOwnProperty("step") && typeof fns.step === "function" ? fns.step : function(){};
+	    
+	            var pkg = {
+	                el: el,
+	                threshold: threshold,
+	                id: id,
+	                enter: enter,
+	                exit: exit,
+	                step: step,
+	                has_entered: false,
+	                has_exited: false,
+	                has_stepped: 0
+	            };
+	    
+	            scroll_stack.push(pkg);
+	    
+	            //initialize listeners after first waypoint added
+	            if(scroll_stack.length == 1){
+	                set_dims();
+	                window.addEventListener("scroll", on_scroll);
+	                window.addEventListener("resize", set_dims);
+	                window.addEventListener("load", function(){
+	                    //console.log("load");
+	                    set_dims();
+	                    on_scroll();
+	                });
+	            }
+	    
+	            //run scroll listener after each waypoint added
+	            on_scroll();
 	        };
 
-	        scroll_stack.push(pkg);
+	        m.node = function(){return view_wrap.node()};
 
-	        //initialize listeners after first waypoint added
-	        if(scroll_stack.length == 1){
-	            set_dims();
-	            window.addEventListener("scroll", on_scroll);
-	            window.addEventListener("resize", set_dims);
-	            window.addEventListener("load", function(){
-	                //console.log("load");
-	                set_dims();
-	                on_scroll();
-	            });
-	        }
-
-	        //run scroll listener after each waypoint added
-	        on_scroll();
-	        //console.log("marker added");
+	        return m;
 	    };
 
 	    methods.supported = function(){
@@ -296,40 +357,60 @@
 	// the first form is used to handle instances when scrollytelling is not supported by the browser (every view should be drawn)
 	// the second form is used to handle scrollytelling 
 
-	function sequence(container, setup, num_views, threshold){
+	//seqs = [setup0, setup1, setup2, ..., setupN];
+
+	function sequence(container, seqs, header, threshold){
 	    
 	    var wrap = d3.select(container).append("div").classed("sequence-wrap",true);
+
 	    
-	    var views;
 
 	    if(threshold == null){
 	        threshold = 0.15;
 	    }
 
 	    if(scrolly.supported()){
-	        var sticky = wrap.append("div"); 
-	        var scr = scrolly(sticky.node(), 90);
-	        views = wrap.selectAll("div.scrolling-panel").data(setup(sticky.node())).enter().append("div").classed("scrolling-panel",true);
-	                
-	        views.selectAll("p").data(function(d){return d.text}).enter().append("p").html(function(d){return d});
 
-	        views.each(function(d){            
-	            var fns = {};
-	            fns.enter = d.hasOwnProperty("enter") ? d.enter : null;
-	            fns.step = d.hasOwnProperty("step") ? d.step : null;
-	            fns.exit = d.hasOwnProperty("exit") ? d.exit : null;
-	    
-	            scr.marker(this, fns, threshold);
-	          });
+	        var stuck = wrap.append("div");
+	        var header = stuck.append("div").html(header);
+
+	        var scr = scrolly(stuck.node(), 90);
+
+	        seqs.forEach(function(seq){
+	            var view = scr.view();
+
+	            var views = seq(view.node());
+
+	            views.forEach(function(d){
+	                //text [c]ontainer
+	                var c = wrap.append("div").classed("scrolling-panel",true);
+	                c.selectAll("p").data(d.text).enter().append("p").html(function(h){return h});
+
+	                var fns = {};
+	                fns.enter = d.hasOwnProperty("enter") ? d.enter : null;
+	                fns.step = d.hasOwnProperty("step") ? d.step : null;
+	                fns.exit = d.hasOwnProperty("exit") ? d.exit : null;
+	            
+	                view.waypoint(c.node(), fns, threshold);
+	            });
+	        });
 	    }
 	    else{
 	        wrap.style("margin-bottom", null);
-	        //draw all views using form setup(container, view_num)
-	        views = wrap.selectAll("div.static-panel").data(d3.range(0,num_views)).enter().append("div").classed("static-panel",true);
-	        views.each(function(d){
-	            setup(this, d);
+
+	        var header = wrap.append("div").html(header);
+
+	        seqs.forEach(function(seq){
+	            //draw all views using form setup(container, view_num)
+	            views = wrap.append("div").selectAll("div.static-panel").data(d3.range(0,seq.nviews)).enter().append("div").classed("static-panel",true);
+	            views.each(function(d){
+	                seq(this, d);
+	            });
 	        });
+
 	    }
+
+
 
 	}
 
@@ -495,12 +576,12 @@
 	        "cbsa": 99999,
 	        "year": 2005,
 	        "actual": 0.00411,
-	        "expected": 0.01534
+	        "expected": 0.01535
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2006,
-	        "actual": 0.02342,
+	        "actual": 0.02343,
 	        "expected": 0.03169
 	      },
 	      {
@@ -512,13 +593,13 @@
 	      {
 	        "cbsa": 99999,
 	        "year": 2008,
-	        "actual": 0.10397,
+	        "actual": 0.10398,
 	        "expected": 0.07314
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2009,
-	        "actual": 0.1492,
+	        "actual": 0.14919,
 	        "expected": 0.07958
 	      },
 	      {
@@ -530,13 +611,13 @@
 	      {
 	        "cbsa": 99999,
 	        "year": 2011,
-	        "actual": 0.19535,
-	        "expected": 0.11767
+	        "actual": 0.19533,
+	        "expected": 0.11766
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2012,
-	        "actual": 0.20543,
+	        "actual": 0.20541,
 	        "expected": 0.136
 	      },
 	      {
@@ -548,14 +629,14 @@
 	      {
 	        "cbsa": 99999,
 	        "year": 2014,
-	        "actual": 0.26156,
+	        "actual": 0.26152,
 	        "expected": 0.16756
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2015,
-	        "actual": 0.29534,
-	        "expected": 0.19896
+	        "actual": 0.29531,
+	        "expected": 0.19897
 	      }
 	    ]
 	  },
@@ -712,74 +793,74 @@
 	      {
 	        "cbsa": 99999,
 	        "year": 2004,
-	        "actual": 20066.14648,
-	        "expected": 20066.14648
+	        "actual": 20067.86497,
+	        "expected": 20067.86497
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2005,
-	        "actual": 20148.64453,
-	        "expected": 20374.03125
+	        "actual": 20150.38006,
+	        "expected": 20375.83362
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2006,
-	        "actual": 20536.01367,
-	        "expected": 20702.06445
+	        "actual": 20537.9669,
+	        "expected": 20703.86259
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2007,
-	        "actual": 20907.63281,
-	        "expected": 20991.31445
+	        "actual": 20909.57941,
+	        "expected": 20993.17693
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2008,
-	        "actual": 22152.37305,
-	        "expected": 21533.74609
+	        "actual": 22154.42442,
+	        "expected": 21535.68121
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2009,
-	        "actual": 23060.08008,
-	        "expected": 21662.94336
+	        "actual": 23061.79556,
+	        "expected": 21664.83762
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2010,
-	        "actual": 23279.40234,
-	        "expected": 21974.77734
+	        "actual": 23281.40824,
+	        "expected": 21976.67029
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2011,
-	        "actual": 23986.06641,
-	        "expected": 22427.23438
+	        "actual": 23987.70046,
+	        "expected": 22429.12523
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2012,
-	        "actual": 24188.29883,
-	        "expected": 22795.07422
+	        "actual": 24190.0763,
+	        "expected": 22797.04395
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2013,
-	        "actual": 24939.69336,
-	        "expected": 23336.54883
+	        "actual": 24941.70047,
+	        "expected": 23338.56869
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2014,
-	        "actual": 25314.63672,
-	        "expected": 23428.42773
+	        "actual": 25316.11257,
+	        "expected": 23430.50358
 	      },
 	      {
 	        "cbsa": 99999,
 	        "year": 2015,
-	        "actual": 25992.56836,
-	        "expected": 24058.55859
+	        "actual": 25994.1244,
+	        "expected": 24060.73673
 	      }
 	    ]
 	  }
@@ -1770,7 +1851,7 @@
 	      "cbsa": 12940,
 	      "naics": "51",
 	      "actual": 0.37421,
-	      "expected": 0.3262
+	      "expected": 0.32621
 	    },
 	    {
 	      "cbsa": 12940,
@@ -2925,7 +3006,7 @@
 	    {
 	      "cbsa": 17460,
 	      "naics": "53",
-	      "actual": -0.16346,
+	      "actual": -0.16345,
 	      "expected": -0.03436
 	    },
 	    {
@@ -3599,104 +3680,104 @@
 	    {
 	      "cbsa": 19740,
 	      "naics": "00",
-	      "actual": 0.10985,
-	      "expected": 0.30312
+	      "actual": 0.10759,
+	      "expected": 0.30216
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "22",
-	      "actual": 0.35921,
-	      "expected": -0.54833
+	      "actual": 0.35919,
+	      "expected": -0.54831
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "23",
-	      "actual": -0.00316,
-	      "expected": 0.0791
+	      "actual": 0.00008,
+	      "expected": 0.07965
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "31",
-	      "actual": -0.16434,
-	      "expected": -0.0117
+	      "actual": -0.19268,
+	      "expected": -0.00983
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "42",
-	      "actual": 0.20109,
-	      "expected": 0.14732
+	      "actual": 0.20742,
+	      "expected": 0.14751
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "44",
-	      "actual": 0.06244,
-	      "expected": 0.22662
+	      "actual": 0.05699,
+	      "expected": 0.22621
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "48",
-	      "actual": -0.36984,
-	      "expected": -0.07598
+	      "actual": -0.36692,
+	      "expected": -0.0758
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "51",
-	      "actual": -0.50015,
-	      "expected": -0.09581
+	      "actual": -0.50312,
+	      "expected": -0.09626
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "52",
-	      "actual": -0.11804,
-	      "expected": 0.0895
+	      "actual": -0.11633,
+	      "expected": 0.08949
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "53",
-	      "actual": 0.15712,
-	      "expected": 0.02115
+	      "actual": 0.15475,
+	      "expected": 0.02089
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "54",
-	      "actual": 0.23599,
-	      "expected": 0.5126
+	      "actual": 0.23457,
+	      "expected": 0.5124
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "55",
-	      "actual": 1.05853,
-	      "expected": 0.88607
+	      "actual": 1.04485,
+	      "expected": 0.88209
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "61",
-	      "actual": 0.25472,
-	      "expected": 0.24162
+	      "actual": 0.25616,
+	      "expected": 0.24273
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "62",
-	      "actual": 0.1487,
-	      "expected": 0.58401
+	      "actual": 0.15057,
+	      "expected": 0.58393
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "71",
-	      "actual": 0.42024,
-	      "expected": 0.27589
+	      "actual": 0.42792,
+	      "expected": 0.27824
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "72",
-	      "actual": 0.17386,
-	      "expected": 0.32742
+	      "actual": 0.17164,
+	      "expected": 0.32695
 	    },
 	    {
 	      "cbsa": 19740,
 	      "naics": "81",
-	      "actual": 0.17371,
-	      "expected": 0.26339
+	      "actual": 0.17154,
+	      "expected": 0.26255
 	    }
 	  ],
 	  "19780": [
@@ -3990,7 +4071,7 @@
 	      "cbsa": 21340,
 	      "naics": "62",
 	      "actual": 0.13431,
-	      "expected": 0.51014
+	      "expected": 0.51015
 	    },
 	    {
 	      "cbsa": 21340,
@@ -5145,7 +5226,7 @@
 	    {
 	      "cbsa": 28140,
 	      "naics": "72",
-	      "actual": 0.04857,
+	      "actual": 0.04856,
 	      "expected": 0.2043
 	    },
 	    {
@@ -5220,7 +5301,7 @@
 	      "cbsa": 28940,
 	      "naics": "54",
 	      "actual": -0.15044,
-	      "expected": 0.19968
+	      "expected": 0.19967
 	    },
 	    {
 	      "cbsa": 28940,
@@ -6070,7 +6151,7 @@
 	      "cbsa": 33100,
 	      "naics": "62",
 	      "actual": 0.23217,
-	      "expected": 0.28032
+	      "expected": 0.28031
 	    },
 	    {
 	      "cbsa": 33100,
@@ -6432,7 +6513,7 @@
 	      "cbsa": 35380,
 	      "naics": "42",
 	      "actual": -0.34269,
-	      "expected": -0.12576
+	      "expected": -0.12577
 	    },
 	    {
 	      "cbsa": 35380,
@@ -6785,7 +6866,7 @@
 	    {
 	      "cbsa": 36260,
 	      "naics": "55",
-	      "actual": -0.73861,
+	      "actual": -0.73862,
 	      "expected": -0.31289
 	    },
 	    {
@@ -9656,7 +9737,7 @@
 	      "cbsa": 45300,
 	      "naics": "42",
 	      "actual": 0.04169,
-	      "expected": 0.01946
+	      "expected": 0.01945
 	    },
 	    {
 	      "cbsa": 45300,
@@ -9863,7 +9944,7 @@
 	    {
 	      "cbsa": 46060,
 	      "naics": "42",
-	      "actual": -0.26342,
+	      "actual": -0.26341,
 	      "expected": -0.12016
 	    },
 	    {
@@ -10567,8 +10648,8 @@
 	    {
 	      "cbsa": 99999,
 	      "naics": "00",
-	      "actual": 0.29534,
-	      "expected": 0.19896
+	      "actual": 0.29531,
+	      "expected": 0.19897
 	    },
 	    {
 	      "cbsa": 99999,
@@ -10579,91 +10660,91 @@
 	    {
 	      "cbsa": 99999,
 	      "naics": "23",
-	      "actual": 0.24442,
-	      "expected": 0.06012
+	      "actual": 0.24446,
+	      "expected": 0.06014
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "31",
-	      "actual": -0.24985,
-	      "expected": -0.20809
+	      "actual": -0.24995,
+	      "expected": -0.20798
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "42",
-	      "actual": 0.15537,
-	      "expected": -0.01744
+	      "actual": 0.15542,
+	      "expected": -0.01742
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "44",
-	      "actual": 0.27273,
-	      "expected": 0.11191
+	      "actual": 0.27266,
+	      "expected": 0.11195
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "48",
-	      "actual": -0.25601,
+	      "actual": -0.25598,
 	      "expected": 0.04787
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "51",
-	      "actual": 0.41471,
-	      "expected": 0.10011
+	      "actual": 0.4145,
+	      "expected": 0.10008
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "52",
-	      "actual": 0.09457,
-	      "expected": 0.01064
+	      "actual": 0.09458,
+	      "expected": 0.01065
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "53",
-	      "actual": 0.20217,
+	      "actual": 0.20214,
 	      "expected": 0.01594
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "54",
-	      "actual": 0.57119,
-	      "expected": 0.35681
+	      "actual": 0.57114,
+	      "expected": 0.35683
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "55",
 	      "actual": 0.38758,
-	      "expected": 0.27799
+	      "expected": 0.27807
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "61",
-	      "actual": 0.29068,
+	      "actual": 0.29069,
 	      "expected": 0.40719
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "62",
-	      "actual": 0.46494,
+	      "actual": 0.46495,
 	      "expected": 0.49033
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "71",
-	      "actual": 0.3353,
-	      "expected": 0.31409
+	      "actual": 0.33534,
+	      "expected": 0.3141
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "72",
-	      "actual": 0.4962,
+	      "actual": 0.49615,
 	      "expected": 0.40754
 	    },
 	    {
 	      "cbsa": 99999,
 	      "naics": "81",
-	      "actual": 0.0988,
+	      "actual": 0.09879,
 	      "expected": 0.09077
 	    }
 	  ]
@@ -10674,87 +10755,104 @@
 	  {
 	    "naics": "00",
 	    "p": 48,
-	    "ge": 16
+	    "ge": 16,
+	    "n": 94
 	  },
 	  {
 	    "naics": "22",
 	    "p": 31,
-	    "ge": 35
+	    "ge": 35,
+	    "n": 94
 	  },
 	  {
 	    "naics": "23",
-	    "p": 29,
-	    "ge": 32
+	    "p": 30,
+	    "ge": 32,
+	    "n": 94
 	  },
 	  {
 	    "naics": "31",
 	    "p": 12,
-	    "ge": 18
+	    "ge": 18,
+	    "n": 94
 	  },
 	  {
 	    "naics": "42",
 	    "p": 30,
-	    "ge": 16
+	    "ge": 16,
+	    "n": 94
 	  },
 	  {
 	    "naics": "44",
 	    "p": 23,
-	    "ge": 11
+	    "ge": 11,
+	    "n": 94
 	  },
 	  {
 	    "naics": "48",
 	    "p": 29,
-	    "ge": 16
+	    "ge": 16,
+	    "n": 94
 	  },
 	  {
 	    "naics": "51",
 	    "p": 17,
-	    "ge": 21
+	    "ge": 21,
+	    "n": 94
 	  },
 	  {
 	    "naics": "52",
 	    "p": 29,
-	    "ge": 25
+	    "ge": 25,
+	    "n": 94
 	  },
 	  {
 	    "naics": "53",
 	    "p": 35,
-	    "ge": 24
+	    "ge": 24,
+	    "n": 94
 	  },
 	  {
 	    "naics": "54",
 	    "p": 58,
-	    "ge": 18
+	    "ge": 18,
+	    "n": 94
 	  },
 	  {
 	    "naics": "55",
 	    "p": 61,
-	    "ge": 39
+	    "ge": 39,
+	    "n": 94
 	  },
 	  {
 	    "naics": "61",
 	    "p": 68,
-	    "ge": 21
+	    "ge": 21,
+	    "n": 94
 	  },
 	  {
 	    "naics": "62",
 	    "p": 72,
-	    "ge": 21
+	    "ge": 21,
+	    "n": 94
 	  },
 	  {
 	    "naics": "71",
 	    "p": 60,
-	    "ge": 38
+	    "ge": 38,
+	    "n": 94
 	  },
 	  {
 	    "naics": "72",
 	    "p": 70,
-	    "ge": 18
+	    "ge": 18,
+	    "n": 94
 	  },
 	  {
 	    "naics": "81",
 	    "p": 17,
-	    "ge": 12
+	    "ge": 12,
+	    "n": 94
 	  }
 	]
 	;
@@ -10892,8 +10990,8 @@
 	      "expected": 0.21545
 	    },
 	  "19740": {
-	      "actual": 0.10985,
-	      "expected": 0.30312
+	      "actual": 0.10759,
+	      "expected": 0.30216
 	    },
 	  "19780": {
 	      "actual": -0.15818,
@@ -11160,8 +11258,8 @@
 	      "expected": -0.09084
 	    },
 	  "99999": {
-	      "actual": 0.29534,
-	      "expected": 0.19896
+	      "actual": 0.29531,
+	      "expected": 0.19897
 	    }
 	}
 	;
@@ -11292,149 +11390,11 @@
 		lightgray: "#eeeeee"
 	};
 
-	function setup_sectors(wrap_){
-	    var wrap = wrap_.append("div").classed("chart-view",true).style("position","absolute").style("top","0px").style("visibility","hidden");
-	    
-	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
+	function seq0(container, i){
 
-	    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.actual, b.actual)});
+	    var wrap_ = d3.select(container).attr("id", "sequence-0").append("div");
 
-	    var svg = wrap.append("div").style("max-width","800px").append("svg").attr("viewBox", "0 0 320 240");
-
-	    var g_x_axis = svg.append("g").classed("axis-group",true);
-	    var g_back = svg.append("g");
-	    var g_trend = svg.append("g");
-
-	    var groups = g_trend.selectAll("g").data(data).enter().append("g");
-
-	    var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
-	                                .attr("stroke", function(d){return d.expected > d.actual ? palette.secondary.blue : palette.secondary.blue})
-	                                .attr("stroke-width","1px")
-	                                ;
-
-	    var group_circles = groups.selectAll("circle").data(function(d){return [d]})
-	                .enter().append("circle").attr("r",4.5).attr("cx","0").attr("cy","0")
-	                .attr("fill", palette.primary.blue)
-	                .attr("stroke", palette.primary.blue)
-	                .attr("stroke-width","1.5px")
-	                ;
-	    
-	    var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
-	    var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
-
-	    var scale_x = d3.scaleLinear().domain([-0.4, 0.6]).nice();
-	    var axis_x = d3.axisTop(scale_x).ticks(5, "+,.0%");
-	    var padding = {top:50, right:25, bottom: 5, left: 15 };
-
-	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
-	                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
-	                        .style("shape-rendering","crispEdges");
-
-	    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
-	                              .attr("x","0").attr("y","0")
-	                              .attr("dx","-10")
-	                              .attr("dy","5").attr("text-anchor","end")
-	                              ;
-
-	    var current_value_prop = "actual";
-	    var group_h = 20;
-
-	    function translate(d,i){
-	        var v = d[current_value_prop];
-	        var x = scale_x(v);
-	        var y = (i*group_h) + (group_h/2);
-	        return "translate(" + x + "," + y + ")";
-	    }
-
-	    function show_actual(){
-	        current_value_prop = "actual";
-	        groups.interrupt().transition().duration(1200).attr("transform", translate);
-	        group_connectors.interrupt()
-	                        .transition().duration(1200)
-	                        .attr("x2","0");
-	    }
-
-	    function show_expected(){
-	        current_value_prop = "expected";
-	        groups.interrupt().transition().duration(1200).attr("transform", translate);
-	        group_connectors.interrupt()
-	                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
-	                        .transition().duration(1200)
-	                        .attr("x2", function(d){return (scale_x(d.actual) - scale_x(d.expected))})
-	                        //.on("end", function(d){d3.select(this).style("opacity","0")})                        
-	                        ;
-	    }
-
-	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-	        var h = this.h - 300;
-	        //var h = w * aspect;
-	        if(h < 400){h = 400;}
-	        scale_x.range([padding.left, w - padding.right]);
-	        
-	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
-
-	        groups.interrupt().transition().duration(0).attr("transform", translate);
-
-	        svg.attr("viewBox", "0 0 " + w + " " + h);
-	        
-	        g_x_axis.attr("transform", "translate(0," + padding.top + ")");
-	        g_trend.attr("transform", "translate(0," + padding.top + ")");
-
-	        gridlines.attr("d", function(d){
-	            var x = Math.floor(scale_x(d))+0.5;
-	            return "M" + x + "," + padding.top + " l0," + (h - padding.top - padding.bottom);
-	        });
-
-	        axis_x(g_x_axis);
-	        
-	        group_connectors.attr("y1", 0).attr("y2", 0)
-	                        .attr("x1", "0")
-	                        .attr("x2", "0")
-	                        ;
-	        
-	    }    
-
-	    //register resize callback. initialize
-	    var redraw_ = on_resize(redraw, true);
-
-
-	    function step(n, s){
-	        wrap.style("opacity",1);
-	        if(n==0){
-	            title.html("Most sectors saw job density increase from 2004 to 2015"); 
-	            groups.style("opacity","1");
-	            show_actual();
-	        }
-	        else if(n==1){
-	            title.html("Most sectors saw job density increase from 2004 to 2015"); 
-	            show_actual();
-	            groups.style("opacity", function(d){return d.actual > 0.4 ? "1" : "0.15"});
-	        }
-	        else if(n==2){
-	            title.html("Expected job density change from 2004 to 2015"); 
-	            show_expected();
-	            groups.style("opacity", "1");
-	        }
-	    }
-
-
-	    return {
-	        step: step,
-	        enter: function(){
-	            redraw_();
-	            wrap.style("position","relative").style("visibility","visible");
-	        },
-	        exit: function(){
-	            wrap.style("position","absolute").style("visibility","hidden").style("top","0px");
-	        }
-	    };
-
-
-	}
-
-
-	function setup_lines(wrap_){
+	    //one time setup
 	    var data = seq0data.changes;
 
 	    var wrap = wrap_.append("div").classed("chart-view",true);
@@ -11471,7 +11431,7 @@
 	                       .style("opacity","0")
 	                       .attr("fill","none")
 	                       .attr("stroke", function(d,i){
-	                           return i==0 || i==3 ? palette.primary.blue : i==1 ? palette.primary.yellow : palette.primary.green
+	                           return i==0 || i==3 ? palette.primary.red : i==1 ? palette.primary.yellow : palette.primary.blue
 	                        })
 	                        .attr("stroke-dasharray", function(d,i){return i==3 ? "2,2" : null})
 	                        ;
@@ -11537,140 +11497,71 @@
 	    //register resize callback. initialize
 	    var redraw_ = on_resize(redraw, true);
 
-	    function step(n, s){
-	        console.log("step " + n);
-	        wrap.style("opacity",1);
-	        lines.style("opacity", function(d,i){
-	            if(n !== 3){
-	                return i <= n ? "1" : "0";
-	            }
-	            else{
-	                return i == n ? "1" : "0.25";
-	            }
-	        });
-	        t_.style("opacity", function(d,i){
-	            if(n !== 3){
-	                return i <= n ? "1" : "0";
-	            }
-	            else{
-	                return i == n ? "1" : "0.25";
-	            }
-	        });
-	        great_recession.style("opacity", function(d,i){
-	            return n > 0 ? "1" : "0";
-	        });
-
-	        if(n == 0){title.text("Metropolitan America saw a large increase in job density from 2004 to 2015");}
-	        else if(n == 0.5){title.text("Great Recession headline ...");}
-	        else if(n == 1){title.text("Very dense places headline");}
-	        else if(n == 2){title.text("Other places headline");}
-	        else if(n == 3){title.text("Actual density increased greater than expected in the 94 metro areas [headline tk]");}
-	    }
-
-
-	    return {
-	        step: step,
-	        enter: function(){
-	            redraw_();
-	            wrap.style("opacity","1");
-	        },
-	        exit: function(){
-	            lines.style("opacity","0");
-	            t_.style("opacity","0");
-	            wrap.style("opacity",null);
-	        },
-	        show: function(){
-	            wrap.style("position","relative").style("visibility","visible");
-	        },
-	        hide: function(){
-	            wrap.style("position","absolute").style("visibility","hidden").style("top","0px");
-	        }
-	    };
-	}
-
-	function seq0(container, i){
-
-	    var wrap = d3.select(container).attr("id", "sequence-0").append("div").style("position","relative");
-	    wrap.append("p").classed("meta-header meta-header-1", true).html("<span>Average changes in job density</span>");
-
-	    //one time setup
-	    var lines = setup_lines(wrap);
-	    var sectors = setup_sectors(wrap);
-
-
 	    var current_view = null;
-	    function show_view(n, s, step_code){
-	        if(step_code != "exit" && n !== current_view){
+
+	    function step(n, s, c){
+	        if(c != "exit" && n!== current_view){
+	            wrap.style("opacity",1);
+	            lines.style("opacity", function(d,i){
+	                if(n !== 3){
+	                    return i <= n ? "1" : "0";
+	                }
+	                else{
+	                    return i == n ? "1" : "0.25";
+	                }
+	            });
+	            t_.style("opacity", function(d,i){
+	                if(n !== 3){
+	                    return i <= n ? "1" : "0";
+	                }
+	                else{
+	                    return i == n ? "1" : "0.25";
+	                }
+	            });
+	            great_recession.style("opacity", function(d,i){
+	                return n > 0 ? "1" : "0";
+	            });
+
+	            if(n == 0){title.text("Metropolitan America saw a large increase in job density from 2004 to 2015");}
+	            else if(n == 0.5){title.text("Great Recession headline ...");}
+	            else if(n == 1){title.text("Very dense places headline");}
+	            else if(n == 2){title.text("Other places headline");}
+	            else if(n == 3){title.text("Actual density increased greater than expected in the 94 metro areas [headline tk]");}  
 	            
-	        
-	            if(current_view < 4){
-	                lines.step(n, s);
-	            }
-	            else{
-	                sectors.step(n-4, s);
-	            }
-
-
 	            current_view = n;
-
 	        }
 	    }
-
 
 	    var views = [
 	        {
 	            text:["The perceived job density of all 94 large metro areas taken together increased nearly 30 percent, indicating job growth was highly concentrated in dense urban areas from 2004 to 2015."],
-	            step:function(s, c){show_view(0, s, c);},
-	            enter: function(){
-	                lines.enter();
-	            },
+	            step:function(s, c){step(0, s, c);},
 	            exit:function(){
-	                lines.exit();
+	                lines.style("opacity","0");
+	                t_.style("opacity","0");
 	                current_view = null;
+	                wrap.style("opacity",null);
 	            }
 	        },
 
 	        {
 	            text:["During the Great Recession from 2007 to 2009, the average perceived job density increased more than 10 percent as suburban and exurban areas shed their jobs faster than denser urban areas. Perceived job density has steadily increased since 2009."],
-	            step:function(s, c){show_view(0.5, s, c);},
+	            step:function(s, c){step(0.5, s, c);},
 	        },
 
 	        {
 	            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle."],
-	            step:function(s, c){show_view(1, s, c);}
+	            step:function(s, c){step(1, s, c);}
 	        },
 
 	        {
 	            text:["In contrast, job density in the other 90 large metro areas increased only 9 percent on average. However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
-	            step:function(s, c){show_view(2, s, c);}
+	            step:function(s, c){step(2, s, c);}
 	        },
 
 	        {
 	            text:["This is the expected change in job density—what we would have expected to see if each office and factory added jobs at its industry-wide average rate"],
-	            step:function(s, c){show_view(3, s, c);}
-	        },
-
-	        {
-	            text:["All but two sectors saw job density increas... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent a maximus quam. Integer suscipit tempor justo. Nullam a metus augue. Phasellus sit amet turpis ac."],
-	            enter:function(){
-	                lines.hide();
-	                lines.exit();
-	                sectors.enter();
-	            },
-	            step:function(s, c){show_view(4, s, c);},
-	            exit:function(){
-	                lines.show();
-	                lines.enter();
-	                sectors.exit();
-	            }
-	        },
-	        {
-	            text:["Four sectors ..."],
-	            step:function(s, c){show_view(5, s, c);},
-	        },
-	        {
-	            text:["In most sectors, the expected change in job density was less than the actual change."],
-	            step:function(s, c){show_view(6, s, c);},
+	            step:function(s, c){step(3, s, c);}
 	        }
 	    ];
 
@@ -11692,6 +11583,220 @@
 	    return views;
 
 	}
+
+	seq0.nviews = 5;
+
+	function seq1(container, i){
+
+	    var wrap_ = d3.select(container).attr("id", "sequence-1").append("div");
+
+	    //one time setup
+	    var wrap = wrap_.append("div").classed("chart-view",true);
+	    
+	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
+
+	    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.expected, b.expected)});
+
+	    var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 320 240");
+	    var padding = {top:50, right:25, bottom: 5, left: 150};
+
+	    var g_main = svg.append("g").attr("transform","translate("+ padding.left + "," +padding.top + ")");
+	    var g_x_axis = g_main.append("g").classed("axis-group",true);
+	    var g_back = g_main.append("g");
+	    var g_trend = g_main.append("g");
+
+	    var groups = g_trend.selectAll("g").data(data).enter().append("g");
+
+	    var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
+	                                .attr("stroke", function(d){return d.expected > d.actual ? palette.secondary.orange : palette.secondary.blue})
+	                                .attr("stroke-width","1px")
+	                                ;
+
+	    var group_circles = groups.selectAll("circle").data(function(d){return [d, d]})
+	                .enter().append("circle").attr("r",4.5).attr("cx","0").attr("cy","0")
+	                .attr("fill", function(d,i){return i==1 ? "#ffffff" : palette.primary.blue})
+	                .attr("stroke", function(d,i){return i==1 ? palette.primary.blue : palette.primary.blue})
+	                .attr("stroke-width","1.5px")
+	                ;
+	    
+	    var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
+	    var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
+
+	    var scale_x = d3.scaleLinear().domain([-0.4, 0.6]).nice();
+	    var axis_x = d3.axisTop(scale_x).ticks(5, "+,.0%");
+
+	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
+	                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
+	                        .style("shape-rendering","crispEdges");
+
+	    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
+	                              .attr("x","0").attr("y","0")
+	                              .attr("dx","-5")
+	                              .attr("dy","5").attr("text-anchor","end")
+	                              ;
+
+	    var group_h = 20;
+
+
+	    var group_shown = "expected";
+
+	    function show_just_expected(){
+	        group_shown = "expected";
+	        group_circles.interrupt().transition().duration(1000)
+	                    .attr("cx", function(d,i){return scale_x(d.expected)})
+	                    .style("opacity", function(d,i){return i==1 ? "1" : "0"})
+	                    ;
+
+	        group_connectors.interrupt().transition().duration(1000)
+	                    .attr("x1", function(d){return scale_x(d.expected)})
+	                    .attr("x2", function(d){return scale_x(d.expected)});
+	    }
+
+	    function show_actual(){
+	        group_shown = "actual";
+	        group_circles.style("opacity", "1")
+	                    .interrupt().transition().duration(1000)
+	                    .attr("cx", function(d,i){return i==1 ? scale_x(d.expected) : scale_x(d.actual)})
+	                    ;
+
+	        group_connectors.interrupt().transition().duration(1000)
+	                    .attr("x1", function(d){return scale_x(d.actual)})
+	                    .attr("x2", function(d){return scale_x(d.expected)});
+	    }
+
+
+	    /*function translate(d,i){
+	        var v = d[current_value_prop];
+	        var x = scale_x(v);
+	        var y = (i*group_h) + (group_h/2);
+	        return "translate(" + x + "," + y + ")";
+	    }
+
+	    function show_actual(){
+	        current_value_prop = "actual";
+	        groups.interrupt().transition().duration(1200).attr("transform", translate);
+	        group_connectors.interrupt()
+	                        .transition().duration(1200)
+	                        .attr("x2","0");
+	    }
+
+	    function show_expected(){
+	        current_value_prop = "expected";
+	        groups.interrupt().transition().duration(1200).attr("transform", translate);
+	        group_connectors.interrupt()
+	                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
+	                        .transition().duration(1200)
+	                        .attr("x2", function(d){return (scale_x(d.actual) - scale_x(d.expected))})
+	                        //.on("end", function(d){d3.select(this).style("opacity","0")})                        
+	                        ;
+	    }
+	    */
+
+	    function redraw(){
+	        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
+	        var h = this.h - 300;
+	        //var h = w * aspect;
+	        if(h < 400){h = 400;}
+	        scale_x.range([0, w - padding.right - padding.left]);
+	        
+	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
+	        var group_h2 = Math.floor(group_h/2);
+
+	        groups.interrupt().transition().duration(0).attr("transform", function(d,i){return "translate(0," + ((i*group_h)+group_h2) + ")"});
+
+	        svg.attr("viewBox", "0 0 " + w + " " + h);
+
+	        gridlines.attr("d", function(d){
+	            var x = Math.floor(scale_x(d))+0.5;
+	            return "M" + x + ",0 l0," + (h - padding.top - padding.bottom);
+	        });
+
+	        axis_x(g_x_axis);
+	        
+	        group_connectors.attr("y1", 0).attr("y2", 0)
+	                        .attr("x1", "0")
+	                        .attr("x2", "0")
+	                        ;
+
+	        if(group_shown == "expected"){
+	            show_just_expected();
+	        }
+	        else{
+	            show_actual();
+	        }
+	        
+	    }    
+
+	    //register resize callback. initialize
+	    var redraw_ = on_resize(redraw, true);
+
+	    var current_view = null;
+
+	    function step(n, s, c){
+	        if(c != "exit" && n!== current_view){
+	            wrap.style("opacity",1);
+	            if(n==0){
+	                title.html("Most sectors saw job density increase from 2004 to 2015"); 
+	                groups.style("opacity","1");
+	                show_just_expected();
+	            }
+	            else if(n==1){
+	                title.html("Most sectors saw job density increase from 2004 to 2015"); 
+	                show_just_expected();
+	                groups.style("opacity", function(d){return d.actual > 0.4 ? "1" : "0.15"});
+	            }
+	            else if(n==2){
+	                title.html("Expected job density change from 2004 to 2015"); 
+	                show_actual();
+	                groups.style("opacity", "1");
+	            }
+
+	            current_view = n;
+	        }
+	    }
+
+
+
+
+	    var views = [
+	        {
+	            text:["All but two sectors saw job density increas... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent a maximus quam. Integer suscipit tempor justo. Nullam a metus augue. Phasellus sit amet turpis ac."],
+	            step:function(s, c){step(0, s, c);},
+	            exit:function(){
+	                current_view = null;
+	                wrap.style("opacity",null);
+	            }
+	        },
+	        {
+	            text:["Four sectors ..."],
+	            step:function(s, c){step(1, s, c);},
+	        },
+	        {
+	            text:["In most sectors, the expected change in job density was less than the actual change."],
+	            step:function(s, c){step(2, s, c);},
+	        }
+	    ];
+
+	    //static, non-scrollytelling
+	    if(arguments.length > 1){
+	        //panel_number.style("display","block");
+	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	        var j = -1;
+	        while(++j <= i){
+	            if(views[j].hasOwnProperty("enter")){
+	                views[j].enter.call(p);
+	            }
+	            if(views[j].hasOwnProperty("step")){
+	                views[j].step.call(p, 1);
+	            }
+	        }
+	    }
+
+	    return views;
+
+	}
+
+	seq1.nviews = 3;
 
 	//current fork of map.js
 	//used in black home devaluation and opportunity industries (late-2018)
@@ -12416,9 +12521,7 @@
 
 	    //one time setup
 	    var wrap = d3.select(container).attr("id","sequence-1").classed("chart-view big-chart",true);
-	    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>");
 
-	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas");
 
 	    var t94 = geos_cbsa.filter(function(d){return naics00.hasOwnProperty(d.cbsa)});
@@ -12560,46 +12663,41 @@
 
 	}
 
+	seq4.nviews = 5;
+
 	function seq5(container, i){
 
 	    var data = sector_counts.slice(0).filter(function(d){return d.naics != "00"}).sort(function(a,b){return d3.descending(a.p, b.p)});
 
 	    //one time setup
 	    var wrap = d3.select(container).classed("chart-view",true);
-	    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>");
 
-	    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Several sectors of the economy saw widespread increases in job density");
 
-	    var svg = wrap.append("div").style("max-width","800px").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-
-	    var g_x_axis = svg.append("g").classed("axis-group",true);
-	    var g_back = svg.append("g");
-	    var g_trend = svg.append("g");
-
-	    var groups = g_trend.selectAll("g").data(data).enter().append("g");
-
-	    var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
-	                                                .attr("stroke", function(d){return d.ge < d.p ? palette.secondary.orange : palette.secondary.blue})
-	                                                .attr("stroke-width","1px")
-	                                                ;
-
-	    var group_circles = groups.selectAll("circle").data(function(d){return [d]})
-	                                .enter().append("circle").attr("r",4.5).attr("cx","0").attr("cy","0")
-	                                .attr("fill",function(d,i){return i==0 ? palette.primary.blue : palette.primary.blue})
-	                                .attr("stroke",function(d,i){return  i==0 ? palette.primary.blue : palette.primary.blue})
-	                                .attr("stroke-width","1.5px")
-	                                ;
-
-	    var scale_x = d3.scaleLinear().domain([0, 94]);
-	    var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return v});
+	    var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
 
 	    var aspect = 2/3;
-	    var padding = {top:50, right:25, bottom: 5, left: 105 };
-	    var axis_title = svg.append("text").attr("y",20).attr("x",padding.left-5);
-	    axis_title.append("tspan").text("Number of metro areas");
-	    //axis_title.append("tspan").text(" where job density growth exceeded expectations");
+	    var padding = {top:50, right:25, bottom: 5, left: 150 };
 
+	    var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")");
+
+	    var g_x_axis = g_main.append("g").classed("axis-group",true);
+	    var g_back = g_main.append("g");
+	    var g_trend = g_main.append("g");
+	    
+	    var groups = g_trend.selectAll("g").data(data).enter().append("g");
+
+	    var rects = groups.selectAll("rect").data(function(d){return [d]})
+	                                .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
+	                                .attr("fill", palette.primary.blue).style("shape-rendering","crispEdges")
+	                                ;
+
+	    var scale_x = d3.scaleLinear().domain([0, 1]);
+	    var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return Math.round(v*100)+"%"});
+
+
+	    var axis_title = svg.append("text").attr("y",20).attr("x", padding.left - 5);
+	    axis_title.append("tspan").text("% of metro areas where job density increased");
 
 	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
 	                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
@@ -12607,51 +12705,36 @@
 
 	    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
 	                              .attr("x", "0")
-	                              .attr("dx","-10")
+	                              .attr("dx","-5")
 	                              .attr("dy","5").attr("text-anchor","end")
 	                              ;
 
-	    var current_value_prop = "p";
 	    var group_h;
-	    var translate = function(d,i){
-	        var v = d[current_value_prop];
-	        var x = scale_x(v);
-	        var y = (i*group_h) + (group_h/2);
-	        return "translate(" + x + "," + y + ")";
-	    };
 
 	    function redraw(){
 	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
 	        var h = w * aspect;
 	        if(h < 400){h = 400;}
-	        scale_x.range([padding.left, w - padding.right]);
+	        scale_x.range([0, w - padding.right - padding.left]);
 	        
 	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
+	        var group_h2 = Math.floor(group_h/2) + 0.5;
 
-	        groups.interrupt().transition().duration(0).attr("transform", translate);
+	        groups.interrupt().transition().duration(0).attr("transform", function(d,i){return "translate(0," + ((i*group_h)+group_h2) + ")"});
 
 	        svg.attr("viewBox", "0 0 " + w + " " + h);
-	        
-	        g_x_axis.attr("transform", "translate(0," + padding.top + ")");
-	        g_trend.attr("transform", "translate(0," + padding.top + ")");
 
 	        gridlines.attr("d", function(d){
 	            var x = Math.floor(scale_x(d))+0.5;
-	            return "M" + x + "," + padding.top + " l0," + (h - padding.top - padding.bottom);
+	            return "M" + x + "," + "0" + " l0," + (h - padding.bottom);
 	        });
 
 	        axis_x(g_x_axis);
 
-	        //[expected, actual]
-	        //group_circles.attr("cx", function(d,i){return i==0 ? scale_x(d) : scale_x(d)}).attr("cy", group_h2);
-	        
-	        group_connectors.attr("y1", 0).attr("y2", 0)
-	                        .attr("x1", "0")
-	                        .attr("x2", "0")
-	                        ;
+	        var half_height = Math.floor(group_h/2);
 
-	        //group_labels.attr("y", group_h2)
-	        //            .attr("x", label_x);
+	        rects.attr("height", half_height).attr("width", function(d){return scale_x(d.p / d.n)});
+	        group_labels.attr("dy", half_height-2);
 	        
 	    }
 
@@ -12662,26 +12745,16 @@
 
 	    //redraw
 
-	    function show_p(){
-	        current_value_prop = "p";
-	        groups.interrupt().transition().duration(1200).attr("transform", translate);
-	        group_connectors.interrupt()
-	                        .transition().duration(1200)
-	                        .attr("x2","0");
-	    }
-
 
 	    var views = [
 	        {
 	            text:["Across the 94 large metro areas, six sectors of the economy saw widespread increases in perceived job density from 2004 to 2015. Health care led the way with increases in 72 metro areas while professional jobs rounded out the group with increases in 58."],
 	            enter:function(){
 	                wrap.style("opacity",1);
-	                groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25});
-	                show_p();  
+	                groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25}); 
 	            },
 	            step: function(s){
-	                if(s > 0 && current_value_prop != "p"){
-	                    show_p();
+	                if(s > 0){
 	                    groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25});
 	                }
 	            },
@@ -12693,11 +12766,9 @@
 	            text:["Gains in job density were least widespread in manufacturing, local services, and information—less than 20 metro areas saw increases in density in these sectors."],
 	            enter:function(){
 	                groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
-	                show_p();  
 	            },
 	            step: function(s){
-	                if(s > 0 && current_value_prop != "p"){
-	                    show_p();
+	                if(s > 0){
 	                    groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
 	                }
 	            },
@@ -12724,14 +12795,14 @@
 
 	}
 
+	seq5.nviews = 2;
+
 	function seq6(container, i){
 
 	    //var data = county_counts.slice(0).filter(function(d){return d.naics != "00"}).sort(function(a,b){return d3.descending(a.p, b.p)});
 
 	    //one time setup
 	    var wrap = d3.select(container).classed("chart-view",true).style("background","#dddddd");
-
-	    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>");
 
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Changes by county type");
 
@@ -12790,6 +12861,8 @@
 
 	}
 
+	seq6.nviews = 3;
+
 	//main function
 	function main(){
 
@@ -12808,11 +12881,8 @@
 
 	  //browser degradation
 	  if(compat.browser()){
-	    sequence(container, seq0, 7);
-
-	    sequence(container, seq4, 4);
-	    sequence(container, seq5, 3);
-	    sequence(container, seq6, 3);
+	    sequence(container, [seq0, seq1], '<p id="group-seqs-1" class="meta-header meta-header-1"><span>Average changes in job density</span></p>');
+	    sequence(container, [seq4, seq5, seq6], '<p id="group-seqs-2" class="meta-header meta-header-2"><span>How widespread...</span></p>');
 	  }
 
 

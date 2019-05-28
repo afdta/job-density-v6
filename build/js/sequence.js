@@ -21,9 +21,9 @@ export default function sequence(container, setup, num_views, threshold){
     }
 
     if(scrolly.supported()){
-        var sticky = wrap.append("div"); 
-        var scr = scrolly(sticky.node(), 90);
-        views = wrap.selectAll("div.scrolling-panel").data(setup(sticky.node())).enter().append("div").classed("scrolling-panel",true);
+        var view = scrolly(wrap.append("div").node(), 90).view();
+
+        views = wrap.selectAll("div.scrolling-panel").data(setup(view.node())).enter().append("div").classed("scrolling-panel",true);
                 
         views.selectAll("p").data(function(d){return d.text}).enter().append("p").html(function(d){return d});
 
@@ -33,7 +33,7 @@ export default function sequence(container, setup, num_views, threshold){
             fns.step = d.hasOwnProperty("step") ? d.step : null;
             fns.exit = d.hasOwnProperty("exit") ? d.exit : null;
     
-            scr.marker(this, fns, threshold);
+            view.waypoint(this, fns, threshold);
           })
     }
     else{

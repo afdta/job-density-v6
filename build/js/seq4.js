@@ -6,13 +6,11 @@ import map from '../../../js-modules/state-map.js';
 import {geos_state} from '../../../js-modules/geos-state.js';
 import geos_cbsa from '../../../js-modules/geos-cbsa';
 
-export default function seq4(container, i){
+function seq4(container, i){
 
     //one time setup
     var wrap = d3.select(container).attr("id","sequence-1").classed("chart-view big-chart",true);
-    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>")
 
-    var panel_number = wrap.append("p").classed("panel-number",true).text("Panel " + (i+1)).style("display","none");
     wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas");
 
     var t94 = geos_cbsa.filter(function(d){return naics00.hasOwnProperty(d.cbsa)});
@@ -155,3 +153,7 @@ export default function seq4(container, i){
     return views;
 
 }
+
+seq4.nviews = 5;
+
+export default seq4;

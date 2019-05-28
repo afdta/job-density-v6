@@ -1,156 +1,13 @@
 import on_resize from './on_resize.js';
-import {seq0data, sector_data, sector_names} from './data.js';
+import {seq0data} from './data.js';
 import palette from '../../../js-modules/palette.js';
 
-function setup_sectors(wrap_){
-    var wrap = wrap_.append("div").classed("chart-view",true).style("position","absolute").style("top","0px").style("visibility","hidden");
-    
-    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
 
-    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.actual, b.actual)});
+function seq0(container, i){
 
-    var svg = wrap.append("div").style("max-width","800px").append("svg").attr("viewBox", "0 0 320 240");
+    var wrap_ = d3.select(container).attr("id", "sequence-0").append("div");
 
-    var g_x_axis = svg.append("g").classed("axis-group",true);
-    var g_back = svg.append("g");
-    var g_trend = svg.append("g");
-
-    var groups = g_trend.selectAll("g").data(data).enter().append("g");
-
-    var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
-                                .attr("stroke", function(d){return d.expected > d.actual ? palette.secondary.blue : palette.secondary.blue})
-                                .attr("stroke-width","1px")
-                                ;
-
-    var group_circles = groups.selectAll("circle").data(function(d){return [d]})
-                .enter().append("circle").attr("r",4.5).attr("cx","0").attr("cy","0")
-                .attr("fill", palette.primary.blue)
-                .attr("stroke", palette.primary.blue)
-                .attr("stroke-width","1.5px")
-                ;
-    
-    var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
-    var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
-
-    var scale_x = d3.scaleLinear().domain([-0.4, 0.6]).nice();
-    var axis_x = d3.axisTop(scale_x).ticks(5, "+,.0%");
-
-    var aspect = 2/3;
-    var padding = {top:50, right:25, bottom: 5, left: 15 }
-
-    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
-                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
-                        .style("shape-rendering","crispEdges");
-
-    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
-                              .attr("x","0").attr("y","0")
-                              .attr("dx","-10")
-                              .attr("dy","5").attr("text-anchor","end")
-                              ;
-
-    var current_value_prop = "actual";
-    var group_h = 20;
-
-    function translate(d,i){
-        var v = d[current_value_prop];
-        var x = scale_x(v);
-        var y = (i*group_h) + (group_h/2);
-        return "translate(" + x + "," + y + ")";
-    }
-
-    function show_actual(){
-        current_value_prop = "actual";
-        groups.interrupt().transition().duration(1200).attr("transform", translate);
-        group_connectors.interrupt()
-                        .transition().duration(1200)
-                        .attr("x2","0");
-    }
-
-    function show_expected(){
-        current_value_prop = "expected";
-        groups.interrupt().transition().duration(1200).attr("transform", translate);
-        group_connectors.interrupt()
-                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
-                        .transition().duration(1200)
-                        .attr("x2", function(d){return (scale_x(d.actual) - scale_x(d.expected))})
-                        //.on("end", function(d){d3.select(this).style("opacity","0")})                        
-                        ;
-    }
-
-    function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-        var h = this.h - 300;
-        //var h = w * aspect;
-        if(h < 400){h = 400};
-
-        scale_x.range([padding.left, w - padding.right]);
-        
-        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
-
-        groups.interrupt().transition().duration(0).attr("transform", translate);
-
-        svg.attr("viewBox", "0 0 " + w + " " + h);
-        
-        g_x_axis.attr("transform", "translate(0," + padding.top + ")");
-        g_trend.attr("transform", "translate(0," + padding.top + ")");
-
-        gridlines.attr("d", function(d){
-            var x = Math.floor(scale_x(d))+0.5;
-            return "M" + x + "," + padding.top + " l0," + (h - padding.top - padding.bottom);
-        })
-
-        axis_x(g_x_axis);
-        
-        group_connectors.attr("y1", 0).attr("y2", 0)
-                        .attr("x1", "0")
-                        .attr("x2", "0")
-                        ;
-        
-    }    
-
-    //register resize callback. initialize
-    var redraw_ = on_resize(redraw, true);
-
-
-    function step(n, s){
-        wrap.style("opacity",1);
-        if(n==0){
-            title.html("Most sectors saw job density increase from 2004 to 2015"); 
-            groups.style("opacity","1");
-            show_actual();
-        }
-        else if(n==1){
-            title.html("Most sectors saw job density increase from 2004 to 2015"); 
-            show_actual();
-            groups.style("opacity", function(d){return d.actual > 0.4 ? "1" : "0.15"});
-        }
-        else if(n==2){
-            title.html("Expected job density change from 2004 to 2015"); 
-            show_expected();
-            groups.style("opacity", "1");
-        }
-        else if(n==3){
-            //groups.style("opacity", function(d){ return d.actual < d.expected ? "1" : "0.15"});
-        }
-    }
-
-
-    return {
-        step: step,
-        enter: function(){
-            redraw_();
-            wrap.style("position","relative").style("visibility","visible");
-        },
-        exit: function(){
-            wrap.style("position","absolute").style("visibility","hidden").style("top","0px");
-        }
-    };
-
-
-}
-
-
-function setup_lines(wrap_){
+    //one time setup
     var data = seq0data.changes;
 
     var wrap = wrap_.append("div").classed("chart-view",true);
@@ -187,7 +44,7 @@ function setup_lines(wrap_){
                        .style("opacity","0")
                        .attr("fill","none")
                        .attr("stroke", function(d,i){
-                           return i==0 || i==3 ? palette.primary.blue : i==1 ? palette.primary.yellow : palette.primary.green
+                           return i==0 || i==3 ? palette.primary.red : i==1 ? palette.primary.yellow : palette.primary.blue
                         })
                         .attr("stroke-dasharray", function(d,i){return i==3 ? "2,2" : null})
                         ;
@@ -257,140 +114,71 @@ function setup_lines(wrap_){
     //register resize callback. initialize
     var redraw_ = on_resize(redraw, true);
 
-    function step(n, s){
-        console.log("step " + n);
-        wrap.style("opacity",1);
-        lines.style("opacity", function(d,i){
-            if(n !== 3){
-                return i <= n ? "1" : "0";
-            }
-            else{
-                return i == n ? "1" : "0.25";
-            }
-        });
-        t_.style("opacity", function(d,i){
-            if(n !== 3){
-                return i <= n ? "1" : "0";
-            }
-            else{
-                return i == n ? "1" : "0.25";
-            }
-        });
-        great_recession.style("opacity", function(d,i){
-            return n > 0 ? "1" : "0";
-        })
-
-        if(n == 0){title.text("Metropolitan America saw a large increase in job density from 2004 to 2015")}
-        else if(n == 0.5){title.text("Great Recession headline ...")}
-        else if(n == 1){title.text("Very dense places headline")}
-        else if(n == 2){title.text("Other places headline")}
-        else if(n == 3){title.text("Actual density increased greater than expected in the 94 metro areas [headline tk]")}
-    }
-
-
-    return {
-        step: step,
-        enter: function(){
-            redraw_();
-            wrap.style("opacity","1");
-        },
-        exit: function(){
-            lines.style("opacity","0");
-            t_.style("opacity","0");
-            wrap.style("opacity",null);
-        },
-        show: function(){
-            wrap.style("position","relative").style("visibility","visible");
-        },
-        hide: function(){
-            wrap.style("position","absolute").style("visibility","hidden").style("top","0px");
-        }
-    };
-}
-
-export default function seq0(container, i){
-
-    var wrap = d3.select(container).attr("id", "sequence-0").append("div").style("position","relative");
-    wrap.append("p").classed("meta-header meta-header-1", true).html("<span>Average changes in job density</span>")
-
-    //one time setup
-    var lines = setup_lines(wrap);
-    var sectors = setup_sectors(wrap);
-
-
     var current_view = null;
-    function show_view(n, s, step_code){
-        if(step_code != "exit" && n !== current_view){
+
+    function step(n, s, c){
+        if(c != "exit" && n!== current_view){
+            wrap.style("opacity",1);
+            lines.style("opacity", function(d,i){
+                if(n !== 3){
+                    return i <= n ? "1" : "0";
+                }
+                else{
+                    return i == n ? "1" : "0.25";
+                }
+            });
+            t_.style("opacity", function(d,i){
+                if(n !== 3){
+                    return i <= n ? "1" : "0";
+                }
+                else{
+                    return i == n ? "1" : "0.25";
+                }
+            });
+            great_recession.style("opacity", function(d,i){
+                return n > 0 ? "1" : "0";
+            })
+
+            if(n == 0){title.text("Metropolitan America saw a large increase in job density from 2004 to 2015")}
+            else if(n == 0.5){title.text("Great Recession headline ...")}
+            else if(n == 1){title.text("Very dense places headline")}
+            else if(n == 2){title.text("Other places headline")}
+            else if(n == 3){title.text("Actual density increased greater than expected in the 94 metro areas [headline tk]")}  
             
-        
-            if(current_view < 4){
-                lines.step(n, s);
-            }
-            else{
-                sectors.step(n-4, s);
-            }
-
-
             current_view = n;
-
         }
     }
-
 
     var views = [
         {
             text:["The perceived job density of all 94 large metro areas taken together increased nearly 30 percent, indicating job growth was highly concentrated in dense urban areas from 2004 to 2015."],
-            step:function(s, c){show_view(0, s, c)},
-            enter: function(){
-                lines.enter();
-            },
+            step:function(s, c){step(0, s, c)},
             exit:function(){
-                lines.exit();
+                lines.style("opacity","0");
+                t_.style("opacity","0")
                 current_view = null;
+                wrap.style("opacity",null);
             }
         },
 
         {
             text:["During the Great Recession from 2007 to 2009, the average perceived job density increased more than 10 percent as suburban and exurban areas shed their jobs faster than denser urban areas. Perceived job density has steadily increased since 2009."],
-            step:function(s, c){show_view(0.5, s, c)},
+            step:function(s, c){step(0.5, s, c)},
         },
 
         {
             text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle."],
-            step:function(s, c){show_view(1, s, c)}
+            step:function(s, c){step(1, s, c)}
         },
 
         {
             text:["In contrast, job density in the other 90 large metro areas increased only 9 percent on average. However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
-            step:function(s, c){show_view(2, s, c)}
+            step:function(s, c){step(2, s, c)}
         },
 
         {
             text:["This is the expected change in job density—what we would have expected to see if each office and factory added jobs at its industry-wide average rate"],
-            step:function(s, c){show_view(3, s, c)}
-        },
-
-        {
-            text:["All but two sectors saw job density increas... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent a maximus quam. Integer suscipit tempor justo. Nullam a metus augue. Phasellus sit amet turpis ac."],
-            enter:function(){
-                lines.hide();
-                lines.exit();
-                sectors.enter();
-            },
-            step:function(s, c){show_view(4, s, c)},
-            exit:function(){
-                lines.show();
-                lines.enter();
-                sectors.exit();
-            }
-        },
-        {
-            text:["Four sectors ..."],
-            step:function(s, c){show_view(5, s, c)},
-        },
-        {
-            text:["In most sectors, the expected change in job density was less than the actual change."],
-            step:function(s, c){show_view(6, s, c)},
+            step:function(s, c){step(3, s, c)}
         }
     ]
 
@@ -412,3 +200,7 @@ export default function seq0(container, i){
     return views;
 
 }
+
+seq0.nviews = 5;
+
+export default seq0;

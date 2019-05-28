@@ -160,12 +160,12 @@ var seq0data =
         "cbsa": 99999,
         "year": 2005,
         "actual": 0.00411,
-        "expected": 0.01534
+        "expected": 0.01535
       },
       {
         "cbsa": 99999,
         "year": 2006,
-        "actual": 0.02342,
+        "actual": 0.02343,
         "expected": 0.03169
       },
       {
@@ -177,13 +177,13 @@ var seq0data =
       {
         "cbsa": 99999,
         "year": 2008,
-        "actual": 0.10397,
+        "actual": 0.10398,
         "expected": 0.07314
       },
       {
         "cbsa": 99999,
         "year": 2009,
-        "actual": 0.1492,
+        "actual": 0.14919,
         "expected": 0.07958
       },
       {
@@ -195,13 +195,13 @@ var seq0data =
       {
         "cbsa": 99999,
         "year": 2011,
-        "actual": 0.19535,
-        "expected": 0.11767
+        "actual": 0.19533,
+        "expected": 0.11766
       },
       {
         "cbsa": 99999,
         "year": 2012,
-        "actual": 0.20543,
+        "actual": 0.20541,
         "expected": 0.136
       },
       {
@@ -213,14 +213,14 @@ var seq0data =
       {
         "cbsa": 99999,
         "year": 2014,
-        "actual": 0.26156,
+        "actual": 0.26152,
         "expected": 0.16756
       },
       {
         "cbsa": 99999,
         "year": 2015,
-        "actual": 0.29534,
-        "expected": 0.19896
+        "actual": 0.29531,
+        "expected": 0.19897
       }
     ]
   },
@@ -377,74 +377,74 @@ var seq0data =
       {
         "cbsa": 99999,
         "year": 2004,
-        "actual": 20066.14648,
-        "expected": 20066.14648
+        "actual": 20067.86497,
+        "expected": 20067.86497
       },
       {
         "cbsa": 99999,
         "year": 2005,
-        "actual": 20148.64453,
-        "expected": 20374.03125
+        "actual": 20150.38006,
+        "expected": 20375.83362
       },
       {
         "cbsa": 99999,
         "year": 2006,
-        "actual": 20536.01367,
-        "expected": 20702.06445
+        "actual": 20537.9669,
+        "expected": 20703.86259
       },
       {
         "cbsa": 99999,
         "year": 2007,
-        "actual": 20907.63281,
-        "expected": 20991.31445
+        "actual": 20909.57941,
+        "expected": 20993.17693
       },
       {
         "cbsa": 99999,
         "year": 2008,
-        "actual": 22152.37305,
-        "expected": 21533.74609
+        "actual": 22154.42442,
+        "expected": 21535.68121
       },
       {
         "cbsa": 99999,
         "year": 2009,
-        "actual": 23060.08008,
-        "expected": 21662.94336
+        "actual": 23061.79556,
+        "expected": 21664.83762
       },
       {
         "cbsa": 99999,
         "year": 2010,
-        "actual": 23279.40234,
-        "expected": 21974.77734
+        "actual": 23281.40824,
+        "expected": 21976.67029
       },
       {
         "cbsa": 99999,
         "year": 2011,
-        "actual": 23986.06641,
-        "expected": 22427.23438
+        "actual": 23987.70046,
+        "expected": 22429.12523
       },
       {
         "cbsa": 99999,
         "year": 2012,
-        "actual": 24188.29883,
-        "expected": 22795.07422
+        "actual": 24190.0763,
+        "expected": 22797.04395
       },
       {
         "cbsa": 99999,
         "year": 2013,
-        "actual": 24939.69336,
-        "expected": 23336.54883
+        "actual": 24941.70047,
+        "expected": 23338.56869
       },
       {
         "cbsa": 99999,
         "year": 2014,
-        "actual": 25314.63672,
-        "expected": 23428.42773
+        "actual": 25316.11257,
+        "expected": 23430.50358
       },
       {
         "cbsa": 99999,
         "year": 2015,
-        "actual": 25992.56836,
-        "expected": 24058.55859
+        "actual": 25994.1244,
+        "expected": 24060.73673
       }
     ]
   }
@@ -1435,7 +1435,7 @@ var sector_data =
       "cbsa": 12940,
       "naics": "51",
       "actual": 0.37421,
-      "expected": 0.3262
+      "expected": 0.32621
     },
     {
       "cbsa": 12940,
@@ -2590,7 +2590,7 @@ var sector_data =
     {
       "cbsa": 17460,
       "naics": "53",
-      "actual": -0.16346,
+      "actual": -0.16345,
       "expected": -0.03436
     },
     {
@@ -3264,104 +3264,104 @@ var sector_data =
     {
       "cbsa": 19740,
       "naics": "00",
-      "actual": 0.10985,
-      "expected": 0.30312
+      "actual": 0.10759,
+      "expected": 0.30216
     },
     {
       "cbsa": 19740,
       "naics": "22",
-      "actual": 0.35921,
-      "expected": -0.54833
+      "actual": 0.35919,
+      "expected": -0.54831
     },
     {
       "cbsa": 19740,
       "naics": "23",
-      "actual": -0.00316,
-      "expected": 0.0791
+      "actual": 0.00008,
+      "expected": 0.07965
     },
     {
       "cbsa": 19740,
       "naics": "31",
-      "actual": -0.16434,
-      "expected": -0.0117
+      "actual": -0.19268,
+      "expected": -0.00983
     },
     {
       "cbsa": 19740,
       "naics": "42",
-      "actual": 0.20109,
-      "expected": 0.14732
+      "actual": 0.20742,
+      "expected": 0.14751
     },
     {
       "cbsa": 19740,
       "naics": "44",
-      "actual": 0.06244,
-      "expected": 0.22662
+      "actual": 0.05699,
+      "expected": 0.22621
     },
     {
       "cbsa": 19740,
       "naics": "48",
-      "actual": -0.36984,
-      "expected": -0.07598
+      "actual": -0.36692,
+      "expected": -0.0758
     },
     {
       "cbsa": 19740,
       "naics": "51",
-      "actual": -0.50015,
-      "expected": -0.09581
+      "actual": -0.50312,
+      "expected": -0.09626
     },
     {
       "cbsa": 19740,
       "naics": "52",
-      "actual": -0.11804,
-      "expected": 0.0895
+      "actual": -0.11633,
+      "expected": 0.08949
     },
     {
       "cbsa": 19740,
       "naics": "53",
-      "actual": 0.15712,
-      "expected": 0.02115
+      "actual": 0.15475,
+      "expected": 0.02089
     },
     {
       "cbsa": 19740,
       "naics": "54",
-      "actual": 0.23599,
-      "expected": 0.5126
+      "actual": 0.23457,
+      "expected": 0.5124
     },
     {
       "cbsa": 19740,
       "naics": "55",
-      "actual": 1.05853,
-      "expected": 0.88607
+      "actual": 1.04485,
+      "expected": 0.88209
     },
     {
       "cbsa": 19740,
       "naics": "61",
-      "actual": 0.25472,
-      "expected": 0.24162
+      "actual": 0.25616,
+      "expected": 0.24273
     },
     {
       "cbsa": 19740,
       "naics": "62",
-      "actual": 0.1487,
-      "expected": 0.58401
+      "actual": 0.15057,
+      "expected": 0.58393
     },
     {
       "cbsa": 19740,
       "naics": "71",
-      "actual": 0.42024,
-      "expected": 0.27589
+      "actual": 0.42792,
+      "expected": 0.27824
     },
     {
       "cbsa": 19740,
       "naics": "72",
-      "actual": 0.17386,
-      "expected": 0.32742
+      "actual": 0.17164,
+      "expected": 0.32695
     },
     {
       "cbsa": 19740,
       "naics": "81",
-      "actual": 0.17371,
-      "expected": 0.26339
+      "actual": 0.17154,
+      "expected": 0.26255
     }
   ],
   "19780": [
@@ -3655,7 +3655,7 @@ var sector_data =
       "cbsa": 21340,
       "naics": "62",
       "actual": 0.13431,
-      "expected": 0.51014
+      "expected": 0.51015
     },
     {
       "cbsa": 21340,
@@ -4810,7 +4810,7 @@ var sector_data =
     {
       "cbsa": 28140,
       "naics": "72",
-      "actual": 0.04857,
+      "actual": 0.04856,
       "expected": 0.2043
     },
     {
@@ -4885,7 +4885,7 @@ var sector_data =
       "cbsa": 28940,
       "naics": "54",
       "actual": -0.15044,
-      "expected": 0.19968
+      "expected": 0.19967
     },
     {
       "cbsa": 28940,
@@ -5735,7 +5735,7 @@ var sector_data =
       "cbsa": 33100,
       "naics": "62",
       "actual": 0.23217,
-      "expected": 0.28032
+      "expected": 0.28031
     },
     {
       "cbsa": 33100,
@@ -6097,7 +6097,7 @@ var sector_data =
       "cbsa": 35380,
       "naics": "42",
       "actual": -0.34269,
-      "expected": -0.12576
+      "expected": -0.12577
     },
     {
       "cbsa": 35380,
@@ -6450,7 +6450,7 @@ var sector_data =
     {
       "cbsa": 36260,
       "naics": "55",
-      "actual": -0.73861,
+      "actual": -0.73862,
       "expected": -0.31289
     },
     {
@@ -9321,7 +9321,7 @@ var sector_data =
       "cbsa": 45300,
       "naics": "42",
       "actual": 0.04169,
-      "expected": 0.01946
+      "expected": 0.01945
     },
     {
       "cbsa": 45300,
@@ -9528,7 +9528,7 @@ var sector_data =
     {
       "cbsa": 46060,
       "naics": "42",
-      "actual": -0.26342,
+      "actual": -0.26341,
       "expected": -0.12016
     },
     {
@@ -10232,8 +10232,8 @@ var sector_data =
     {
       "cbsa": 99999,
       "naics": "00",
-      "actual": 0.29534,
-      "expected": 0.19896
+      "actual": 0.29531,
+      "expected": 0.19897
     },
     {
       "cbsa": 99999,
@@ -10244,91 +10244,91 @@ var sector_data =
     {
       "cbsa": 99999,
       "naics": "23",
-      "actual": 0.24442,
-      "expected": 0.06012
+      "actual": 0.24446,
+      "expected": 0.06014
     },
     {
       "cbsa": 99999,
       "naics": "31",
-      "actual": -0.24985,
-      "expected": -0.20809
+      "actual": -0.24995,
+      "expected": -0.20798
     },
     {
       "cbsa": 99999,
       "naics": "42",
-      "actual": 0.15537,
-      "expected": -0.01744
+      "actual": 0.15542,
+      "expected": -0.01742
     },
     {
       "cbsa": 99999,
       "naics": "44",
-      "actual": 0.27273,
-      "expected": 0.11191
+      "actual": 0.27266,
+      "expected": 0.11195
     },
     {
       "cbsa": 99999,
       "naics": "48",
-      "actual": -0.25601,
+      "actual": -0.25598,
       "expected": 0.04787
     },
     {
       "cbsa": 99999,
       "naics": "51",
-      "actual": 0.41471,
-      "expected": 0.10011
+      "actual": 0.4145,
+      "expected": 0.10008
     },
     {
       "cbsa": 99999,
       "naics": "52",
-      "actual": 0.09457,
-      "expected": 0.01064
+      "actual": 0.09458,
+      "expected": 0.01065
     },
     {
       "cbsa": 99999,
       "naics": "53",
-      "actual": 0.20217,
+      "actual": 0.20214,
       "expected": 0.01594
     },
     {
       "cbsa": 99999,
       "naics": "54",
-      "actual": 0.57119,
-      "expected": 0.35681
+      "actual": 0.57114,
+      "expected": 0.35683
     },
     {
       "cbsa": 99999,
       "naics": "55",
       "actual": 0.38758,
-      "expected": 0.27799
+      "expected": 0.27807
     },
     {
       "cbsa": 99999,
       "naics": "61",
-      "actual": 0.29068,
+      "actual": 0.29069,
       "expected": 0.40719
     },
     {
       "cbsa": 99999,
       "naics": "62",
-      "actual": 0.46494,
+      "actual": 0.46495,
       "expected": 0.49033
     },
     {
       "cbsa": 99999,
       "naics": "71",
-      "actual": 0.3353,
-      "expected": 0.31409
+      "actual": 0.33534,
+      "expected": 0.3141
     },
     {
       "cbsa": 99999,
       "naics": "72",
-      "actual": 0.4962,
+      "actual": 0.49615,
       "expected": 0.40754
     },
     {
       "cbsa": 99999,
       "naics": "81",
-      "actual": 0.0988,
+      "actual": 0.09879,
       "expected": 0.09077
     }
   ]
@@ -10339,87 +10339,104 @@ var sector_counts =
   {
     "naics": "00",
     "p": 48,
-    "ge": 16
+    "ge": 16,
+    "n": 94
   },
   {
     "naics": "22",
     "p": 31,
-    "ge": 35
+    "ge": 35,
+    "n": 94
   },
   {
     "naics": "23",
-    "p": 29,
-    "ge": 32
+    "p": 30,
+    "ge": 32,
+    "n": 94
   },
   {
     "naics": "31",
     "p": 12,
-    "ge": 18
+    "ge": 18,
+    "n": 94
   },
   {
     "naics": "42",
     "p": 30,
-    "ge": 16
+    "ge": 16,
+    "n": 94
   },
   {
     "naics": "44",
     "p": 23,
-    "ge": 11
+    "ge": 11,
+    "n": 94
   },
   {
     "naics": "48",
     "p": 29,
-    "ge": 16
+    "ge": 16,
+    "n": 94
   },
   {
     "naics": "51",
     "p": 17,
-    "ge": 21
+    "ge": 21,
+    "n": 94
   },
   {
     "naics": "52",
     "p": 29,
-    "ge": 25
+    "ge": 25,
+    "n": 94
   },
   {
     "naics": "53",
     "p": 35,
-    "ge": 24
+    "ge": 24,
+    "n": 94
   },
   {
     "naics": "54",
     "p": 58,
-    "ge": 18
+    "ge": 18,
+    "n": 94
   },
   {
     "naics": "55",
     "p": 61,
-    "ge": 39
+    "ge": 39,
+    "n": 94
   },
   {
     "naics": "61",
     "p": 68,
-    "ge": 21
+    "ge": 21,
+    "n": 94
   },
   {
     "naics": "62",
     "p": 72,
-    "ge": 21
+    "ge": 21,
+    "n": 94
   },
   {
     "naics": "71",
     "p": 60,
-    "ge": 38
+    "ge": 38,
+    "n": 94
   },
   {
     "naics": "72",
     "p": 70,
-    "ge": 18
+    "ge": 18,
+    "n": 94
   },
   {
     "naics": "81",
     "p": 17,
-    "ge": 12
+    "ge": 12,
+    "n": 94
   }
 ]
 ;
@@ -10445,6 +10462,2188 @@ var sector_names =
     "72": "Hospitality",
     "81": "Local Services"
   }
+;
+var county_data = 
+{
+  "10420": [
+    {
+      "cbsa": 10420,
+      "type": "ES",
+      "actual": 0.1142,
+      "expected": -0.04337
+    },
+    {
+      "cbsa": 10420,
+      "type": "MS",
+      "actual": -0.22341,
+      "expected": 0.163
+    },
+    {
+      "cbsa": 10420,
+      "type": "TOTAL",
+      "actual": -0.21292,
+      "expected": 0.15659
+    }
+  ],
+  "10580": [
+    {
+      "cbsa": 10580,
+      "type": "ES",
+      "actual": 0.2448,
+      "expected": 0.28827
+    },
+    {
+      "cbsa": 10580,
+      "type": "EX",
+      "actual": -0.47664,
+      "expected": 0.05912
+    },
+    {
+      "cbsa": 10580,
+      "type": "MS",
+      "actual": 0.47366,
+      "expected": 0.19788
+    },
+    {
+      "cbsa": 10580,
+      "type": "TOTAL",
+      "actual": 0.43341,
+      "expected": 0.21229
+    }
+  ],
+  "10740": [
+    {
+      "cbsa": 10740,
+      "type": "ES",
+      "actual": -0.9046,
+      "expected": 0.01294
+    },
+    {
+      "cbsa": 10740,
+      "type": "EX",
+      "actual": -0.63045,
+      "expected": 0.4873
+    },
+    {
+      "cbsa": 10740,
+      "type": "MS",
+      "actual": -0.06781,
+      "expected": 0.1514
+    },
+    {
+      "cbsa": 10740,
+      "type": "TOTAL",
+      "actual": -0.21248,
+      "expected": 0.12925
+    }
+  ],
+  "10900": [
+    {
+      "cbsa": 10900,
+      "type": "ES",
+      "actual": -0.50241,
+      "expected": 0.00107
+    },
+    {
+      "cbsa": 10900,
+      "type": "MS",
+      "actual": 0.09113,
+      "expected": 0.22907
+    },
+    {
+      "cbsa": 10900,
+      "type": "TOTAL",
+      "actual": 0.04818,
+      "expected": 0.21257
+    }
+  ],
+  "12060": [
+    {
+      "cbsa": 12060,
+      "type": "ES",
+      "actual": 0.4787,
+      "expected": 0.1484
+    },
+    {
+      "cbsa": 12060,
+      "type": "EX",
+      "actual": 0.28773,
+      "expected": 0.23123
+    },
+    {
+      "cbsa": 12060,
+      "type": "MS",
+      "actual": 0.03399,
+      "expected": 0.10438
+    },
+    {
+      "cbsa": 12060,
+      "type": "TOTAL",
+      "actual": 0.19815,
+      "expected": 0.24761
+    },
+    {
+      "cbsa": 12060,
+      "type": "UC",
+      "actual": 0.19601,
+      "expected": 0.24962
+    }
+  ],
+  "12260": [
+    {
+      "cbsa": 12260,
+      "type": "ES",
+      "actual": -0.16096,
+      "expected": 0.09292
+    },
+    {
+      "cbsa": 12260,
+      "type": "EX",
+      "actual": 0.03787,
+      "expected": 0.19985
+    },
+    {
+      "cbsa": 12260,
+      "type": "TOTAL",
+      "actual": -0.00191,
+      "expected": 0.17845
+    }
+  ],
+  "12420": [
+    {
+      "cbsa": 12420,
+      "type": "ES",
+      "actual": 0.41626,
+      "expected": 0.5622
+    },
+    {
+      "cbsa": 12420,
+      "type": "EX",
+      "actual": -0.38541,
+      "expected": 0.34271
+    },
+    {
+      "cbsa": 12420,
+      "type": "TOTAL",
+      "actual": 0.39553,
+      "expected": 0.55652
+    }
+  ],
+  "12540": [
+    {
+      "cbsa": 12540,
+      "type": "ES",
+      "actual": 0.04182,
+      "expected": 0.28047
+    },
+    {
+      "cbsa": 12540,
+      "type": "TOTAL",
+      "actual": 0.04182,
+      "expected": 0.28047
+    }
+  ],
+  "12580": [
+    {
+      "cbsa": 12580,
+      "type": "ES",
+      "actual": 0.33439,
+      "expected": 0.26353
+    },
+    {
+      "cbsa": 12580,
+      "type": "EX",
+      "actual": 0.45466,
+      "expected": 0.12611
+    },
+    {
+      "cbsa": 12580,
+      "type": "MS",
+      "actual": 0.03195,
+      "expected": 0.09731
+    },
+    {
+      "cbsa": 12580,
+      "type": "TOTAL",
+      "actual": -0.01017,
+      "expected": 0.17854
+    },
+    {
+      "cbsa": 12580,
+      "type": "UC",
+      "actual": -0.02244,
+      "expected": 0.19828
+    }
+  ],
+  "12940": [
+    {
+      "cbsa": 12940,
+      "type": "ES",
+      "actual": 0.89135,
+      "expected": 0.24446
+    },
+    {
+      "cbsa": 12940,
+      "type": "EX",
+      "actual": -0.28115,
+      "expected": 0.03674
+    },
+    {
+      "cbsa": 12940,
+      "type": "MS",
+      "actual": -0.06191,
+      "expected": 0.19717
+    },
+    {
+      "cbsa": 12940,
+      "type": "TOTAL",
+      "actual": -0.04436,
+      "expected": 0.197
+    }
+  ],
+  "13820": [
+    {
+      "cbsa": 13820,
+      "type": "ES",
+      "actual": 0.76051,
+      "expected": 0.09445
+    },
+    {
+      "cbsa": 13820,
+      "type": "EX",
+      "actual": 0.01181,
+      "expected": 0.03074
+    },
+    {
+      "cbsa": 13820,
+      "type": "MS",
+      "actual": -0.21507,
+      "expected": 0.04371
+    },
+    {
+      "cbsa": 13820,
+      "type": "TOTAL",
+      "actual": -0.15149,
+      "expected": 0.04696
+    }
+  ],
+  "14260": [
+    {
+      "cbsa": 14260,
+      "type": "ES",
+      "actual": -0.33993,
+      "expected": 0.13659
+    },
+    {
+      "cbsa": 14260,
+      "type": "EX",
+      "actual": 0.11366,
+      "expected": 0.38379
+    },
+    {
+      "cbsa": 14260,
+      "type": "MS",
+      "actual": 0.27277,
+      "expected": 0.34002
+    },
+    {
+      "cbsa": 14260,
+      "type": "TOTAL",
+      "actual": 0.21377,
+      "expected": 0.32051
+    }
+  ],
+  "14860": [
+    {
+      "cbsa": 14860,
+      "type": "MS",
+      "actual": -0.06212,
+      "expected": 0.06938
+    },
+    {
+      "cbsa": 14860,
+      "type": "TOTAL",
+      "actual": -0.06212,
+      "expected": 0.06938
+    }
+  ],
+  "15380": [
+    {
+      "cbsa": 15380,
+      "type": "ES",
+      "actual": 0.03242,
+      "expected": 0.01289
+    },
+    {
+      "cbsa": 15380,
+      "type": "MS",
+      "actual": -0.13425,
+      "expected": 0.16853
+    },
+    {
+      "cbsa": 15380,
+      "type": "TOTAL",
+      "actual": -0.12852,
+      "expected": 0.16317
+    }
+  ],
+  "15980": [
+    {
+      "cbsa": 15980,
+      "type": "MS",
+      "actual": -0.31102,
+      "expected": 0.01014
+    },
+    {
+      "cbsa": 15980,
+      "type": "TOTAL",
+      "actual": -0.31102,
+      "expected": 0.01014
+    }
+  ],
+  "16700": [
+    {
+      "cbsa": 16700,
+      "type": "ES",
+      "actual": -0.10699,
+      "expected": 0.18775
+    },
+    {
+      "cbsa": 16700,
+      "type": "MS",
+      "actual": 0.0349,
+      "expected": 0.25159
+    },
+    {
+      "cbsa": 16700,
+      "type": "TOTAL",
+      "actual": 0.02588,
+      "expected": 0.24754
+    }
+  ],
+  "16740": [
+    {
+      "cbsa": 16740,
+      "type": "ES",
+      "actual": -0.00011,
+      "expected": 0.27328
+    },
+    {
+      "cbsa": 16740,
+      "type": "EX",
+      "actual": -0.37673,
+      "expected": 0.17529
+    },
+    {
+      "cbsa": 16740,
+      "type": "MS",
+      "actual": 0.49648,
+      "expected": 0.51615
+    },
+    {
+      "cbsa": 16740,
+      "type": "TOTAL",
+      "actual": 0.44242,
+      "expected": 0.49257
+    }
+  ],
+  "16860": [
+    {
+      "cbsa": 16860,
+      "type": "ES",
+      "actual": -0.57987,
+      "expected": 0.06147
+    },
+    {
+      "cbsa": 16860,
+      "type": "EX",
+      "actual": -0.23053,
+      "expected": -0.03771
+    },
+    {
+      "cbsa": 16860,
+      "type": "MS",
+      "actual": -0.25325,
+      "expected": -0.01481
+    },
+    {
+      "cbsa": 16860,
+      "type": "TOTAL",
+      "actual": -0.26323,
+      "expected": -0.0125
+    }
+  ],
+  "16980": [
+    {
+      "cbsa": 16980,
+      "type": "ES",
+      "actual": -0.05811,
+      "expected": 0.12783
+    },
+    {
+      "cbsa": 16980,
+      "type": "EX",
+      "actual": -0.04901,
+      "expected": 0.21886
+    },
+    {
+      "cbsa": 16980,
+      "type": "MS",
+      "actual": 0.1631,
+      "expected": 0.14044
+    },
+    {
+      "cbsa": 16980,
+      "type": "TOTAL",
+      "actual": 0.20434,
+      "expected": 0.14028
+    },
+    {
+      "cbsa": 16980,
+      "type": "UC",
+      "actual": 0.20517,
+      "expected": 0.14029
+    }
+  ],
+  "17140": [
+    {
+      "cbsa": 17140,
+      "type": "ES",
+      "actual": 0.45847,
+      "expected": 0.01976
+    },
+    {
+      "cbsa": 17140,
+      "type": "EX",
+      "actual": -0.42069,
+      "expected": 0.00191
+    },
+    {
+      "cbsa": 17140,
+      "type": "MS",
+      "actual": -0.21048,
+      "expected": 0.02787
+    },
+    {
+      "cbsa": 17140,
+      "type": "TOTAL",
+      "actual": 0.07408,
+      "expected": 0.1763
+    },
+    {
+      "cbsa": 17140,
+      "type": "UC",
+      "actual": 0.10739,
+      "expected": 0.20105
+    }
+  ],
+  "17460": [
+    {
+      "cbsa": 17460,
+      "type": "ES",
+      "actual": -0.11777,
+      "expected": 0.01737
+    },
+    {
+      "cbsa": 17460,
+      "type": "EX",
+      "actual": -0.4241,
+      "expected": -0.24528
+    },
+    {
+      "cbsa": 17460,
+      "type": "MS",
+      "actual": -0.20948,
+      "expected": 0.00269
+    },
+    {
+      "cbsa": 17460,
+      "type": "TOTAL",
+      "actual": 0.29741,
+      "expected": 0.03136
+    },
+    {
+      "cbsa": 17460,
+      "type": "UC",
+      "actual": 0.32514,
+      "expected": 0.03377
+    }
+  ],
+  "17820": [
+    {
+      "cbsa": 17820,
+      "type": "ES",
+      "actual": -0.05622,
+      "expected": 0.08202
+    },
+    {
+      "cbsa": 17820,
+      "type": "EX",
+      "actual": 0.92822,
+      "expected": 0.31512
+    },
+    {
+      "cbsa": 17820,
+      "type": "TOTAL",
+      "actual": -0.05474,
+      "expected": 0.08237
+    }
+  ],
+  "17900": [
+    {
+      "cbsa": 17900,
+      "type": "ES",
+      "actual": 0.11648,
+      "expected": 0.11767
+    },
+    {
+      "cbsa": 17900,
+      "type": "EX",
+      "actual": -0.35058,
+      "expected": 0.13866
+    },
+    {
+      "cbsa": 17900,
+      "type": "MS",
+      "actual": -0.15222,
+      "expected": 0.13659
+    },
+    {
+      "cbsa": 17900,
+      "type": "TOTAL",
+      "actual": -0.13207,
+      "expected": 0.13509
+    }
+  ],
+  "18140": [
+    {
+      "cbsa": 18140,
+      "type": "ES",
+      "actual": 1.14954,
+      "expected": 0.02865
+    },
+    {
+      "cbsa": 18140,
+      "type": "EX",
+      "actual": -0.27911,
+      "expected": -0.05882
+    },
+    {
+      "cbsa": 18140,
+      "type": "MS",
+      "actual": 0.27756,
+      "expected": 0.34735
+    },
+    {
+      "cbsa": 18140,
+      "type": "TOTAL",
+      "actual": 0.30288,
+      "expected": 0.32325
+    }
+  ],
+  "19100": [
+    {
+      "cbsa": 19100,
+      "type": "ES",
+      "actual": 0.34867,
+      "expected": 0.31921
+    },
+    {
+      "cbsa": 19100,
+      "type": "EX",
+      "actual": -0.1187,
+      "expected": 0.21841
+    },
+    {
+      "cbsa": 19100,
+      "type": "MS",
+      "actual": 0.80584,
+      "expected": 0.3531
+    },
+    {
+      "cbsa": 19100,
+      "type": "TOTAL",
+      "actual": 0.01006,
+      "expected": 0.2858
+    },
+    {
+      "cbsa": 19100,
+      "type": "UC",
+      "actual": -0.02958,
+      "expected": 0.28266
+    }
+  ],
+  "19380": [
+    {
+      "cbsa": 19380,
+      "type": "ES",
+      "actual": 0.14721,
+      "expected": -0.12258
+    },
+    {
+      "cbsa": 19380,
+      "type": "MS",
+      "actual": -0.09957,
+      "expected": 0.04412
+    },
+    {
+      "cbsa": 19380,
+      "type": "TOTAL",
+      "actual": -0.08979,
+      "expected": 0.03751
+    }
+  ],
+  "19660": [
+    {
+      "cbsa": 19660,
+      "type": "EX",
+      "actual": -0.17631,
+      "expected": -0.20039
+    },
+    {
+      "cbsa": 19660,
+      "type": "MS",
+      "actual": 0.0069,
+      "expected": 0.23225
+    },
+    {
+      "cbsa": 19660,
+      "type": "TOTAL",
+      "actual": -0.00021,
+      "expected": 0.21545
+    }
+  ],
+  "19740": [
+    {
+      "cbsa": 19740,
+      "type": "ES",
+      "actual": 0.40505,
+      "expected": 0.24619
+    },
+    {
+      "cbsa": 19740,
+      "type": "EX",
+      "actual": -0.22618,
+      "expected": 0.33868
+    },
+    {
+      "cbsa": 19740,
+      "type": "MS",
+      "actual": 0.0167,
+      "expected": 0.20012
+    },
+    {
+      "cbsa": 19740,
+      "type": "TOTAL",
+      "actual": 0.10759,
+      "expected": 0.30216
+    },
+    {
+      "cbsa": 19740,
+      "type": "UC",
+      "actual": 0.11001,
+      "expected": 0.31036
+    }
+  ],
+  "19780": [
+    {
+      "cbsa": 19780,
+      "type": "ES",
+      "actual": 1.58511,
+      "expected": 0.2454
+    },
+    {
+      "cbsa": 19780,
+      "type": "EX",
+      "actual": -0.55945,
+      "expected": 0.0956
+    },
+    {
+      "cbsa": 19780,
+      "type": "MS",
+      "actual": -0.17611,
+      "expected": 0.17069
+    },
+    {
+      "cbsa": 19780,
+      "type": "TOTAL",
+      "actual": -0.15818,
+      "expected": 0.17071
+    }
+  ],
+  "19820": [
+    {
+      "cbsa": 19820,
+      "type": "ES",
+      "actual": -0.38373,
+      "expected": 0.04374
+    },
+    {
+      "cbsa": 19820,
+      "type": "EX",
+      "actual": -0.21676,
+      "expected": -0.05709
+    },
+    {
+      "cbsa": 19820,
+      "type": "MS",
+      "actual": -0.07902,
+      "expected": 0.06205
+    },
+    {
+      "cbsa": 19820,
+      "type": "TOTAL",
+      "actual": 0.02204,
+      "expected": 0.10532
+    },
+    {
+      "cbsa": 19820,
+      "type": "UC",
+      "actual": 0.07502,
+      "expected": 0.1258
+    }
+  ],
+  "21340": [
+    {
+      "cbsa": 21340,
+      "type": "EX",
+      "actual": 8.47216,
+      "expected": -0.75404
+    },
+    {
+      "cbsa": 21340,
+      "type": "MS",
+      "actual": -0.13147,
+      "expected": 0.16072
+    },
+    {
+      "cbsa": 21340,
+      "type": "TOTAL",
+      "actual": -0.13147,
+      "expected": 0.16072
+    }
+  ],
+  "23420": [
+    {
+      "cbsa": 23420,
+      "type": "ES",
+      "actual": 0.3513,
+      "expected": 0.4036
+    },
+    {
+      "cbsa": 23420,
+      "type": "TOTAL",
+      "actual": 0.3513,
+      "expected": 0.4036
+    }
+  ],
+  "24340": [
+    {
+      "cbsa": 24340,
+      "type": "ES",
+      "actual": -0.27632,
+      "expected": 0.15507
+    },
+    {
+      "cbsa": 24340,
+      "type": "EX",
+      "actual": -0.65475,
+      "expected": -0.07529
+    },
+    {
+      "cbsa": 24340,
+      "type": "TOTAL",
+      "actual": -0.2791,
+      "expected": 0.15338
+    }
+  ],
+  "24660": [
+    {
+      "cbsa": 24660,
+      "type": "ES",
+      "actual": 0.022,
+      "expected": 0.09832
+    },
+    {
+      "cbsa": 24660,
+      "type": "EX",
+      "actual": -0.26596,
+      "expected": 0.03807
+    },
+    {
+      "cbsa": 24660,
+      "type": "TOTAL",
+      "actual": 0.00282,
+      "expected": 0.09431
+    }
+  ],
+  "24860": [
+    {
+      "cbsa": 24860,
+      "type": "ES",
+      "actual": -0.35636,
+      "expected": 0.06586
+    },
+    {
+      "cbsa": 24860,
+      "type": "EX",
+      "actual": -0.37452,
+      "expected": 0.07678
+    },
+    {
+      "cbsa": 24860,
+      "type": "MS",
+      "actual": 0.3392,
+      "expected": 0.20946
+    },
+    {
+      "cbsa": 24860,
+      "type": "TOTAL",
+      "actual": 0.23806,
+      "expected": 0.18881
+    }
+  ],
+  "25420": [
+    {
+      "cbsa": 25420,
+      "type": "ES",
+      "actual": -0.24725,
+      "expected": 0.21954
+    },
+    {
+      "cbsa": 25420,
+      "type": "EX",
+      "actual": -0.47851,
+      "expected": 0.07865
+    },
+    {
+      "cbsa": 25420,
+      "type": "MS",
+      "actual": 0.4672,
+      "expected": 0.45036
+    },
+    {
+      "cbsa": 25420,
+      "type": "TOTAL",
+      "actual": 0.10415,
+      "expected": 0.33289
+    }
+  ],
+  "25540": [
+    {
+      "cbsa": 25540,
+      "type": "ES",
+      "actual": 0.02397,
+      "expected": 0.16265
+    },
+    {
+      "cbsa": 25540,
+      "type": "MS",
+      "actual": 0.18804,
+      "expected": 0.16272
+    },
+    {
+      "cbsa": 25540,
+      "type": "TOTAL",
+      "actual": 0.18427,
+      "expected": 0.16272
+    }
+  ],
+  "26420": [
+    {
+      "cbsa": 26420,
+      "type": "ES",
+      "actual": 0.57403,
+      "expected": 0.38411
+    },
+    {
+      "cbsa": 26420,
+      "type": "EX",
+      "actual": -0.15383,
+      "expected": 0.28855
+    },
+    {
+      "cbsa": 26420,
+      "type": "MS",
+      "actual": 0.14983,
+      "expected": 0.39684
+    },
+    {
+      "cbsa": 26420,
+      "type": "TOTAL",
+      "actual": 0.15529,
+      "expected": 0.39664
+    }
+  ],
+  "26900": [
+    {
+      "cbsa": 26900,
+      "type": "ES",
+      "actual": -0.07498,
+      "expected": 0.21221
+    },
+    {
+      "cbsa": 26900,
+      "type": "EX",
+      "actual": -0.5733,
+      "expected": 0.11623
+    },
+    {
+      "cbsa": 26900,
+      "type": "MS",
+      "actual": 0.32304,
+      "expected": 0.11242
+    },
+    {
+      "cbsa": 26900,
+      "type": "TOTAL",
+      "actual": 0.41505,
+      "expected": 0.19592
+    },
+    {
+      "cbsa": 26900,
+      "type": "UC",
+      "actual": 0.45894,
+      "expected": 0.20382
+    }
+  ],
+  "27140": [
+    {
+      "cbsa": 27140,
+      "type": "ES",
+      "actual": -0.10673,
+      "expected": 0.15038
+    },
+    {
+      "cbsa": 27140,
+      "type": "EX",
+      "actual": -0.24274,
+      "expected": 0.33151
+    },
+    {
+      "cbsa": 27140,
+      "type": "TOTAL",
+      "actual": -0.10943,
+      "expected": 0.15398
+    }
+  ],
+  "27260": [
+    {
+      "cbsa": 27260,
+      "type": "ES",
+      "actual": -0.13511,
+      "expected": 0.14341
+    },
+    {
+      "cbsa": 27260,
+      "type": "EX",
+      "actual": -0.03026,
+      "expected": 0.09907
+    },
+    {
+      "cbsa": 27260,
+      "type": "MS",
+      "actual": 0.40352,
+      "expected": 0.27292
+    },
+    {
+      "cbsa": 27260,
+      "type": "TOTAL",
+      "actual": 0.16981,
+      "expected": 0.1984
+    },
+    {
+      "cbsa": 27260,
+      "type": "UC",
+      "actual": 0.17756,
+      "expected": 0.1995
+    }
+  ],
+  "28140": [
+    {
+      "cbsa": 28140,
+      "type": "ES",
+      "actual": 0.13145,
+      "expected": 0.16311
+    },
+    {
+      "cbsa": 28140,
+      "type": "EX",
+      "actual": -0.38821,
+      "expected": 0.13835
+    },
+    {
+      "cbsa": 28140,
+      "type": "MS",
+      "actual": -0.01189,
+      "expected": 0.1574
+    },
+    {
+      "cbsa": 28140,
+      "type": "TOTAL",
+      "actual": -0.00704,
+      "expected": 0.15757
+    }
+  ],
+  "28940": [
+    {
+      "cbsa": 28940,
+      "type": "ES",
+      "actual": 0.08119,
+      "expected": -0.06299
+    },
+    {
+      "cbsa": 28940,
+      "type": "EX",
+      "actual": -0.14379,
+      "expected": 0.03444
+    },
+    {
+      "cbsa": 28940,
+      "type": "MS",
+      "actual": -0.1241,
+      "expected": 0.15641
+    },
+    {
+      "cbsa": 28940,
+      "type": "TOTAL",
+      "actual": -0.1163,
+      "expected": 0.1368
+    }
+  ],
+  "29460": [
+    {
+      "cbsa": 29460,
+      "type": "ES",
+      "actual": -0.00888,
+      "expected": 0.24922
+    },
+    {
+      "cbsa": 29460,
+      "type": "TOTAL",
+      "actual": -0.00888,
+      "expected": 0.24922
+    }
+  ],
+  "29820": [
+    {
+      "cbsa": 29820,
+      "type": "MS",
+      "actual": 0.34455,
+      "expected": 0.2192
+    },
+    {
+      "cbsa": 29820,
+      "type": "TOTAL",
+      "actual": 0.34455,
+      "expected": 0.2192
+    }
+  ],
+  "30780": [
+    {
+      "cbsa": 30780,
+      "type": "ES",
+      "actual": -0.16483,
+      "expected": 0.10157
+    },
+    {
+      "cbsa": 30780,
+      "type": "EX",
+      "actual": -0.14006,
+      "expected": 0.09119
+    },
+    {
+      "cbsa": 30780,
+      "type": "TOTAL",
+      "actual": -0.16346,
+      "expected": 0.10099
+    }
+  ],
+  "31080": [
+    {
+      "cbsa": 31080,
+      "type": "TOTAL",
+      "actual": 0.14937,
+      "expected": 0.20619
+    },
+    {
+      "cbsa": 31080,
+      "type": "UC",
+      "actual": 0.14937,
+      "expected": 0.20619
+    }
+  ],
+  "31140": [
+    {
+      "cbsa": 31140,
+      "type": "ES",
+      "actual": -0.02187,
+      "expected": -0.00057
+    },
+    {
+      "cbsa": 31140,
+      "type": "EX",
+      "actual": -0.39144,
+      "expected": 0.04144
+    },
+    {
+      "cbsa": 31140,
+      "type": "MS",
+      "actual": -0.22843,
+      "expected": 0.06448
+    },
+    {
+      "cbsa": 31140,
+      "type": "TOTAL",
+      "actual": -0.0272,
+      "expected": 0.15373
+    },
+    {
+      "cbsa": 31140,
+      "type": "UC",
+      "actual": -0.02393,
+      "expected": 0.15834
+    }
+  ],
+  "32580": [
+    {
+      "cbsa": 32580,
+      "type": "MS",
+      "actual": 0.00186,
+      "expected": 0.39466
+    },
+    {
+      "cbsa": 32580,
+      "type": "TOTAL",
+      "actual": 0.00186,
+      "expected": 0.39466
+    }
+  ],
+  "32820": [
+    {
+      "cbsa": 32820,
+      "type": "ES",
+      "actual": 0.21403,
+      "expected": 0.11667
+    },
+    {
+      "cbsa": 32820,
+      "type": "EX",
+      "actual": -0.40371,
+      "expected": -0.02129
+    },
+    {
+      "cbsa": 32820,
+      "type": "MS",
+      "actual": -0.04576,
+      "expected": 0.08097
+    },
+    {
+      "cbsa": 32820,
+      "type": "TOTAL",
+      "actual": -0.04061,
+      "expected": 0.08147
+    }
+  ],
+  "33100": [
+    {
+      "cbsa": 33100,
+      "type": "MS",
+      "actual": 0.17115,
+      "expected": 0.19974
+    },
+    {
+      "cbsa": 33100,
+      "type": "TOTAL",
+      "actual": 0.11156,
+      "expected": 0.19153
+    },
+    {
+      "cbsa": 33100,
+      "type": "UC",
+      "actual": 0.10379,
+      "expected": 0.19046
+    }
+  ],
+  "33460": [
+    {
+      "cbsa": 33460,
+      "type": "ES",
+      "actual": 0.26657,
+      "expected": 0.08952
+    },
+    {
+      "cbsa": 33460,
+      "type": "EX",
+      "actual": 0.09535,
+      "expected": 0.14381
+    },
+    {
+      "cbsa": 33460,
+      "type": "MS",
+      "actual": -0.32777,
+      "expected": 0.02498
+    },
+    {
+      "cbsa": 33460,
+      "type": "TOTAL",
+      "actual": 0.08258,
+      "expected": 0.03223
+    },
+    {
+      "cbsa": 33460,
+      "type": "UC",
+      "actual": 0.09743,
+      "expected": 0.03203
+    }
+  ],
+  "34980": [
+    {
+      "cbsa": 34980,
+      "type": "ES",
+      "actual": 0.74462,
+      "expected": 0.36482
+    },
+    {
+      "cbsa": 34980,
+      "type": "EX",
+      "actual": -0.34237,
+      "expected": 0.20093
+    },
+    {
+      "cbsa": 34980,
+      "type": "MS",
+      "actual": 0.39211,
+      "expected": 0.3419
+    },
+    {
+      "cbsa": 34980,
+      "type": "TOTAL",
+      "actual": 0.4176,
+      "expected": 0.3428
+    }
+  ],
+  "35300": [
+    {
+      "cbsa": 35300,
+      "type": "TOTAL",
+      "actual": -0.32638,
+      "expected": 0.13295
+    },
+    {
+      "cbsa": 35300,
+      "type": "UC",
+      "actual": -0.32638,
+      "expected": 0.13295
+    }
+  ],
+  "35380": [
+    {
+      "cbsa": 35380,
+      "type": "ES",
+      "actual": 0.48202,
+      "expected": 0.22378
+    },
+    {
+      "cbsa": 35380,
+      "type": "EX",
+      "actual": 0.3998,
+      "expected": -0.09797
+    },
+    {
+      "cbsa": 35380,
+      "type": "TOTAL",
+      "actual": -0.19194,
+      "expected": -0.01096
+    },
+    {
+      "cbsa": 35380,
+      "type": "UC",
+      "actual": -0.20019,
+      "expected": -0.01229
+    }
+  ],
+  "35620": [
+    {
+      "cbsa": 35620,
+      "type": "ES",
+      "actual": -0.22817,
+      "expected": 0.1776
+    },
+    {
+      "cbsa": 35620,
+      "type": "EX",
+      "actual": -0.39549,
+      "expected": 0.20671
+    },
+    {
+      "cbsa": 35620,
+      "type": "MS",
+      "actual": -0.03597,
+      "expected": 0.04997
+    },
+    {
+      "cbsa": 35620,
+      "type": "TOTAL",
+      "actual": 0.41943,
+      "expected": 0.19631
+    },
+    {
+      "cbsa": 35620,
+      "type": "UC",
+      "actual": 0.42177,
+      "expected": 0.19704
+    }
+  ],
+  "35840": [
+    {
+      "cbsa": 35840,
+      "type": "MS",
+      "actual": -0.21187,
+      "expected": 0.02768
+    },
+    {
+      "cbsa": 35840,
+      "type": "TOTAL",
+      "actual": -0.13948,
+      "expected": 0.16081
+    },
+    {
+      "cbsa": 35840,
+      "type": "UC",
+      "actual": -0.09671,
+      "expected": 0.23946
+    }
+  ],
+  "36260": [
+    {
+      "cbsa": 36260,
+      "type": "EX",
+      "actual": -0.19776,
+      "expected": 0.06276
+    },
+    {
+      "cbsa": 36260,
+      "type": "MS",
+      "actual": 0.04513,
+      "expected": 0.28708
+    },
+    {
+      "cbsa": 36260,
+      "type": "TOTAL",
+      "actual": 0.10285,
+      "expected": 0.25978
+    },
+    {
+      "cbsa": 36260,
+      "type": "UC",
+      "actual": 0.18412,
+      "expected": 0.24844
+    }
+  ],
+  "36420": [
+    {
+      "cbsa": 36420,
+      "type": "ES",
+      "actual": -0.10252,
+      "expected": 0.15713
+    },
+    {
+      "cbsa": 36420,
+      "type": "EX",
+      "actual": -0.67037,
+      "expected": 0.01475
+    },
+    {
+      "cbsa": 36420,
+      "type": "MS",
+      "actual": 0.05882,
+      "expected": 0.25903
+    },
+    {
+      "cbsa": 36420,
+      "type": "TOTAL",
+      "actual": 0.04007,
+      "expected": 0.25003
+    }
+  ],
+  "36540": [
+    {
+      "cbsa": 36540,
+      "type": "ES",
+      "actual": -0.09181,
+      "expected": 0.15277
+    },
+    {
+      "cbsa": 36540,
+      "type": "EX",
+      "actual": 0.05851,
+      "expected": 0.16186
+    },
+    {
+      "cbsa": 36540,
+      "type": "MS",
+      "actual": 0.00073,
+      "expected": 0.14991
+    },
+    {
+      "cbsa": 36540,
+      "type": "TOTAL",
+      "actual": -0.00216,
+      "expected": 0.15005
+    }
+  ],
+  "36740": [
+    {
+      "cbsa": 36740,
+      "type": "ES",
+      "actual": -0.05347,
+      "expected": 0.37955
+    },
+    {
+      "cbsa": 36740,
+      "type": "TOTAL",
+      "actual": 0.05565,
+      "expected": 0.26154
+    },
+    {
+      "cbsa": 36740,
+      "type": "UC",
+      "actual": 0.06018,
+      "expected": 0.25665
+    }
+  ],
+  "37100": [
+    {
+      "cbsa": 37100,
+      "type": "MS",
+      "actual": 0.50514,
+      "expected": 0.09079
+    },
+    {
+      "cbsa": 37100,
+      "type": "TOTAL",
+      "actual": 0.50514,
+      "expected": 0.09079
+    }
+  ],
+  "37340": [
+    {
+      "cbsa": 37340,
+      "type": "TOTAL",
+      "actual": -0.08732,
+      "expected": 0.08084
+    },
+    {
+      "cbsa": 37340,
+      "type": "UC",
+      "actual": -0.08732,
+      "expected": 0.08084
+    }
+  ],
+  "37980": [
+    {
+      "cbsa": 37980,
+      "type": "ES",
+      "actual": 0.47786,
+      "expected": -0.02303
+    },
+    {
+      "cbsa": 37980,
+      "type": "MS",
+      "actual": -0.39197,
+      "expected": 0.07319
+    },
+    {
+      "cbsa": 37980,
+      "type": "TOTAL",
+      "actual": 0.23984,
+      "expected": 0.17902
+    },
+    {
+      "cbsa": 37980,
+      "type": "UC",
+      "actual": 0.3467,
+      "expected": 0.19704
+    }
+  ],
+  "38060": [
+    {
+      "cbsa": 38060,
+      "type": "EX",
+      "actual": 0.1492,
+      "expected": 0.39739
+    },
+    {
+      "cbsa": 38060,
+      "type": "MS",
+      "actual": -0.00285,
+      "expected": 0.22455
+    },
+    {
+      "cbsa": 38060,
+      "type": "TOTAL",
+      "actual": -0.00264,
+      "expected": 0.22479
+    }
+  ],
+  "38300": [
+    {
+      "cbsa": 38300,
+      "type": "ES",
+      "actual": -0.13177,
+      "expected": 0.08297
+    },
+    {
+      "cbsa": 38300,
+      "type": "EX",
+      "actual": -0.21201,
+      "expected": 0.0602
+    },
+    {
+      "cbsa": 38300,
+      "type": "TOTAL",
+      "actual": -0.06894,
+      "expected": 0.24142
+    },
+    {
+      "cbsa": 38300,
+      "type": "UC",
+      "actual": -0.06617,
+      "expected": 0.24671
+    }
+  ],
+  "38900": [
+    {
+      "cbsa": 38900,
+      "type": "ES",
+      "actual": 0.21799,
+      "expected": 0.27626
+    },
+    {
+      "cbsa": 38900,
+      "type": "EX",
+      "actual": 0.19173,
+      "expected": 0.25421
+    },
+    {
+      "cbsa": 38900,
+      "type": "MS",
+      "actual": 0.22471,
+      "expected": 0.294
+    },
+    {
+      "cbsa": 38900,
+      "type": "TOTAL",
+      "actual": 0.22409,
+      "expected": 0.29255
+    }
+  ],
+  "39300": [
+    {
+      "cbsa": 39300,
+      "type": "ES",
+      "actual": 0.21232,
+      "expected": 0.01634
+    },
+    {
+      "cbsa": 39300,
+      "type": "MS",
+      "actual": -0.05769,
+      "expected": 0.12476
+    },
+    {
+      "cbsa": 39300,
+      "type": "TOTAL",
+      "actual": -0.05505,
+      "expected": 0.12179
+    },
+    {
+      "cbsa": 39300,
+      "type": "UC",
+      "actual": -0.20538,
+      "expected": -0.0406
+    }
+  ],
+  "39340": [
+    {
+      "cbsa": 39340,
+      "type": "EX",
+      "actual": -0.28683,
+      "expected": 0.42739
+    },
+    {
+      "cbsa": 39340,
+      "type": "MS",
+      "actual": 0.30754,
+      "expected": 0.41138
+    },
+    {
+      "cbsa": 39340,
+      "type": "TOTAL",
+      "actual": 0.30718,
+      "expected": 0.41139
+    }
+  ],
+  "39580": [
+    {
+      "cbsa": 39580,
+      "type": "EX",
+      "actual": -0.31153,
+      "expected": 0.26196
+    },
+    {
+      "cbsa": 39580,
+      "type": "MS",
+      "actual": 0.12606,
+      "expected": 0.41049
+    },
+    {
+      "cbsa": 39580,
+      "type": "TOTAL",
+      "actual": 0.11922,
+      "expected": 0.40817
+    }
+  ],
+  "40060": [
+    {
+      "cbsa": 40060,
+      "type": "ES",
+      "actual": 0.41339,
+      "expected": 0.15067
+    },
+    {
+      "cbsa": 40060,
+      "type": "EX",
+      "actual": 4.19111,
+      "expected": 0.37612
+    },
+    {
+      "cbsa": 40060,
+      "type": "MS",
+      "actual": 0.04338,
+      "expected": 0.19233
+    },
+    {
+      "cbsa": 40060,
+      "type": "TOTAL",
+      "actual": 0.19948,
+      "expected": 0.20134
+    },
+    {
+      "cbsa": 40060,
+      "type": "UC",
+      "actual": 0.29645,
+      "expected": 0.20864
+    }
+  ],
+  "40140": [
+    {
+      "cbsa": 40140,
+      "type": "MS",
+      "actual": -0.01685,
+      "expected": 0.34264
+    },
+    {
+      "cbsa": 40140,
+      "type": "TOTAL",
+      "actual": -0.01685,
+      "expected": 0.34264
+    }
+  ],
+  "40380": [
+    {
+      "cbsa": 40380,
+      "type": "EX",
+      "actual": 0.15146,
+      "expected": -0.02824
+    },
+    {
+      "cbsa": 40380,
+      "type": "MS",
+      "actual": -0.38644,
+      "expected": 0.01001
+    },
+    {
+      "cbsa": 40380,
+      "type": "TOTAL",
+      "actual": -0.3795,
+      "expected": 0.00952
+    }
+  ],
+  "40900": [
+    {
+      "cbsa": 40900,
+      "type": "ES",
+      "actual": 0.11492,
+      "expected": 0.21705
+    },
+    {
+      "cbsa": 40900,
+      "type": "EX",
+      "actual": 0.28343,
+      "expected": 0.18068
+    },
+    {
+      "cbsa": 40900,
+      "type": "TOTAL",
+      "actual": -0.44308,
+      "expected": -0.02279
+    },
+    {
+      "cbsa": 40900,
+      "type": "UC",
+      "actual": -0.50232,
+      "expected": -0.04765
+    }
+  ],
+  "41180": [
+    {
+      "cbsa": 41180,
+      "type": "ES",
+      "actual": -0.0655,
+      "expected": 0.03601
+    },
+    {
+      "cbsa": 41180,
+      "type": "EX",
+      "actual": -0.08281,
+      "expected": -0.03426
+    },
+    {
+      "cbsa": 41180,
+      "type": "MS",
+      "actual": -0.04449,
+      "expected": -0.0103
+    },
+    {
+      "cbsa": 41180,
+      "type": "TOTAL",
+      "actual": -0.08023,
+      "expected": 0.17404
+    },
+    {
+      "cbsa": 41180,
+      "type": "UC",
+      "actual": -0.08256,
+      "expected": 0.18744
+    }
+  ],
+  "41620": [
+    {
+      "cbsa": 41620,
+      "type": "EX",
+      "actual": 0.04317,
+      "expected": 0.21208
+    },
+    {
+      "cbsa": 41620,
+      "type": "TOTAL",
+      "actual": 0.05589,
+      "expected": 0.24236
+    },
+    {
+      "cbsa": 41620,
+      "type": "UC",
+      "actual": 0.05591,
+      "expected": 0.2424
+    }
+  ],
+  "41700": [
+    {
+      "cbsa": 41700,
+      "type": "ES",
+      "actual": 0.06548,
+      "expected": 0.37863
+    },
+    {
+      "cbsa": 41700,
+      "type": "EX",
+      "actual": -0.08315,
+      "expected": 0.1679
+    },
+    {
+      "cbsa": 41700,
+      "type": "TOTAL",
+      "actual": 0.06241,
+      "expected": 0.37429
+    }
+  ],
+  "41740": [
+    {
+      "cbsa": 41740,
+      "type": "MS",
+      "actual": -0.02631,
+      "expected": 0.15017
+    },
+    {
+      "cbsa": 41740,
+      "type": "TOTAL",
+      "actual": -0.02631,
+      "expected": 0.15017
+    }
+  ],
+  "41860": [
+    {
+      "cbsa": 41860,
+      "type": "MS",
+      "actual": -0.11643,
+      "expected": 0.21725
+    },
+    {
+      "cbsa": 41860,
+      "type": "TOTAL",
+      "actual": 0.63606,
+      "expected": 0.33812
+    },
+    {
+      "cbsa": 41860,
+      "type": "UC",
+      "actual": 0.64098,
+      "expected": 0.33892
+    }
+  ],
+  "41940": [
+    {
+      "cbsa": 41940,
+      "type": "EX",
+      "actual": -0.49993,
+      "expected": 0.00694
+    },
+    {
+      "cbsa": 41940,
+      "type": "TOTAL",
+      "actual": 0.45572,
+      "expected": 0.28238
+    },
+    {
+      "cbsa": 41940,
+      "type": "UC",
+      "actual": 0.45747,
+      "expected": 0.28288
+    }
+  ],
+  "42540": [
+    {
+      "cbsa": 42540,
+      "type": "EX",
+      "actual": -0.57817,
+      "expected": 0.23959
+    },
+    {
+      "cbsa": 42540,
+      "type": "MS",
+      "actual": -0.30599,
+      "expected": 0.09146
+    },
+    {
+      "cbsa": 42540,
+      "type": "TOTAL",
+      "actual": -0.30743,
+      "expected": 0.09225
+    }
+  ],
+  "42660": [
+    {
+      "cbsa": 42660,
+      "type": "MS",
+      "actual": 0.28913,
+      "expected": 0.09869
+    },
+    {
+      "cbsa": 42660,
+      "type": "TOTAL",
+      "actual": 0.28913,
+      "expected": 0.09869
+    }
+  ],
+  "44060": [
+    {
+      "cbsa": 44060,
+      "type": "ES",
+      "actual": 0.06831,
+      "expected": 0.12568
+    },
+    {
+      "cbsa": 44060,
+      "type": "EX",
+      "actual": -0.21455,
+      "expected": -0.02727
+    },
+    {
+      "cbsa": 44060,
+      "type": "TOTAL",
+      "actual": 0.06702,
+      "expected": 0.12499
+    }
+  ],
+  "44700": [
+    {
+      "cbsa": 44700,
+      "type": "MS",
+      "actual": -0.28082,
+      "expected": 0.0123
+    },
+    {
+      "cbsa": 44700,
+      "type": "TOTAL",
+      "actual": -0.28082,
+      "expected": 0.0123
+    }
+  ],
+  "45060": [
+    {
+      "cbsa": 45060,
+      "type": "EX",
+      "actual": -0.4085,
+      "expected": 0.05657
+    },
+    {
+      "cbsa": 45060,
+      "type": "MS",
+      "actual": -0.17008,
+      "expected": 0.00288
+    },
+    {
+      "cbsa": 45060,
+      "type": "TOTAL",
+      "actual": -0.17817,
+      "expected": 0.0047
+    }
+  ],
+  "45300": [
+    {
+      "cbsa": 45300,
+      "type": "ES",
+      "actual": 0.0951,
+      "expected": 0.23447
+    },
+    {
+      "cbsa": 45300,
+      "type": "MS",
+      "actual": 0.25286,
+      "expected": 0.23146
+    },
+    {
+      "cbsa": 45300,
+      "type": "TOTAL",
+      "actual": 0.15708,
+      "expected": 0.20068
+    },
+    {
+      "cbsa": 45300,
+      "type": "UC",
+      "actual": -0.01603,
+      "expected": 0.14454
+    }
+  ],
+  "45780": [
+    {
+      "cbsa": 45780,
+      "type": "ES",
+      "actual": 0.10925,
+      "expected": -0.04655
+    },
+    {
+      "cbsa": 45780,
+      "type": "EX",
+      "actual": -0.43542,
+      "expected": -0.06893
+    },
+    {
+      "cbsa": 45780,
+      "type": "MS",
+      "actual": -0.20023,
+      "expected": 0.02105
+    },
+    {
+      "cbsa": 45780,
+      "type": "TOTAL",
+      "actual": -0.19085,
+      "expected": 0.01561
+    }
+  ],
+  "46060": [
+    {
+      "cbsa": 46060,
+      "type": "ES",
+      "actual": -0.24872,
+      "expected": 0.09489
+    },
+    {
+      "cbsa": 46060,
+      "type": "TOTAL",
+      "actual": -0.24872,
+      "expected": 0.09489
+    }
+  ],
+  "46140": [
+    {
+      "cbsa": 46140,
+      "type": "ES",
+      "actual": -0.05606,
+      "expected": 0.16413
+    },
+    {
+      "cbsa": 46140,
+      "type": "EX",
+      "actual": -0.19597,
+      "expected": 0.13032
+    },
+    {
+      "cbsa": 46140,
+      "type": "TOTAL",
+      "actual": -0.05748,
+      "expected": 0.16378
+    }
+  ],
+  "46520": [
+    {
+      "cbsa": 46520,
+      "type": "TOTAL",
+      "actual": 0.55552,
+      "expected": 0.10445
+    },
+    {
+      "cbsa": 46520,
+      "type": "UC",
+      "actual": 0.55552,
+      "expected": 0.10445
+    }
+  ],
+  "47260": [
+    {
+      "cbsa": 47260,
+      "type": "ES",
+      "actual": 1.16684,
+      "expected": -0.15141
+    },
+    {
+      "cbsa": 47260,
+      "type": "EX",
+      "actual": -0.10849,
+      "expected": -0.00932
+    },
+    {
+      "cbsa": 47260,
+      "type": "MS",
+      "actual": -0.05831,
+      "expected": -0.00676
+    },
+    {
+      "cbsa": 47260,
+      "type": "TOTAL",
+      "actual": 0.00172,
+      "expected": 0.02033
+    },
+    {
+      "cbsa": 47260,
+      "type": "UC",
+      "actual": 0.00125,
+      "expected": 0.02436
+    }
+  ],
+  "48620": [
+    {
+      "cbsa": 48620,
+      "type": "ES",
+      "actual": -0.2064,
+      "expected": 0.04796
+    },
+    {
+      "cbsa": 48620,
+      "type": "EX",
+      "actual": -0.09728,
+      "expected": 0.07734
+    },
+    {
+      "cbsa": 48620,
+      "type": "TOTAL",
+      "actual": -0.20476,
+      "expected": 0.0484
+    }
+  ],
+  "49180": [
+    {
+      "cbsa": 49180,
+      "type": "ES",
+      "actual": -0.55886,
+      "expected": 0.02586
+    },
+    {
+      "cbsa": 49180,
+      "type": "EX",
+      "actual": -0.11125,
+      "expected": -0.01185
+    },
+    {
+      "cbsa": 49180,
+      "type": "MS",
+      "actual": -0.1861,
+      "expected": 0.16516
+    },
+    {
+      "cbsa": 49180,
+      "type": "TOTAL",
+      "actual": -0.19709,
+      "expected": 0.16035
+    }
+  ],
+  "49660": [
+    {
+      "cbsa": 49660,
+      "type": "ES",
+      "actual": -0.71001,
+      "expected": -0.1326
+    },
+    {
+      "cbsa": 49660,
+      "type": "MS",
+      "actual": -0.11022,
+      "expected": 0.0127
+    },
+    {
+      "cbsa": 49660,
+      "type": "TOTAL",
+      "actual": -0.53765,
+      "expected": -0.09084
+    }
+  ]
+}
+;
+var county_counts = 
+[
+  {
+    "type": "ES",
+    "p": 36,
+    "ge": 23,
+    "n": 67
+  },
+  {
+    "type": "EX",
+    "p": 16,
+    "ge": 9,
+    "n": 63
+  },
+  {
+    "type": "MS",
+    "p": 32,
+    "ge": 13,
+    "n": 69
+  },
+  {
+    "type": "TOTAL",
+    "p": 48,
+    "ge": 16,
+    "n": 94
+  },
+  {
+    "type": "UC",
+    "p": 21,
+    "ge": 10,
+    "n": 33
+  }
+]
 ;
 var naics00 = 
 {
@@ -10557,8 +12756,8 @@ var naics00 =
       "expected": 0.21545
     },
   "19740": {
-      "actual": 0.10985,
-      "expected": 0.30312
+      "actual": 0.10759,
+      "expected": 0.30216
     },
   "19780": {
       "actual": -0.15818,
@@ -10825,8 +13024,8 @@ var naics00 =
       "expected": -0.09084
     },
   "99999": {
-      "actual": 0.29534,
-      "expected": 0.19896
+      "actual": 0.29531,
+      "expected": 0.19897
     }
 }
 ;
@@ -10931,5 +13130,5 @@ var metro_names =
     "99999": "U.S. 94 metro areas"
   }
 ;
-export {seq0data, sector_data, sector_counts, sector_names, naics00, metro_names}
+export {seq0data, sector_data, sector_counts, sector_names, county_data, county_counts, naics00, metro_names}
 ;

@@ -2,14 +2,12 @@ import on_resize from './on_resize.js';
 //import {county_counts} from './data.js';
 import palette from '../../../js-modules/palette.js';
 
-export default function seq6(container, i){
+function seq6(container, i){
 
     //var data = county_counts.slice(0).filter(function(d){return d.naics != "00"}).sort(function(a,b){return d3.descending(a.p, b.p)});
 
     //one time setup
     var wrap = d3.select(container).classed("chart-view",true).style("background","#dddddd");
-
-    wrap.append("p").classed("meta-header meta-header-2", true).html("<span>Job density across metro America</span>")
 
     wrap.append("div").classed("sticky-chart-title",true).append("p").html("Changes by county type");
 
@@ -67,3 +65,7 @@ export default function seq6(container, i){
     return views;
 
 }
+
+seq6.nviews = 3;
+
+export default seq6;
