@@ -6,7 +6,7 @@ library(jsonlite)
 #to do: revise with latest data
 # check counts against increase/greater_inc variables
 
-file <- here("Job density data extract 20190503.xlsx")
+file <- here("Job_density_data_extract_20190527.xlsx")
 data <- read_xlsx(file) %>% rename(cbsa_old = cbsa) %>% mutate(cbsa = ifelse(cbsa_old == 19430, 19380, cbsa_old))
 dayton <- filter(data, cbsa != cbsa_old)
 
@@ -22,9 +22,9 @@ sector15_ <- data %>% filter(type=="TOTAL", year==2015, !(cbsa %in% c(99997, 999
                 select(cbsa, naics, measure, pchange) %>% 
                 spread(measure, pchange)
 
-sector15counts <- sector15_ %>% mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0)) %>% filter(cbsa < 90000) %>% group_by(naics) %>% summarise(p=sum(p_), ge=sum(ge_))
+sector15counts <- sector15_ %>% mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0)) %>% filter(cbsa < 90000) %>% group_by(naics) %>% summarise(p=sum(p_), ge=sum(ge_), n=n())
 
-county_ <- data %>% filter(cbsa < 90000, naics=="00", year==2015, cntyfips=="00000") %>% select("cbsa", "type", "measure","pchange") %>% spread(measure, pchange) 
+county_ <- data %>% filter(cbsa < 90000, naics=="00", year==2015) %>% select("cbsa", "type", "measure","pchange") %>% spread(measure, pchange) 
 table(county_$type)
 
 countycounts <- county_ %>% mutate(p_=ifelse(actual>0,1,0), ge_=ifelse(actual > expected, 1, 0)) %>% group_by(type) %>% summarise(p=sum(p_), ge=sum(ge_), n=n())
