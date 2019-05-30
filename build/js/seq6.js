@@ -26,7 +26,7 @@ function seq6(container, i){
     }
 
     //one time setup
-    var types = ["TOTAL", "UC", "MS", "ES", "EX"];
+    var types = ["UC", "TOTAL", "MS", "ES", "EX"];
     var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
     var pchanges = {TOTAL: 0.295310915, UC: 0.327477276, MS: 0.138150200, ES: 0.055588711, EX: -0.182804719};
 

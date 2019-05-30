@@ -1,13 +1,16 @@
 import on_resize from './on_resize.js';
 import {county_counts} from './data.js';
 import palette from '../../../js-modules/palette.js';
+import pal from './pal.js';
 
-function seq5(container, i){
+function seq7(container, i){
 
     //one time setup
     var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
     var ordering = {TOTAL: "0", UC: "1", MS: "2", ES: "3", EX: "4"};
 
+    var types = ["UC", "TOTAL", "MS", "ES", "EX"];
+    var cols = pal(types);
 
     var data = county_counts.slice(0).sort(function(a, b){
         return ordering[a.type] - ordering[b.type];
@@ -34,7 +37,7 @@ function seq5(container, i){
 
     var rects = groups.selectAll("rect").data(function(d){return [d]})
                                 .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
-                                .attr("fill", palette.secondary.blue).style("shape-rendering","crispEdges")
+                                .attr("fill", function(d){return cols(d.type)}).style("shape-rendering","crispEdges")
                                 ;
 
     var scale_x = d3.scaleLinear().domain([0, 1]);
@@ -127,6 +130,6 @@ function seq5(container, i){
 
 }
 
-seq5.nviews = 2;
+seq7.nviews = 2;
 
-export default seq5;
+export default seq7;

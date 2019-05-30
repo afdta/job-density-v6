@@ -11903,8 +11903,8 @@
 	    };
 
 	    var titles = {
-	        all:"Metropolitan America saw a large increase in job density from 2004 to 2015",
-	        all_expected:"Actual density increased greater than expected in the 94 metro areas [headline tk]",
+	        all:"Metropolitan America actually saw an even greater increase in job density from 2004 to 2015",
+	        all_expected:"Metropolitan America saw a greater increase in job density from 2004 to 2015",
 	        big4:"Four extremely dense metro areas fueled much of metropolitan America’s increasing job density from 2004 to 2015",
 	        other:"Other metro areas saw a smaller overall increase in job density from 2004 to 2015"       
 	    };
@@ -13298,7 +13298,7 @@
 	    };
 
 	    //one time setup
-	    var types = ["TOTAL", "UC", "MS", "ES", "EX"];
+	    var types = ["UC", "TOTAL", "MS", "ES", "EX"];
 	    var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
 	    var pchanges = {TOTAL: 0.295310915, UC: 0.327477276, MS: 0.138150200, ES: 0.055588711, EX: -0.182804719};
 
@@ -13456,12 +13456,14 @@
 
 	seq6.nviews = 5;
 
-	function seq5$1(container, i){
+	function seq7(container, i){
 
 	    //one time setup
 	    var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
 	    var ordering = {TOTAL: "0", UC: "1", MS: "2", ES: "3", EX: "4"};
 
+	    var types = ["UC", "TOTAL", "MS", "ES", "EX"];
+	    var cols = pal(types);
 
 	    var data = county_counts.slice(0).sort(function(a, b){
 	        return ordering[a.type] - ordering[b.type];
@@ -13488,7 +13490,7 @@
 
 	    var rects = groups.selectAll("rect").data(function(d){return [d]})
 	                                .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
-	                                .attr("fill", palette.secondary.blue).style("shape-rendering","crispEdges")
+	                                .attr("fill", function(d){return cols(d.type)}).style("shape-rendering","crispEdges")
 	                                ;
 
 	    var scale_x = d3.scaleLinear().domain([0, 1]);
@@ -13580,7 +13582,7 @@
 
 	}
 
-	seq5$1.nviews = 2;
+	seq7.nviews = 2;
 
 	//main function
 	function main(){
@@ -13609,7 +13611,7 @@
 	        .append("p").html("Although metropolitan America as a whole saw a notable and greater-than-expected increase in job density, trends across individual metro areas varied considerably, and only a few saw greater-than-expected increases in job density.");
 
 	    
-	    sequence(container, [seq4, seq5, seq6, seq5$1], '<p id="group-seqs-2" class="meta-header meta-header-2"><span>Job density trends across metro America</span></p>');
+	    sequence(container, [seq4, seq5, seq6, seq7], '<p id="group-seqs-2" class="meta-header meta-header-2"><span>Job density trends across metro America</span></p>');
 	  
 	    wrap.append("div").classed("sequence-wrap",true).append("div").classed("center-col",true).html("<p>This analysis sheds light on how the overall economy and different industry sectors are expressing a demand for place by tracking trends in density of jobs—one measure of economic activity—within and among America’s large metro areas from 2004 to 2015, a period of dramatic economic change.</p><p>Metropolitan America as a whole saw a large and greater-than-expected increase in the density of jobs, which strongly suggests that the overall demand for place—for density—rose over the period of our analysis. Yet this increase was driven in large part by a select group of sectors and by the core urban counties of a small set of especially large and dense metro areas. Indeed, our look within metros revealed that almost every large metro area exhibited both job densification and job sprawl across its counties, yielding a more polycentric pattern of development in most places than previous studies of the distribution job density have described.</p><p>In all, these findings reveal a growing demand for density in metropolitan America—but also that individual metro areas could be doing far better when it comes to embracing equitable and sustainable economic growth, and in turn setting the stage for the kind of transformative placemaking solutions to create places where more businesses and workers can thrive.</p>");
 
