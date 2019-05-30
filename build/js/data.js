@@ -12645,6 +12645,320 @@ var county_counts =
   }
 ]
 ;
+var county_trend = 
+{
+  "ES": [
+    {
+      "type": "ES",
+      "year": 2004,
+      "value": 0
+    },
+    {
+      "type": "ES",
+      "year": 2005,
+      "value": -0.0185
+    },
+    {
+      "type": "ES",
+      "year": 2006,
+      "value": 0.01636
+    },
+    {
+      "type": "ES",
+      "year": 2007,
+      "value": -0.00842
+    },
+    {
+      "type": "ES",
+      "year": 2008,
+      "value": 0.01401
+    },
+    {
+      "type": "ES",
+      "year": 2009,
+      "value": -0.01127
+    },
+    {
+      "type": "ES",
+      "year": 2010,
+      "value": -0.00402
+    },
+    {
+      "type": "ES",
+      "year": 2011,
+      "value": 0.00433
+    },
+    {
+      "type": "ES",
+      "year": 2012,
+      "value": -0.01427
+    },
+    {
+      "type": "ES",
+      "year": 2013,
+      "value": 0.01898
+    },
+    {
+      "type": "ES",
+      "year": 2014,
+      "value": 0.01978
+    },
+    {
+      "type": "ES",
+      "year": 2015,
+      "value": 0.05559
+    }
+  ],
+  "EX": [
+    {
+      "type": "EX",
+      "year": 2004,
+      "value": 0
+    },
+    {
+      "type": "EX",
+      "year": 2005,
+      "value": -0.0533
+    },
+    {
+      "type": "EX",
+      "year": 2006,
+      "value": -0.02957
+    },
+    {
+      "type": "EX",
+      "year": 2007,
+      "value": -0.05722
+    },
+    {
+      "type": "EX",
+      "year": 2008,
+      "value": -0.05616
+    },
+    {
+      "type": "EX",
+      "year": 2009,
+      "value": -0.09254
+    },
+    {
+      "type": "EX",
+      "year": 2010,
+      "value": -0.05914
+    },
+    {
+      "type": "EX",
+      "year": 2011,
+      "value": -0.05552
+    },
+    {
+      "type": "EX",
+      "year": 2012,
+      "value": -0.18756
+    },
+    {
+      "type": "EX",
+      "year": 2013,
+      "value": -0.18984
+    },
+    {
+      "type": "EX",
+      "year": 2014,
+      "value": -0.18541
+    },
+    {
+      "type": "EX",
+      "year": 2015,
+      "value": -0.1828
+    }
+  ],
+  "MS": [
+    {
+      "type": "MS",
+      "year": 2004,
+      "value": 0
+    },
+    {
+      "type": "MS",
+      "year": 2005,
+      "value": 0.00426
+    },
+    {
+      "type": "MS",
+      "year": 2006,
+      "value": 0.03005
+    },
+    {
+      "type": "MS",
+      "year": 2007,
+      "value": 0.03676
+    },
+    {
+      "type": "MS",
+      "year": 2008,
+      "value": 0.09756
+    },
+    {
+      "type": "MS",
+      "year": 2009,
+      "value": 0.13549
+    },
+    {
+      "type": "MS",
+      "year": 2010,
+      "value": 0.16592
+    },
+    {
+      "type": "MS",
+      "year": 2011,
+      "value": 0.14518
+    },
+    {
+      "type": "MS",
+      "year": 2012,
+      "value": 0.12577
+    },
+    {
+      "type": "MS",
+      "year": 2013,
+      "value": 0.16927
+    },
+    {
+      "type": "MS",
+      "year": 2014,
+      "value": 0.22342
+    },
+    {
+      "type": "MS",
+      "year": 2015,
+      "value": 0.13815
+    }
+  ],
+  "TOTAL": [
+    {
+      "type": "TOTAL",
+      "year": 2004,
+      "value": 0
+    },
+    {
+      "type": "TOTAL",
+      "year": 2005,
+      "value": 0.00411
+    },
+    {
+      "type": "TOTAL",
+      "year": 2006,
+      "value": 0.02343
+    },
+    {
+      "type": "TOTAL",
+      "year": 2007,
+      "value": 0.04194
+    },
+    {
+      "type": "TOTAL",
+      "year": 2008,
+      "value": 0.10398
+    },
+    {
+      "type": "TOTAL",
+      "year": 2009,
+      "value": 0.14919
+    },
+    {
+      "type": "TOTAL",
+      "year": 2010,
+      "value": 0.16013
+    },
+    {
+      "type": "TOTAL",
+      "year": 2011,
+      "value": 0.19533
+    },
+    {
+      "type": "TOTAL",
+      "year": 2012,
+      "value": 0.20541
+    },
+    {
+      "type": "TOTAL",
+      "year": 2013,
+      "value": 0.24287
+    },
+    {
+      "type": "TOTAL",
+      "year": 2014,
+      "value": 0.26152
+    },
+    {
+      "type": "TOTAL",
+      "year": 2015,
+      "value": 0.29531
+    }
+  ],
+  "UC": [
+    {
+      "type": "UC",
+      "year": 2004,
+      "value": 0
+    },
+    {
+      "type": "UC",
+      "year": 2005,
+      "value": 0.00472
+    },
+    {
+      "type": "UC",
+      "year": 2006,
+      "value": 0.0226
+    },
+    {
+      "type": "UC",
+      "year": 2007,
+      "value": 0.04415
+    },
+    {
+      "type": "UC",
+      "year": 2008,
+      "value": 0.10742
+    },
+    {
+      "type": "UC",
+      "year": 2009,
+      "value": 0.15562
+    },
+    {
+      "type": "UC",
+      "year": 2010,
+      "value": 0.16342
+    },
+    {
+      "type": "UC",
+      "year": 2011,
+      "value": 0.20845
+    },
+    {
+      "type": "UC",
+      "year": 2012,
+      "value": 0.22428
+    },
+    {
+      "type": "UC",
+      "year": 2013,
+      "value": 0.26092
+    },
+    {
+      "type": "UC",
+      "year": 2014,
+      "value": 0.27421
+    },
+    {
+      "type": "UC",
+      "year": 2015,
+      "value": 0.32748
+    }
+  ]
+}
+;
 var naics00 = 
 {
   "10420": {
@@ -13130,5 +13444,5 @@ var metro_names =
     "99999": "U.S. 94 metro areas"
   }
 ;
-export {seq0data, sector_data, sector_counts, sector_names, county_data, county_counts, naics00, metro_names}
+export {seq0data, sector_data, sector_counts, sector_names, county_data, county_counts, county_trend, naics00, metro_names}
 ;

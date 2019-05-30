@@ -11,7 +11,7 @@ function seq4(container, i){
     //one time setup
     var wrap = d3.select(container).attr("id","sequence-1").classed("chart-view big-chart",true);
 
-    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas");
+    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas from 2004 to 2015");
 
     var t94 = geos_cbsa.filter(function(d){return naics00.hasOwnProperty(d.cbsa)});
 
@@ -80,7 +80,7 @@ function seq4(container, i){
 
     var views = [
         {
-            text:["Although metropolitan America saw a notable increase in job density as a whole, this trend was not widespread across metro areas."],
+            text:["These job density increases were not widespread across individual metro areas."],
             enter:function(){
                 wrap.style("opacity","1");
             },
@@ -94,7 +94,7 @@ function seq4(container, i){
             }
         },
         {
-            text:["Out of 94 large metro areas, only 48 posted increases in perceived job density during the period."],
+            text:["Out of the 94 large metro areas in our study, only 48 posted an increase in job density from 2004 to 2015. Of those, 14 metro areas saw job density increases that exceeded the 94-metro area average, led by San Francisco, Honolulu, Oxnard, Calif., Charlotte, N.C., and Albany, N.Y."],
             step: function(s){
                 if(s > 0){
                     points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 0.25});
@@ -103,33 +103,11 @@ function seq4(container, i){
             }
         },
         {
-            text: ["Talk about some places (here >= +40% density gain)", "It may be better to talk about 1-2 at a time to avoid labeling issues (especially relevant on mobile)."],
-            step: function(s){
-                if(s > 0){
-                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 0.25});
-                    labels.style("opacity", function(d){
-                        return naics00[d.key].actual > 0.4 ? 1 : 0;
-                    });
-                }
-            }
-        },
-        {
-            text: ["Meanwhile 46 saw perceived job density decline"],
+            text: ["Meanwhile, 46 metro areas saw perceived job density decline. Most declines were relatively modest. However, six metro areas saw declines greater than 30%, including Scranton, Pa. Cape Coral, Fla., New Haven, Conn., and Sacramento, Calif."],
             step: function(s){
                 if(s > 0){
                     points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
                     labels.style("opacity", "0");
-                }
-            }
-        },
-        {
-            text: ["Talk about big declines in density (here <= -30%). Also highlight places where actual change exceeded expected, and vice versa."],
-            step: function(s){
-                if(s > 0){
-                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
-                    labels.style("opacity", function(d){
-                        return naics00[d.key].actual < -0.3 ? 1 : 0;
-                    });
                 }
             }
         }

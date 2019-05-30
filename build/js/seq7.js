@@ -1,15 +1,23 @@
 import on_resize from './on_resize.js';
-import {sector_counts, sector_names} from './data.js';
+import {county_counts} from './data.js';
 import palette from '../../../js-modules/palette.js';
 
 function seq5(container, i){
 
-    var data = sector_counts.slice(0).filter(function(d){return d.naics != "00"}).sort(function(a,b){return d3.descending(a.p, b.p)});
+    //one time setup
+    var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
+    var ordering = {TOTAL: "0", UC: "1", MS: "2", ES: "3", EX: "4"};
+
+
+    var data = county_counts.slice(0).sort(function(a, b){
+        return ordering[a.type] - ordering[b.type];
+    });
+
 
     //one time setup
     var wrap = d3.select(container).classed("chart-view",true);
 
-    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Several industry sectors saw widespread increases in job density from 2004 to 2015");
+    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied within metro areas");
 
     var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
 
@@ -26,7 +34,7 @@ function seq5(container, i){
 
     var rects = groups.selectAll("rect").data(function(d){return [d]})
                                 .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
-                                .attr("fill", palette.primary.blue).style("shape-rendering","crispEdges")
+                                .attr("fill", palette.secondary.blue).style("shape-rendering","crispEdges")
                                 ;
 
     var scale_x = d3.scaleLinear().domain([0, 1]);
@@ -40,7 +48,7 @@ function seq5(container, i){
                         .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
                         .style("shape-rendering","crispEdges");
 
-    var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
+    var group_labels = groups.append("text").text(function(d){return names[d.type]})
                               .attr("x", "0")
                               .attr("dx","-5")
                               .attr("dy","5").attr("text-anchor","end")
@@ -57,8 +65,9 @@ function seq5(container, i){
         
         group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
         var group_h2 = Math.floor(group_h/2) + 0.5;
+        var group_h4 = Math.floor(group_h/4) + 0.5;
 
-        groups.interrupt().transition().duration(0).attr("transform", function(d,i){return "translate(0," + ((i*group_h)+group_h2) + ")"});
+        groups.interrupt().transition().duration(0).attr("transform", function(d,i){return "translate(0," + ((i*group_h) + group_h4) + ")"});
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
 
@@ -69,10 +78,8 @@ function seq5(container, i){
 
         axis_x(g_x_axis);
 
-        var half_height = Math.floor(group_h/2);
-
-        rects.attr("height", half_height).attr("width", function(d){return scale_x(d.p / d.n)});
-        group_labels.attr("dy", half_height-2);
+        rects.attr("height", group_h2).attr("width", function(d){return scale_x(d.p / d.n)});
+        group_labels.attr("dy", group_h2/1.5);
         
     }
 
@@ -86,44 +93,18 @@ function seq5(container, i){
 
     var views = [
         {
-            text:["Across the 94 large metro areas, only six sectors of the economy saw widespread increases in perceived job density from 2004 to 2015. The density of jobs in the health care and education sectors increased in 72 (or 77%) and 68 (72% of) metro areas, respectively."],
+            text:["Looking within metro areas we see a similar pattern—that is, job densification trends varied greatly within metro areas and seemed to be driven by a small set of already-dense parts of metro areas. While 64% of metro areas with core urban counties (where at least 95 percent of the residents live in urbanized areas) saw an increase in perceived job density in such counties, just 25% of metro areas saw perceived job density increase in their exurban counties (where less than 25 percent of residents live in urbanized areas)."],
             enter:function(){
                 wrap.style("opacity",1);
-                groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25}); 
+                groups.style("opacity", function(d,i){return "1"}); 
             },
             step: function(s){
                 if(s > 0){
-                    groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25});
+                    groups.style("opacity", function(d,i){return "1"});
                 }
             },
             exit:function(){
                 wrap.style("opacity",0.25);
-            }
-        },
-        {
-            text:["Gains in job density were least widespread in manufacturing, information, and local services—less than 20 (or 18% of) metro areas saw job density increase in these sectors."],
-            enter:function(){
-                groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
-            },
-            step: function(s){
-                if(s > 0){
-                    groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
-                }
-            },
-            exit:function(){
-            }
-        },
-        {
-            text:["Although the information sector saw a 41% increase in overall job density in the 94 metro areas taken together, this was driven largely by the increasing concentration of information jobs in the large and dense metro areas of San Francisco, New York, and Seattle."],
-            enter:function(){
-                groups.style("opacity", function(d,i){return i == 13 ? 1 : 0.25});
-            },
-            step: function(s){
-                if(s > 0){
-                    groups.style("opacity", function(d,i){return i == 13 ? 1 : 0.25});
-                }
-            },
-            exit:function(){
             }
         }
     ]

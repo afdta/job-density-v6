@@ -156,22 +156,14 @@ function seq1(container, i){
         if(c != "exit" && n!== current_view){
             wrap.style("opacity",1);
             if(n==0){
-                title.html("Most sectors saw job density increase from 2004 to 2015"); 
-                groups.style("opacity","1");
+                title.html("Most sectors’ jobs were expected to grow denser from 2004 to 2015 in metropolitan America"); 
                 show_just_expected();
-            }
-            else if(n==1){
-                title.html("Most sectors saw job density increase from 2004 to 2015"); 
-                show_just_expected();
-                groups.style("opacity", function(d){return d.actual > 0.4 ? "1" : "0.15"});
-            }
-            else if(n==2){
-                title.html("Expected job density change from 2004 to 2015"); 
-                show_actual();
                 groups.style("opacity", "1");
             }
-            else if(n==3){
-                //groups.style("opacity", function(d){ return d.actual < d.expected ? "1" : "0.15"});
+            else if(n==1){
+                title.html("Most sectors’ job density increased by more than expected from 2004 to 2015 in metropolitan America"); 
+                show_actual();
+                groups.style("opacity", "1")
             }
 
             current_view = n;
@@ -183,7 +175,7 @@ function seq1(container, i){
 
     var views = [
         {
-            text:["All but two sectors saw job density increas... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent a maximus quam. Integer suscipit tempor justo. Nullam a metus augue. Phasellus sit amet turpis ac."],
+            text:["If each sector’s job growth had accumulated according to where its existing jobs were located, we could have expected every industry sector except wholesale and manufacturing to post an increase in job density from 2004 to 2015."],
             step:function(s, c){step(0, s, c)},
             exit:function(){
                 current_view = null;
@@ -191,12 +183,8 @@ function seq1(container, i){
             }
         },
         {
-            text:["Four sectors ..."],
+            text:["Actually, every sector but manufacturing and logistics posted an increase in job density from 2004 to 2015. In most sectors, the actual change in job density exceeded the expected change. In the professional, hospitality, information, and headquarters sectors, actual job density increase by more than 40%."],
             step:function(s, c){step(1, s, c)},
-        },
-        {
-            text:["In most sectors, the expected change in job density was less than the actual change."],
-            step:function(s, c){step(2, s, c)},
         }
     ]
 

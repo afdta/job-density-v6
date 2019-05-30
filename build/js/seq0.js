@@ -1,6 +1,7 @@
 import on_resize from './on_resize.js';
 import {seq0data} from './data.js';
 import palette from '../../../js-modules/palette.js';
+import pal from './pal.js';
 
 
 function seq0(container, i){
@@ -13,7 +14,7 @@ function seq0(container, i){
     var wrap = wrap_.append("div").classed("chart-view",true);
     var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Metropolitan America saw a large increase in job density from 2004 to 2015"); 
     
-    var svg = wrap.append("div").style("max-width","800px").append("svg").attr("viewBox", "0 0 320 240");
+    var svg = wrap.append("div").style("max-width","900px").append("svg").attr("viewBox", "0 0 320 240");
 
     var g_y_axis = svg.append("g").classed("axis-group",true);
     var g_x_axis = svg.append("g").classed("axis-group",true);
@@ -21,9 +22,37 @@ function seq0(container, i){
     var g_trend = svg.append("g");
     var g_anno = svg.append("g");
 
-    var t_ = g_anno.selectAll("g.text-group").data([["94 metro areas"], ["New York", "Chicago", "San Francisco", "Seattle"], ["Other 90"], ["Expected:","94 metro areas"]])
-                                             .enter().append("g").classed("text-group",true).style("opacity","0");
-    var ts_ = t_.selectAll("text").data(function(d){return d}).enter().append("text").attr("y", function(d,i){return i*16}).text(function(d){return d}).style("font-size","15px").attr("dy","8");
+    var names = {
+        all:["94 metro areas"],
+        all_expected:["Expected:","94 metro areas"],
+        big4: ["New York", "Chicago", "San Francisco", "Seattle"],
+        other: ["Other 90"]
+    }
+
+    var label_pos = {
+        all:[2015, 0.3],
+        all_expected:[2015, 0.2],
+        big4:[2015, 0.4],
+        other:[2015, 0.1]
+    }
+
+    var titles = {
+        all:"Metropolitan America actually saw an even greater increase in job density from 2004 to 2015",
+        all_expected:"Metropolitan America saw a greater increase in job density from 2004 to 2015",
+        big4:"Four extremely dense metro areas fueled much of metropolitan America’s increasing job density from 2004 to 2015",
+        other:"Other metro areas saw a smaller overall increase in job density from 2004 to 2015"       
+    }
+
+    //what lines to show when a given view code is selected
+    var sequence = {
+        all: {all_expected:1, all:1, big4:0.25, other:0.25},
+        all_expected:{all_expected:1, all:0.25, big4:0.25, other:0.25},
+        big4: {all_expected:1, all:1, big4:1, other:0.25},
+        other: {all_expected:1, all:1, big4:1, other:1}
+    }
+
+    var t_ = g_anno.selectAll("g.text-group").data(["other", "all_expected", "all", "big4"]).enter().append("g").classed("text-group",true).style("opacity","0");
+    var ts_ = t_.selectAll("text").data(function(d){return names[d]}).enter().append("text").attr("y", function(d,i){return i*16}).text(function(d){return d}).style("font-size","15px").attr("dy","8");
 
     function dmap(key_){
         var key = arguments.length == 0 || key_ == null ? "actual" : key_;
@@ -31,22 +60,25 @@ function seq0(container, i){
             return {cbsa:d.cbsa, year:d.year, value:d[key]}
         }
     }
-    var values = [
-        data["99999"].map(dmap()),
-        data["99998"].map(dmap()),
-        data["99997"].map(dmap()),
-        data["99999"].map(dmap("expected")),
-    ]
+    var values = {
+        big4: data["99998"].map(dmap()),
+        all: data["99999"].map(dmap()),
+        all_expected: data["99999"].map(dmap("expected")),
+        other: data["99997"].map(dmap())
+    }
 
-    var lines = g_trend.selectAll("path").data(values)
+    var codes = ["big4", "all", "all_expected", "other"];
+    var cols = pal(codes);
+
+    var lines = g_trend.selectAll("path").data(codes)
                        .enter().append("path")
-                       .attr("stroke-width","2px")
+                       .attr("stroke-width","3px")
                        .style("opacity","0")
                        .attr("fill","none")
                        .attr("stroke", function(d,i){
-                           return i==0 || i==3 ? palette.primary.red : i==1 ? palette.primary.yellow : palette.primary.blue
+                           return cols(i);
                         })
-                        .attr("stroke-dasharray", function(d,i){return i==3 ? "2,2" : null})
+                        .attr("stroke-dasharray", function(d,i){return d=="all_expected" ? "2,2" : null})
                         ;
 
     var great_recession = g_back.append("rect").attr("fill","#dddddd").style("opacity","0");
@@ -61,16 +93,16 @@ function seq0(container, i){
                         ;
 
     var axis_y = d3.axisLeft(scale_y).ticks(4, "+,.0%");
-    var axis_x = d3.axisBottom(scale_x).tickValues([2005, 2010, 2015]).tickFormat(function(v){return v});
+    var axis_x = d3.axisBottom(scale_x).tickValues([2005, 2007, 2009, 2011, 2013, 2015]).tickFormat(function(v){return v});
 
     var aspect = 2/3;
-    var padding = {top:20, right:125, bottom: 40, left: 60 }
+    var padding = {top:20, right:120, bottom: 40, left: 60 }
 
     function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
+        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
         var h = this.h - 300;
         //var h = w * aspect;
-        if(h < 400){h = 400};
+        if(h < 300){h = 300};
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
         
@@ -81,14 +113,10 @@ function seq0(container, i){
         scale_y.range([h - padding.bottom, 0 + padding.top]);
 
         t_.attr("transform", function(d,i){
-            var v;
-            if(i == 0){v = 0.3}
-            else if(i == 1){v = 0.4}
-            else if(i == 2){v = 0.1}
-            else if(i == 3){v = 0.2};
-
-            var y = scale_y(v);
-            return "translate(" + (w-padding.right+3) + ", " + y + ")";
+            var xy = label_pos[d];
+            var y = scale_y(xy[1]);
+            var x = scale_x(xy[0]);
+            return "translate(" + (x+3) + ", " + y + ")";
         });
 
         var grid_lines_ = g_back.selectAll("line").data(scale_y.ticks(4));
@@ -107,7 +135,7 @@ function seq0(container, i){
         axis_x(g_x_axis);
         axis_y(g_y_axis);
 
-        lines.attr("d", function(d){return line(d)});
+        lines.attr("d", function(d){return line(values[d])});
 
     }
 
@@ -116,43 +144,29 @@ function seq0(container, i){
 
     var current_view = null;
 
-    function step(n, s, c){
-        if(c != "exit" && n!== current_view){
+    function step(vn, s, c){
+        if(c != "exit" && vn!== current_view){
             wrap.style("opacity",1);
-            lines.style("opacity", function(d,i){
-                if(n !== 3){
-                    return i <= n ? "1" : "0";
-                }
-                else{
-                    return i == n ? "1" : "0.25";
-                }
-            });
-            t_.style("opacity", function(d,i){
-                if(n !== 3){
-                    return i <= n ? "1" : "0";
-                }
-                else{
-                    return i == n ? "1" : "0.25";
-                }
-            });
+
+            var seq = sequence[vn];
+
+            lines.style("opacity", function(d,i){return seq[d]});
+            t_.style("opacity", function(d,i){return seq[d]});
+            
             great_recession.style("opacity", function(d,i){
-                return n > 0 ? "1" : "0";
+                return "1";
             })
 
-            if(n == 0){title.text("Metropolitan America saw a large increase in job density from 2004 to 2015")}
-            else if(n == 0.5){title.text("Great Recession headline ...")}
-            else if(n == 1){title.text("Very dense places headline")}
-            else if(n == 2){title.text("Other places headline")}
-            else if(n == 3){title.text("Actual density increased greater than expected in the 94 metro areas [headline tk]")}  
+            title.text(titles[vn])
             
-            current_view = n;
+            current_view = vn;
         }
     }
 
     var views = [
         {
-            text:["The perceived job density of all 94 large metro areas taken together increased nearly 30 percent, indicating job growth was highly concentrated in dense urban areas from 2004 to 2015."],
-            step:function(s, c){step(0, s, c)},
+            text:["If metro areas’ job growth had accumulated according to where their existing jobs were located, we could have expected the 94 large metropolitan areas in our study to post an overall increase in job density of about 20% from 2004 to 2015."],
+            step:function(s, c){step("all_expected", s, c)},
             exit:function(){
                 lines.style("opacity","0");
                 t_.style("opacity","0")
@@ -160,26 +174,28 @@ function seq0(container, i){
                 wrap.style("opacity",null);
             }
         },
-
         {
-            text:["During the Great Recession from 2007 to 2009, the average perceived job density increased more than 10 percent as suburban and exurban areas shed their jobs faster than denser urban areas. Perceived job density has steadily increased since 2009."],
-            step:function(s, c){step(0.5, s, c)},
+            text:["These 94 large metro areas actually posted a greater-than-expected increase in job density of 30%, which suggests that job growth during this period disproportionately favored already-dense parts of metro areas."],
+            step:function(s, c){step("all", s, c)},
+
         },
 
         {
-            text:["These overall trends in job density however were greatly influenced by a set of four extremely dense metro areas – New York, Chicago, San Francisco, and Seattle."],
-            step:function(s, c){step(1, s, c)}
+            text:["Actual job density in these 94 metro areas increased more than 10% over the course of the Great Recession from 2007 to 2009, as suburban and exurban areas shed their jobs faster than denser urban areas. Job density increased steadily in the years following the recession."],
+            step:function(s, c){step("all", s, c)},
         },
 
         {
-            text:["In contrast, job density in the other 90 large metro areas increased only 9 percent on average. However, these metro areas also show considerable variation in the direction and extent of changes in job density during this period."],
-            step:function(s, c){step(2, s, c)}
+            text:["The job density trends seen across these 94 metro areas were driven in large part by just four especially large and extremely dense metro areas: New York, Chicago, San Francisco, and Seattle. In fact, these four metro areas account for about 90% of the increase in job density seen among all 94 large metro areas during this period."],
+            step:function(s, c){step("big4", s, c)}
         },
 
         {
-            text:["This is the expected change in job density—what we would have expected to see if each office and factory added jobs at its industry-wide average rate"],
-            step:function(s, c){step(3, s, c)}
-        }
+            text:["In contrast, overall job density in the other 90 large metro areas increased only 9%."],
+            step:function(s, c){step("other", s, c)}
+        },
+
+
     ]
 
     //static, non-scrollytelling

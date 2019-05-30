@@ -1,3 +1,5 @@
+var fixed_header_height = 170;
+
 function on_resize(callback, init){
     var viewport = {};
 
