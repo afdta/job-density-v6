@@ -7,7 +7,7 @@ function seq7(container, i){
 
     //one time setup
     var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
-    var ordering = {TOTAL: "0", UC: "1", MS: "2", ES: "3", EX: "4"};
+    var ordering = {TOTAL: "4", UC: "0", MS: "1", ES: "2", EX: "3"};
 
     var types = ["UC", "TOTAL", "MS", "ES", "EX"];
     var cols = pal(types);
