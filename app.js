@@ -787,7 +787,7 @@
 	            }
 	        },
 	        {
-	            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile."],
+	            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile.", '<span style="color:red>Finalized chart labels TK</span>'],
 	            step:function(s, c){step(1, s, c);}
 	        },
 	        {
