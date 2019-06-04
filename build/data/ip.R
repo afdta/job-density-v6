@@ -13,6 +13,9 @@ dayton <- filter(data, cbsa != cbsa_old)
 #totals
 tots <- data %>% filter(cbsa > 90000, type=="TOTAL", naics=="00") %>% select("cbsa", "year","measure","density","pchange")
 types <- data %>% filter(cbsa == 99999, naics=="00", measure=="actual") %>% select("type", "year", "value"="pchange") %>% split(.$type)
+
+#trends
+trend_data <- data %>% filter(type=="TOTAL", naics=="00") %>% select("year", "measure", "pchange", "cbsa") %>% spread("measure", "pchange") %>% split(.$cbsa) %>% lapply(function(e){return(e %>% select(-cbsa))})
             
 tots_change <- tots %>% select(-density) %>% spread(key=measure, value=pchange) %>% split(.$cbsa)
 tots_density <- tots %>% select(-pchange) %>% spread(key=measure, value=density) %>% split(.$cbsa)
@@ -53,6 +56,7 @@ names_json <- unique(data[c("cbsa", "cbsaname")]) %>% spread(key=cbsa, value=cbs
 sector_counts_json <- toJSON(sector15counts, digits=5, pretty=TRUE)
 county_counts_json <- toJSON(countycounts, digits=5, pretty=TRUE)
 types_json <- toJSON(types, digits=5, pretty=TRUE)
+trend_json <- toJSON(trend_data, digits=5, pretty=TRUE)
 
 counts <- as.data.frame(table(sector15_$cbsa))
 
@@ -66,7 +70,8 @@ writeLines(c(
              "var county_trend = ", types_json, ";",
              "var naics00 = ", tots_json, ";",
              "var metro_names = ", names_json, ";",
-             "export {seq0data, sector_data, sector_counts, sector_names, county_data, county_counts, county_trend, naics00, metro_names}", ";"
+             "var trend_data = ", trend_json, ";",
+             "export {seq0data, sector_data, sector_counts, sector_names, county_data, county_counts, county_trend, naics00, metro_names, trend_data}", ";"
              ),
             here("../js/data.js"))
 
