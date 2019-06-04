@@ -31,7 +31,7 @@ function main(){
 
   //browser degradation
   if(compat.browser()){
-    sequence(container, [intro0], '<p>DEFINING TERMS</p>');
+    //sequence(container, [intro0], '<p>DEFINING TERMS</p>');
 
 
     sequence(container, [seq0, seq1], '<p id="group-seqs-1" class="meta-header meta-header-1"><span>Overall job density trends in metro America</span></p>');

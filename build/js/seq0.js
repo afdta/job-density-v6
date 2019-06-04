@@ -1,12 +1,10 @@
-import on_resize from './on_resize.js';
 import {seq0data} from './data.js';
 import palette from '../../../js-modules/palette.js';
 import pal from './pal.js';
 
+function seq0(container){
 
-function seq0(container, i){
-
-    var wrap_ = d3.select(container).attr("id", "sequence-0").append("div");
+    var wrap_ = d3.select(container).append("div");
 
     //one time setup
     var data = seq0data.changes;
@@ -45,9 +43,9 @@ function seq0(container, i){
 
     //what lines to show when a given view code is selected
     var sequence = {
-        all: {all_expected:1, all:1, big4:0.25, other:0.25},
-        all_expected:{all_expected:1, all:0.25, big4:0.25, other:0.25},
-        big4: {all_expected:1, all:1, big4:1, other:0.25},
+        all: {all_expected:1, all:1, big4:0, other:0},
+        all_expected:{all_expected:1, all:0, big4:0, other:0},
+        big4: {all_expected:1, all:1, big4:1, other:0},
         other: {all_expected:1, all:1, big4:1, other:1}
     }
 
@@ -99,10 +97,10 @@ function seq0(container, i){
     var padding = {top:20, right:120, bottom: 40, left: 60 }
 
     function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
-        var h = this.h - 300;
-        //var h = w * aspect;
-        if(h < 300){h = 300};
+        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);        
+        var h = this.gh - 250;
+        if(h < 200){h = 200};
+        w = w - 30;
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
         
@@ -138,9 +136,6 @@ function seq0(container, i){
         lines.attr("d", function(d){return line(values[d])});
 
     }
-
-    //register resize callback. initialize
-    var redraw_ = on_resize(redraw, true);
 
     var current_view = null;
 
@@ -193,30 +188,13 @@ function seq0(container, i){
         {
             text:["In contrast, overall job density in the other 90 large metro areas increased only 9%."],
             step:function(s, c){step("other", s, c)}
-        },
-
-
+        }
     ]
 
-    //static, non-scrollytelling
-    if(arguments.length > 1){
-        //panel_number.style("display","block");
-        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-        var j = -1;
-        while(++j <= i){
-            if(views[j].hasOwnProperty("enter")){
-                views[j].enter.call(p);
-            }
-            if(views[j].hasOwnProperty("step")){
-                views[j].step.call(p, 1);
-            }
-        }
-    }
-
-    return views;
+    return {resize: redraw, views:views};
 
 }
 
-seq0.nviews = 5;
+//seq0.nviews = 5;
 
 export default seq0;

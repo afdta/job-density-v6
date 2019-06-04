@@ -49,9 +49,10 @@ function seq5(container, i){
     var group_h;
 
     function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-        var h = w * aspect;
-        if(h < 400){h = 400};
+        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
+        var h = this.gh - 250;
+        if(h < 200){h = 200};
+        w = w - 30;
 
         scale_x.range([0, w - padding.right - padding.left]);
         
@@ -75,13 +76,6 @@ function seq5(container, i){
         group_labels.attr("dy", half_height-2);
         
     }
-
-    //register resize callback. initialize
-    on_resize(redraw, true);
-
-    //set extent
-
-    //redraw
 
 
     var views = [
@@ -142,10 +136,8 @@ function seq5(container, i){
         }
     }
 
-    return views;
+    return {views:views, resize:redraw};
 
 }
-
-seq5.nviews = 2;
 
 export default seq5;

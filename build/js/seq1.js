@@ -5,7 +5,7 @@ import palette from '../../../js-modules/palette.js';
 
 function seq1(container, i){
 
-    var wrap_ = d3.select(container).attr("id", "sequence-1").append("div");
+    var wrap_ = d3.select(container).append("div");
 
     //one time setup
     var wrap = wrap_.append("div").classed("chart-view",true);
@@ -84,38 +84,11 @@ function seq1(container, i){
     }
 
 
-    /*function translate(d,i){
-        var v = d[current_value_prop];
-        var x = scale_x(v);
-        var y = (i*group_h) + (group_h/2);
-        return "translate(" + x + "," + y + ")";
-    }
-
-    function show_actual(){
-        current_value_prop = "actual";
-        groups.interrupt().transition().duration(1200).attr("transform", translate);
-        group_connectors.interrupt()
-                        .transition().duration(1200)
-                        .attr("x2","0");
-    }
-
-    function show_expected(){
-        current_value_prop = "expected";
-        groups.interrupt().transition().duration(1200).attr("transform", translate);
-        group_connectors.interrupt()
-                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
-                        .transition().duration(1200)
-                        .attr("x2", function(d){return (scale_x(d.actual) - scale_x(d.expected))})
-                        //.on("end", function(d){d3.select(this).style("opacity","0")})                        
-                        ;
-    }
-    */
-
     function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
-        var h = this.h - 300;
-        //var h = w * aspect;
-        if(h < 400){h = 400};
+        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
+        var h = this.gh - 250;
+        if(h < 200){h = 200};
+        w = w - 30;
 
         scale_x.range([0, w - padding.right - padding.left]);
         
@@ -146,9 +119,6 @@ function seq1(container, i){
         }
         
     }    
-
-    //register resize callback. initialize
-    var redraw_ = on_resize(redraw, true);
 
     var current_view = null;
 
@@ -203,10 +173,8 @@ function seq1(container, i){
         }
     }
 
-    return views;
+    return {resize:redraw, views:views};
 
 }
-
-seq1.nviews = 3;
 
 export default seq1;

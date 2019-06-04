@@ -25,14 +25,19 @@ export default function sequence(container, seqs, header, threshold){
     if(scrolly.supported()){
 
         var stuck = wrap.append("div");
-        var header = stuck.append("div").html(header);
+        var header = stuck.append("div").style("border-bottom","1px solid #aaaaaa").html(header);
 
         var scr = scrolly(stuck.node(), 90);
 
         seqs.forEach(function(seq){
             var view = scr.view();
 
-            var views = seq(view.node());
+            //each sequence returns
+            var view_setup = seq(view.node());
+
+            var views = view_setup.views;
+            
+            view.resize(view_setup.resize);
 
             views.forEach(function(d){
                 //text [c]ontainer
@@ -53,12 +58,49 @@ export default function sequence(container, seqs, header, threshold){
 
         var header = wrap.append("div").html(header);
 
+        function loop_to(i, views){
+            var j = -1;
+            while(++j <= i){
+                if(views[j].hasOwnProperty("enter")){
+                    views[j].enter.call({});
+                }
+                if(views[j].hasOwnProperty("step")){
+                    views[j].step.call({}, 1);
+                }
+            }
+        }
+
+        var resize_stack = [];
         seqs.forEach(function(seq){
-            //draw all views using form setup(container, view_num)
-            views = wrap.append("div").selectAll("div.static-panel").data(d3.range(0,seq.nviews)).enter().append("div").classed("static-panel",true);
-            views.each(function(d){
-                seq(this, d);
-            });
+            //draw first case
+            var wrap0 = wrap.append("div").classed("static-panel",true).style("min-height","1px");
+            var v0 = seq(wrap0.node());
+            wrap0.append("div").classed("static-panel-caption",true)
+                 .selectAll("p").data(v0.views[0].text).enter().append("p").html(function(t){return t});
+            loop_to(0, v0.views);
+            resize_stack.push(v0.resize);
+
+            //draw any remaining views
+            if(v0.views.length > 1){
+                d3.range(1, v0.views.length).forEach(function(i){
+                    var wrapz = wrap.append("div").classed("static-panel", true);
+                    var vz = seq(wrapz.node());
+                    wrapz.append("div").classed("static-panel-caption", true)
+                        .selectAll("p").data(vz.views[i].text).enter().append("p").html(function(t){return t});
+                    loop_to(i, vz.views);
+                    resize_stack.push(vz.resize);
+                })
+            }
+
+            var resize_statics = function(){
+                var dims = scrolly.dims(wrap0.node(), 90);
+                resize_stack.forEach(function(fn){
+                    fn.call(dims);
+                });
+            }
+
+            resize_statics();
+            window.addEventListener("resize", resize_statics);
         });
 
     }

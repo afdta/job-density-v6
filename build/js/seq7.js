@@ -44,7 +44,7 @@ function seq7(container, i){
     var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return Math.round(v*100)+"%"});
 
 
-    var axis_title = svg.append("text").attr("y",20).attr("x", padding.left - 5);
+    var axis_title = svg.append("text").attr("y",20).attr("text-anchor","end").style("font-size","15px");
     axis_title.append("tspan").text("% of metro areas where job density increased");
 
     var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
@@ -60,9 +60,10 @@ function seq7(container, i){
     var group_h;
 
     function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-        var h = w * aspect;
-        if(h < 400){h = 400};
+        var w = this.vw < 320 ? 320 : (this.vw > 800 ? 800 : this.vw);
+        var h = this.gh - 350;
+        if(h < 200){h = 200};
+        w = w - 30;
 
         scale_x.range([0, w - padding.right - padding.left]);
         
@@ -81,18 +82,12 @@ function seq7(container, i){
 
         axis_x(g_x_axis);
 
+        axis_title.attr("x", 150 + scale_x(1));
+
         rects.attr("height", group_h2).attr("width", function(d){return scale_x(d.p / d.n)});
         group_labels.attr("dy", group_h2/1.5);
         
     }
-
-    //register resize callback. initialize
-    on_resize(redraw, true);
-
-    //set extent
-
-    //redraw
-
 
     var views = [
         {
@@ -126,10 +121,8 @@ function seq7(container, i){
         }
     }
 
-    return views;
+    return {views:views, resize:redraw};
 
 }
-
-seq7.nviews = 2;
 
 export default seq7;

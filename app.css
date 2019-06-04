@@ -10,6 +10,17 @@ div.static-panel{
     margin-bottom:30vh;
 }
 
+div.static-panel-caption{
+    max-width:900px;
+    margin:0px auto;
+}
+
+div.static-panel-caption p{
+    font-style:italic;
+    line-height:1.5em;
+    max-width:650px;
+}
+
 p.panel-number{
     font-style:italic;
     font-size:0.875rem;
@@ -47,16 +58,16 @@ div.scrolling-panel > p > span{
 
 div.center-col{
     max-width:900px;
-    margin:1rem 0px;
-    padding:15px;
+    margin:0rem 15px 1rem 15px;
 }
 
 div.center-col p{
     line-height:1.7em;
-    max-width:850px;
-    width:80%;
-    margin-right:10%;
-    margin-left:10%;
+    max-width:700px;
+    border-radius:3px;
+    border:1px solid #aaaaaa;
+    padding:15px;
+    margin:0rem auto 2rem auto;
 }
 
 .meta-tag{
@@ -87,23 +98,25 @@ div.center-col p{
 
 .sequence-wrap{
     max-width:1400px;
-    margin:0px auto 10vh auto;
+    margin:0px auto 0px auto;
     
 }
 
 .sticky-el{
-    padding:15px;
-    border-top:1px solid #aaaaaa;
+    padding:0px 15px;
+    border-top:0px solid #aaaaaa;
     position:relative;
     position:-webkit-sticky;
     position:sticky;
+    height:100%;
     height:100vh;
 }
 
 .sticky-chart-title{
-    max-width:800px;
-    padding:5px 0px 15px 0px;
-    margin:0px;
+    padding:5px 0px 10px 9px;
+    margin:5px auto 10px auto;
+    border-bottom:0px solid #aaaaaa;
+    line-height:1.6em;
 }
 
 .sticky-chart-title > *{
@@ -154,16 +167,16 @@ div.center-col p{
 }
 
 .meta-header{
-    margin:0px 0px 10px 0px;
+    margin:10px 0px -1px 0px;
 }
 
 .meta-header > *{
-    padding:6px 6px;
+    padding:6px 9px;
     line-height:1em;
-    font-size:18px;
+    font-size:24px;
     font-weight:bold;
     color:#eeeeee;
-    border-radius:7px;
+    border-radius:0px;
     display:inline-block;
 
     text-decoration:none;
@@ -185,6 +198,12 @@ div.center-col p{
     color:#333333;
 }
 
+.metro-interactive p *{
+    font-size:inherit;
+    font-weight:inherit;
+    text-decoration:inherit;
+    font-style:inherit;
+}
 
 @media (min-width:0px){
     div.scrolling-panel{
@@ -193,6 +212,16 @@ div.center-col p{
 
     .chart-view{
         margin:0px auto;
+    }
+
+    .metro-interactive p{
+        font-size: 16px;
+    }
+
+    .metro-interactive .sticky-chart-title *, .metro-interactive .meta-header > *{
+        font-size:18px;
+        font-weight:bold;
+        line-height:1.2em;
     }
 }
 
@@ -203,5 +232,15 @@ div.center-col p{
 
     .chart-view{
         margin:0px auto 0px 0px;
+    }
+
+    .metro-interactive p{
+        font-size: 18px;
+    }
+
+    .metro-interactive .sticky-chart-title *, .metro-interactive .meta-header > *{
+        font-size:24px;
+        font-weight:bold;
+        line-height:1.3em;
     }
 }

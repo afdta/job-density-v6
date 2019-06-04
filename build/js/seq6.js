@@ -73,10 +73,10 @@ function seq6(container, i){
     var padding = {top:20, right:120, bottom: 40, left: 60 }
 
     function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
-        var h = this.h - 300;
-        //var h = w * aspect;
-        if(h < 400){h = 400};
+        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
+        var h = this.gh - 250;
+        if(h < 200){h = 200};
+        w = w - 30;
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
         
@@ -113,9 +113,6 @@ function seq6(container, i){
         lines.attr("d", function(d){return line(county_trend[d])});
 
     }
-
-    //register resize callback. initialize
-    var redraw_ = on_resize(redraw, true);
 
     var current_view = null;
 
@@ -182,7 +179,7 @@ function seq6(container, i){
         }
     }
 
-    return views;
+    return {views:views, resize:redraw};
 
 }
 

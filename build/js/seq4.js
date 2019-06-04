@@ -62,20 +62,22 @@ function seq4(container, i){
 
     var labels = cbsa_layer.labels();
     var points = cbsa_layer.points();
+    var mapaspect = 1.8;
 
     function redraw(){
-        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-        var h = w * aspect;
-        if(h < 400){h = 400};
-        
+        var h = this.gh - 250;
+        if(h < 300){h = 300};
+
+        var w0 = h*mapaspect;
+        var w1 = this.vw > 900 ? 900 : this.vw;
+        w1 = w1 - 30; //subtract padding
+
+        console.log(this.vw);
+
+        var w = Math.min(w0, w1);
+
+        main_map.print(w);
     }
-
-    //register resize callback. initialize
-    on_resize(redraw, true);
-
-    //set extent
-
-    //redraw
 
 
     var views = [
@@ -128,10 +130,8 @@ function seq4(container, i){
         }
     }
 
-    return views;
+    return {resize:redraw, views:views};
 
 }
-
-seq4.nviews = 5;
 
 export default seq4;

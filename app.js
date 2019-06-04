@@ -112,13 +112,39 @@
 	    return browser_support;
 	}
 
+	function scrolly_dims(element, top_){
+	    //record viewport dimensions
+	    var vh = Math.max(document.documentElement.clientHeight, (window.innerHeight || 0));
+	    var vw = document.documentElement.clientWidth && window.innerWidth ?
+	            Math.min(document.documentElement.clientWidth, window.innerWidth) : 
+	            document.documentElement.clientWidth || window.innerWidth; 
+	    var gh;
+	    var gw;
+
+	    var top = arguments.length > 1 && top_ != null ? top_ : 0;
+
+	    var el_box = element.getBoundingClientRect();
+	    
+	    try{
+	        gw = el_box.right-el_box.left;
+	    }
+	    catch(e){
+	        gw = null;
+	    }
+
+	    gh = vh - top;
+
+	    return {vw:vw, vh:vh, gh:gh, gw:gw};
+	}
+
 	// Credit: This module was inspired by Russell Goldenberg's enter-view module [License: https://github.com/russellgoldenberg/enter-view/blob/master/LICENSE]
 
 	function scrolly(element, top_, default_threshold_){
 	    
-	    var sticky_el = d3.select(element);
-	    
-	    sticky_el.style("position", "sticky").style("top", arguments.length > 1 && top_ != null ? (top_+"px") : "0px").classed("sticky-el",true);
+	    var top = arguments.length > 1 && top_ != null ? top_ : 0;
+	    var sticky_el = d3.select(element).style("min-height","1px")
+	                     .style("position", "sticky").style("top","0px").style("padding-top", top + "px")
+	                     .style("box-sizing","border-box").classed("sticky-el",true);
 
 	    //place actual graphics here
 	    var views_wrap = sticky_el.append("div").style("position","relative");
@@ -138,7 +164,6 @@
 	    
 	    // viewport dimensions
 	    var vh;
-	    var vw;
 
 	    var default_threshold = default_threshold_ != null ? default_threshold_ : 0.15;
 
@@ -270,13 +295,22 @@
 	        }
 	    }
 
+	    var resize_stack = [];
+
 	    function set_dims(){
-	        //record viewport dimensions
-	        vh = Math.max(document.documentElement.clientHeight, (window.innerHeight || 0));
-	        vw = document.documentElement.clientWidth && window.innerWidth ?
-	                Math.min(document.documentElement.clientWidth, window.innerWidth) : 
-	                document.documentElement.clientWidth || window.innerWidth;      
+
+	        var viewport = scrolly_dims(element, top);
+	        
+	        vh = viewport.vh;
+
+	        resize_stack.forEach(function(fn){
+	            fn.call(viewport);
+	        });
+
+	        return viewport;
 	    }
+
+	    set_dims(); //initialize
 
 	    //API exposed to user of module
 	    var methods = {};
@@ -333,6 +367,16 @@
 
 	        m.node = function(){return view_wrap.node()};
 
+	        m.resize = function(fn){
+	            resize_stack.push(fn);
+	            
+	            //set and get dims
+	            var vp = set_dims();
+	            
+	            //initialize
+	            fn.call(vp);
+	        };
+
 	        return m;
 	    };
 
@@ -340,12 +384,17 @@
 	        return browser_support;
 	    };
 
+	    //update and retrieve dimensions: viewport dimensions (vh, vw) and (maximum) graphics dimensions (gh, gw)
+	    methods.dims = set_dims;
+
 	    return methods;
 	    
 	}
 
-	//static method
+	//static methods
 	scrolly.supported = scrolly_supported;
+
+	scrolly.dims = scrolly_dims;
 
 	// the setup function must take two arguments: setup(container, view_num)
 	// if setup is called with both arguments, it should draw the requested view (view_num) of the graphic, running setup first. 
@@ -372,14 +421,19 @@
 	    if(scrolly.supported()){
 
 	        var stuck = wrap.append("div");
-	        var header = stuck.append("div").html(header);
+	        var header = stuck.append("div").style("border-bottom","1px solid #aaaaaa").html(header);
 
 	        var scr = scrolly(stuck.node(), 90);
 
 	        seqs.forEach(function(seq){
 	            var view = scr.view();
 
-	            var views = seq(view.node());
+	            //each sequence returns
+	            var view_setup = seq(view.node());
+
+	            var views = view_setup.views;
+	            
+	            view.resize(view_setup.resize);
 
 	            views.forEach(function(d){
 	                //text [c]ontainer
@@ -400,12 +454,49 @@
 
 	        var header = wrap.append("div").html(header);
 
+	        function loop_to(i, views){
+	            var j = -1;
+	            while(++j <= i){
+	                if(views[j].hasOwnProperty("enter")){
+	                    views[j].enter.call({});
+	                }
+	                if(views[j].hasOwnProperty("step")){
+	                    views[j].step.call({}, 1);
+	                }
+	            }
+	        }
+
+	        var resize_stack = [];
 	        seqs.forEach(function(seq){
-	            //draw all views using form setup(container, view_num)
-	            views = wrap.append("div").selectAll("div.static-panel").data(d3.range(0,seq.nviews)).enter().append("div").classed("static-panel",true);
-	            views.each(function(d){
-	                seq(this, d);
-	            });
+	            //draw first case
+	            var wrap0 = wrap.append("div").classed("static-panel",true).style("min-height","1px");
+	            var v0 = seq(wrap0.node());
+	            wrap0.append("div").classed("static-panel-caption",true)
+	                 .selectAll("p").data(v0.views[0].text).enter().append("p").html(function(t){return t});
+	            loop_to(0, v0.views);
+	            resize_stack.push(v0.resize);
+
+	            //draw any remaining views
+	            if(v0.views.length > 1){
+	                d3.range(1, v0.views.length).forEach(function(i){
+	                    var wrapz = wrap.append("div").classed("static-panel", true);
+	                    var vz = seq(wrapz.node());
+	                    wrapz.append("div").classed("static-panel-caption", true)
+	                        .selectAll("p").data(vz.views[i].text).enter().append("p").html(function(t){return t});
+	                    loop_to(i, vz.views);
+	                    resize_stack.push(vz.resize);
+	                });
+	            }
+
+	            var resize_statics = function(){
+	                var dims = scrolly.dims(wrap0.node(), 90);
+	                resize_stack.forEach(function(fn){
+	                    fn.call(dims);
+	                });
+	            };
+
+	            resize_statics();
+	            window.addEventListener("resize", resize_statics);
 	        });
 
 	    }
@@ -438,111 +529,6 @@
 		mediumgray: "#aaaaaa",
 		lightgray: "#eeeeee"
 	};
-
-	function intro0(container, i){
-
-	    var wrap_ = d3.select(container).attr("id", "intro-0").append("div");
-
-	    //one time setup
-
-	    var wrap = wrap_.append("div").classed("chart-view",true);
-	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Defining perceived job density"); 
-
-	    var svg = wrap.append("svg");
-
-	    var groups = svg.selectAll("g").data(["a","b","c"]).enter().append("g");
-
-	    var hlines = groups.selectAll("line.h-line").data([1,2]).enter().append("line").classed("h-line",true).style("shape-rendering","crispEdges").attr("x1",0).attr("stroke","#dddddd");
-	    var vlines = groups.selectAll("line.v-line").data([1,2]).enter().append("line").classed("v-line",true).style("shape-rendering","crispEdges").attr("y1",0).attr("stroke","#dddddd");
-
-	    var rects = groups.append("rect").attr("x","0").attr("y",0).attr("rx","11").attr("ry","11")
-	                    .attr("fill","none").attr("stroke","#333333").attr("stroke-width","1px");
-	                    //.style("shape-rendering","crispEdges");
-
-	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
-	        var h = this.h - 300;
-	        
-	        //var h = w * aspect;
-	        if(h < 400){h = 400;}
-	        var w_gap = Math.floor(w/12);
-	        var w_square = Math.floor(w/4);
-	        var h_square = w_square;
-	        var w_ = w_gap + w_square;
-	        var w_3 = Math.floor(w_square/3);
-
-	        svg.attr("viewBox", "0 0 " + w + " " + h);
-	        
-	        groups.attr("transform", function(d,i){
-	            return "translate(" + ((i*w_)+0.5) + "," + (w_gap+0.5) + ")"
-	        });
-
-	        vlines.attr("y2", h_square)
-	              .attr("x1", function(d,i){return d*(w_3)})
-	              .attr("x2", function(d,i){return d*(w_3)});
-
-	        hlines.attr("x2", h_square)
-	              .attr("y1", function(d,i){return d*(w_3)})
-	              .attr("y2", function(d,i){return d*(w_3)});
-
-	        rects.attr("width", w_square).attr("height", h_square);
-
-	    }
-
-	    //register resize callback. initialize
-	    var redraw_ = on_resize(redraw, true);
-
-	    var current_view = -1;
-
-	    function step(n, s, c){
-	        if(c != "exit" && n!== current_view){
-	            wrap.style("opacity", n < 0 ? null : "1");
-
-	            groups.style("opacity", function(d,i){return i <= n ? "1" : "0.25"});
-
-	            current_view = n;
-	        }
-	    }
-
-	    var views = [
-	        {
-	            text:["Evenly distributed, these are the density."],
-	            step:function(s, c){step(0, s, c);},
-	            exit:function(){
-	                step(-1, 0, "");
-	            }
-	        },
-	        {
-	            text:["Same standard density, but more jobs clustered in some neighborhoods increases the perceived density"],
-	            step:function(s, c){step(1, s, c);}
-	        },
-	        {
-	            text:["Same standard density, but now all jobs are crammed in..."],
-	            step:function(s, c){step(2, s, c);}
-	        },
-
-	    ];
-
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        //panel_number.style("display","block");
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
-
-	    return views;
-
-	}
-
-	intro0.nviews = 3;
 
 	var seq0data = 
 	{
@@ -11870,9 +11856,9 @@
 	    return d3.scaleOrdinal().domain(d).range(c);
 	}
 
-	function seq0(container, i){
+	function seq0(container){
 
-	    var wrap_ = d3.select(container).attr("id", "sequence-0").append("div");
+	    var wrap_ = d3.select(container).append("div");
 
 	    //one time setup
 	    var data = seq0data.changes;
@@ -11911,9 +11897,9 @@
 
 	    //what lines to show when a given view code is selected
 	    var sequence = {
-	        all: {all_expected:1, all:1, big4:0.25, other:0.25},
-	        all_expected:{all_expected:1, all:0.25, big4:0.25, other:0.25},
-	        big4: {all_expected:1, all:1, big4:1, other:0.25},
+	        all: {all_expected:1, all:1, big4:0, other:0},
+	        all_expected:{all_expected:1, all:0, big4:0, other:0},
+	        big4: {all_expected:1, all:1, big4:1, other:0},
 	        other: {all_expected:1, all:1, big4:1, other:1}
 	    };
 
@@ -11963,10 +11949,10 @@
 	    var padding = {top:20, right:120, bottom: 40, left: 60 };
 
 	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
-	        var h = this.h - 300;
-	        //var h = w * aspect;
-	        if(h < 300){h = 300;}
+	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);        
+	        var h = this.gh - 250;
+	        if(h < 200){h = 200;}        w = w - 30;
+
 	        svg.attr("viewBox", "0 0 " + w + " " + h);
 	        
 	        g_x_axis.attr("transform", "translate(0," + (h-padding.bottom) + ")");
@@ -12001,9 +11987,6 @@
 	        lines.attr("d", function(d){return line(values[d])});
 
 	    }
-
-	    //register resize callback. initialize
-	    var redraw_ = on_resize(redraw, true);
 
 	    var current_view = null;
 
@@ -12056,35 +12039,16 @@
 	        {
 	            text:["In contrast, overall job density in the other 90 large metro areas increased only 9%."],
 	            step:function(s, c){step("other", s, c);}
-	        },
-
-
+	        }
 	    ];
 
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        //panel_number.style("display","block");
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
-
-	    return views;
+	    return {resize: redraw, views:views};
 
 	}
 
-	seq0.nviews = 5;
-
 	function seq1(container, i){
 
-	    var wrap_ = d3.select(container).attr("id", "sequence-1").append("div");
+	    var wrap_ = d3.select(container).append("div");
 
 	    //one time setup
 	    var wrap = wrap_.append("div").classed("chart-view",true);
@@ -12161,38 +12125,11 @@
 	    }
 
 
-	    /*function translate(d,i){
-	        var v = d[current_value_prop];
-	        var x = scale_x(v);
-	        var y = (i*group_h) + (group_h/2);
-	        return "translate(" + x + "," + y + ")";
-	    }
-
-	    function show_actual(){
-	        current_value_prop = "actual";
-	        groups.interrupt().transition().duration(1200).attr("transform", translate);
-	        group_connectors.interrupt()
-	                        .transition().duration(1200)
-	                        .attr("x2","0");
-	    }
-
-	    function show_expected(){
-	        current_value_prop = "expected";
-	        groups.interrupt().transition().duration(1200).attr("transform", translate);
-	        group_connectors.interrupt()
-	                        .attr("x1", "0").attr("x2", "0").style("opacity","1")
-	                        .transition().duration(1200)
-	                        .attr("x2", function(d){return (scale_x(d.actual) - scale_x(d.expected))})
-	                        //.on("end", function(d){d3.select(this).style("opacity","0")})                        
-	                        ;
-	    }
-	    */
-
 	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
-	        var h = this.h - 300;
-	        //var h = w * aspect;
-	        if(h < 400){h = 400;}
+	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
+	        var h = this.gh - 250;
+	        if(h < 200){h = 200;}        w = w - 30;
+
 	        scale_x.range([0, w - padding.right - padding.left]);
 	        
 	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
@@ -12222,9 +12159,6 @@
 	        }
 	        
 	    }    
-
-	    //register resize callback. initialize
-	    var redraw_ = on_resize(redraw, true);
 
 	    var current_view = null;
 
@@ -12279,11 +12213,9 @@
 	        }
 	    }
 
-	    return views;
+	    return {resize:redraw, views:views};
 
 	}
-
-	seq1.nviews = 3;
 
 	//current fork of map.js
 	//used in black home devaluation and opportunity industries (late-2018)
@@ -13060,18 +12992,21 @@
 
 	    var labels = cbsa_layer.labels();
 	    var points = cbsa_layer.points();
+	    var mapaspect = 1.8;
 
 	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-	        
+	        var h = this.gh - 250;
+	        if(h < 300){h = 300;}
+	        var w0 = h*mapaspect;
+	        var w1 = this.vw > 900 ? 900 : this.vw;
+	        w1 = w1 - 30; //subtract padding
+
+	        console.log(this.vw);
+
+	        var w = Math.min(w0, w1);
+
+	        main_map.print(w);
 	    }
-
-	    //register resize callback. initialize
-	    on_resize(redraw, true);
-
-	    //set extent
-
-	    //redraw
 
 
 	    var views = [
@@ -13124,11 +13059,9 @@
 	        }
 	    }
 
-	    return views;
+	    return {resize:redraw, views:views};
 
 	}
-
-	seq4.nviews = 5;
 
 	function seq5(container, i){
 
@@ -13140,8 +13073,6 @@
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Several industry sectors saw widespread increases in job density from 2004 to 2015");
 
 	    var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-
-	    var aspect = 2/3;
 	    var padding = {top:50, right:25, bottom: 5, left: 150 };
 
 	    var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")");
@@ -13177,9 +13108,10 @@
 	    var group_h;
 
 	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-	        var h = w * aspect;
-	        if(h < 400){h = 400;}
+	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
+	        var h = this.gh - 250;
+	        if(h < 200){h = 200;}        w = w - 30;
+
 	        scale_x.range([0, w - padding.right - padding.left]);
 	        
 	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
@@ -13202,13 +13134,6 @@
 	        group_labels.attr("dy", half_height-2);
 	        
 	    }
-
-	    //register resize callback. initialize
-	    on_resize(redraw, true);
-
-	    //set extent
-
-	    //redraw
 
 
 	    var views = [
@@ -13269,11 +13194,9 @@
 	        }
 	    }
 
-	    return views;
+	    return {views:views, resize:redraw};
 
 	}
-
-	seq5.nviews = 2;
 
 	function seq6(container, i){
 
@@ -13343,10 +13266,10 @@
 	    var padding = {top:20, right:120, bottom: 40, left: 60 };
 
 	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 900 ? 900 : this.w);
-	        var h = this.h - 300;
-	        //var h = w * aspect;
-	        if(h < 400){h = 400;}
+	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
+	        var h = this.gh - 250;
+	        if(h < 200){h = 200;}        w = w - 30;
+
 	        svg.attr("viewBox", "0 0 " + w + " " + h);
 	        
 	        g_x_axis.attr("transform", "translate(0," + (h-padding.bottom) + ")");
@@ -13381,9 +13304,6 @@
 	        lines.attr("d", function(d){return line(county_trend[d])});
 
 	    }
-
-	    //register resize callback. initialize
-	    var redraw_ = on_resize(redraw, true);
 
 	    var current_view = null;
 
@@ -13450,7 +13370,7 @@
 	        }
 	    }
 
-	    return views;
+	    return {views:views, resize:redraw};
 
 	}
 
@@ -13476,8 +13396,6 @@
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied within metro areas");
 
 	    var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-
-	    var aspect = 2/3;
 	    var padding = {top:50, right:25, bottom: 5, left: 150 };
 
 	    var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")");
@@ -13497,7 +13415,7 @@
 	    var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return Math.round(v*100)+"%"});
 
 
-	    var axis_title = svg.append("text").attr("y",20).attr("x", padding.left - 5);
+	    var axis_title = svg.append("text").attr("y",20).attr("text-anchor","end").style("font-size","15px");
 	    axis_title.append("tspan").text("% of metro areas where job density increased");
 
 	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
@@ -13513,9 +13431,10 @@
 	    var group_h;
 
 	    function redraw(){
-	        var w = this.w < 320 ? 320 : (this.w > 800 ? 800 : this.w);
-	        var h = w * aspect;
-	        if(h < 400){h = 400;}
+	        var w = this.vw < 320 ? 320 : (this.vw > 800 ? 800 : this.vw);
+	        var h = this.gh - 350;
+	        if(h < 200){h = 200;}        w = w - 30;
+
 	        scale_x.range([0, w - padding.right - padding.left]);
 	        
 	        group_h = Math.floor((h-padding.top-padding.bottom)/data.length);
@@ -13533,18 +13452,12 @@
 
 	        axis_x(g_x_axis);
 
+	        axis_title.attr("x", 150 + scale_x(1));
+
 	        rects.attr("height", group_h2).attr("width", function(d){return scale_x(d.p / d.n)});
 	        group_labels.attr("dy", group_h2/1.5);
 	        
 	    }
-
-	    //register resize callback. initialize
-	    on_resize(redraw, true);
-
-	    //set extent
-
-	    //redraw
-
 
 	    var views = [
 	        {
@@ -13578,11 +13491,9 @@
 	        }
 	    }
 
-	    return views;
+	    return {views:views, resize:redraw};
 
 	}
-
-	seq7.nviews = 2;
 
 	//main function
 	function main(){
@@ -13602,7 +13513,7 @@
 
 	  //browser degradation
 	  if(compat.browser()){
-	    sequence(container, [intro0], '<p>DEFINING TERMS</p>');
+	    //sequence(container, [intro0], '<p>DEFINING TERMS</p>');
 
 
 	    sequence(container, [seq0, seq1], '<p id="group-seqs-1" class="meta-header meta-header-1"><span>Overall job density trends in metro America</span></p>');
