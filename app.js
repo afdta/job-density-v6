@@ -787,7 +787,7 @@
 	            }
 	        },
 	        {
-	            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile.", '<span style="color:red>Finalized chart labels TK</span>'],
+	            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile.", '<span style="color:red">Finalized chart labels TK</span>'],
 	            step:function(s, c){step(1, s, c);}
 	        },
 	        {
@@ -20420,7 +20420,7 @@
 	            }
 	        },
 	        {
-	            text:["Every sector but manufacturing and logistics did in fact post an increase in job density from 2004 to 2015. The job density of most sectors actually increased more than their growth alone would predict. Especially, in the information and construction sectors, where job density increased by more than 40%."],
+	            text:["Every sector but manufacturing and logistics did in fact post an increase in job density from 2004 to 2015. The job density of most sectors actually increased more than their growth alone would predict. Especially, in the information and construction sectors, where job density increased by more than 40%.", '<span style="color:red">LEGEND TK</span>'],
 	            step:function(s, c){step(1, s, c);},
 	        }
 	    ];
@@ -21389,6 +21389,7 @@
 	            step:function(s, c){step(0, s, c);},
 	            exit:function(){
 	                wrap.style("opacity",0.25);
+	                current_view = null;
 	            }
 	        },
 	        {

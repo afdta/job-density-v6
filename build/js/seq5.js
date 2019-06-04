@@ -111,6 +111,7 @@ function seq5(container, i){
             step:function(s, c){step(0, s, c)},
             exit:function(){
                 wrap.style("opacity",0.25);
+                current_view = null;
             }
         },
         {
