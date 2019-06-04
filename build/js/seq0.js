@@ -21,7 +21,7 @@ function seq0(container){
     var g_anno = svg.append("g");
 
     var names = {
-        all:["94 metro areas"],
+        all:["Actual:", "94 metro areas"],
         all_expected:["Expected:","94 metro areas"],
         big4: ["New York", "Chicago", "San Francisco", "Seattle"],
         other: ["Other 90"]
@@ -33,10 +33,10 @@ function seq0(container){
         big4:[2015, 0.4],
         other:[2015, 0.1]
     }
-
+    
     var titles = {
         all:"Metropolitan America actually saw an even greater increase in job density from 2004 to 2015",
-        all_expected:"Metropolitan America saw a greater increase in job density from 2004 to 2015",
+        all_expected:"Metropolitan America’s job density was expected to increase from 2004 to 2015",
         big4:"Four extremely dense metro areas fueled much of metropolitan America’s increasing job density from 2004 to 2015",
         other:"Other metro areas saw a smaller overall increase in job density from 2004 to 2015"       
     }
@@ -149,7 +149,7 @@ function seq0(container){
             t_.style("opacity", function(d,i){return seq[d]});
             
             great_recession.style("opacity", function(d,i){
-                return "1";
+                return "0";
             })
 
             title.text(titles[vn])
@@ -160,7 +160,7 @@ function seq0(container){
 
     var views = [
         {
-            text:["If metro areas’ job growth had accumulated according to where their existing jobs were located, we could have expected the 94 large metropolitan areas in our study to post an overall increase in job density of about 20% from 2004 to 2015."],
+            text:["If the 94 metro areas’ job growth had accumulated according to where their existing jobs were located, we would have seen an overall increase in job density of about 18% from 2004 to 2015."],
             step:function(s, c){step("all_expected", s, c)},
             exit:function(){
                 lines.style("opacity","0");
@@ -176,12 +176,7 @@ function seq0(container){
         },
 
         {
-            text:["Actual job density in these 94 metro areas increased more than 10% over the course of the Great Recession from 2007 to 2009, as suburban and exurban areas shed their jobs faster than denser urban areas. Job density increased steadily in the years following the recession."],
-            step:function(s, c){step("all", s, c)},
-        },
-
-        {
-            text:["The job density trends seen across these 94 metro areas were driven in large part by just four especially large and extremely dense metro areas: New York, Chicago, San Francisco, and Seattle. In fact, these four metro areas account for about 90% of the increase in job density seen among all 94 large metro areas during this period."],
+            text:["These job density trends were driven largely by just four especially large and extremely dense metro areas: New York, Chicago, San Francisco, and Seattle. In fact, these four metro areas accounted for about 90% of the increase in job density seen among all 94 large metro areas during this period."],
             step:function(s, c){step("big4", s, c)}
         },
 

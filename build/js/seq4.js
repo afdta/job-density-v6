@@ -82,7 +82,7 @@ function seq4(container, i){
 
     var views = [
         {
-            text:["These job density increases were not widespread across individual metro areas."],
+            text:["Although metropolitan America as a whole saw a notable and greater-than-expected increase in job density, trends across individual metro areas varied considerably."],
             enter:function(){
                 wrap.style("opacity","1");
             },
@@ -96,20 +96,20 @@ function seq4(container, i){
             }
         },
         {
-            text:["Out of the 94 large metro areas in our study, only 48 posted an increase in job density from 2004 to 2015. Of those, 14 metro areas saw job density increases that exceeded the 94-metro area average, led by San Francisco, Honolulu, Oxnard, Calif., Charlotte, N.C., and Albany, N.Y."],
+            text:["Out of the 94 large metro areas in our study, only 48 posted an increase in job density from 2004 to 2015. Of those, 14 metro areas saw job density increases that exceeded the 94-metro area average, led by San Francisco, Honolulu, Oxnard, Calif., Charlotte, N.C., and Albany, N.Y.", "For instance, Charlotte’s job density increased by 44% to 8,092 jobs per square mile. Most of this increase was driven by job growth patterns in already dense parts of the metro." ],
             step: function(s){
                 if(s > 0){
                     points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 0.25});
-                    labels.style("opacity", "0");
+                    labels.style("opacity", function(d){return d.key in {41860:1, 46520:1, 16740:1, 37100:1, 10580:1} ? 1 : 0});
                 }
             }
         },
         {
-            text: ["Meanwhile, 46 metro areas saw perceived job density decline. Most declines were relatively modest. However, six metro areas saw declines greater than 30%, including Scranton, Pa. Cape Coral, Fla., New Haven, Conn., and Sacramento, Calif."],
+            text: ["Meanwhile, 46 metro areas saw job density decline, though most declines were relatively modest. However, six metro areas saw declines greater than 30%, including Scranton, Pa., Cape Coral, Fla., New Haven, Conn., Rochester, N.Y., Sacramento, Calif., and Youngstown, Ohio.", "From 2004 to 2015, Cape Coral saw its job density decline by about 31% to 1,694 jobs per square mile. This decrease was largely driven by new jobs that spread out to less-dense parts of the metro area."],
             step: function(s){
                 if(s > 0){
                     points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
-                    labels.style("opacity", "0");
+                    labels.style("opacity", function(d){return d.key in {15980:1, 42540:1, 35300:1, 40380:1, 40900:1, 49660:1} ? 1 : 0});
                 }
             }
         }

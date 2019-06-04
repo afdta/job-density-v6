@@ -18,22 +18,22 @@ function seq6(container, i){
     //what lines to show when a given view code is selected
 
     var sequence = {
-        TOTAL: {TOTAL:1, UC:0.25, MS: 0.25, ES:0.25, EX:0.25},
-        UC:{TOTAL:1, UC:1, MS: 0.25, ES:0.25, EX:0.25},
-        MS:{TOTAL:1, UC:1, MS: 1, ES:0.25, EX:0.25},
-        ES:{TOTAL:1, UC:1, MS: 1, ES:1, EX:0.25},
+        TOTAL: {TOTAL:1, UC:0, MS: 0, ES:0, EX:0},
+        UC:{TOTAL:1, UC:1, MS: 0, ES:0, EX:0},
+        MS:{TOTAL:1, UC:1, MS: 1, ES:1, EX:0},
+        ES:{TOTAL:1, UC:1, MS: 1, ES:1, EX:0},
         EX:{TOTAL:1, UC:1, MS: 1, ES:1, EX:1},
     }
 
     //one time setup
     var types = ["UC", "TOTAL", "MS", "ES", "EX"];
     var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
-    var pchanges = {TOTAL: 0.295310915, UC: 0.327477276, MS: 0.138150200, ES: 0.055588711, EX: -0.182804719};
+    var pchanges = {TOTAL: 0.295310915, UC: 0.353635699, MS: 0.126305595, ES: 0.010075171, EX: -0.180935696};
 
     var cols = pal(types);
 
     var wrap = wrap_.append("div").classed("chart-view",true);
-    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("TITLE"); 
+    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Metropolitan America’s more-urbanized counties posted larger increases in job density"); 
     
     var svg = wrap.append("div").style("max-width","900px").append("svg").attr("viewBox", "0 0 320 240");
 
@@ -55,7 +55,7 @@ function seq6(container, i){
                        .attr("stroke", function(d,i){return cols(d)})
                         ;
 
-    var great_recession = g_back.append("rect").attr("fill","#dddddd").style("opacity","1");
+    var great_recession = g_back.append("rect").attr("fill","#dddddd").style("opacity","0");
     
     var years = d3.range(2004, 2016)
     
@@ -126,7 +126,7 @@ function seq6(container, i){
             lines.style("opacity", function(d,i){return seq[d]});
             t_.style("opacity", function(d,i){return seq[d]});
             
-            title.text(titles[vn])
+            //title.text(titles[vn])
             
             current_view = vn;
         }
@@ -134,7 +134,7 @@ function seq6(container, i){
 
     var views = [
         {
-            text:["All 94"],
+            text:["Job density trends not only varied among individual metro areas, but also within them."],
             step:function(s, c){step("TOTAL", s, c)},
             exit:function(){
                 lines.style("opacity","0");
@@ -144,22 +144,17 @@ function seq6(container, i){
             }
         },
         {
-            text:["Urban core"],
+            text:["The core urban counties within metro areas—defined as counties where at least 95% of residents lived in an urbanized area in 2000—collectively saw job density"],
             step:function(s, c){step("UC", s, c)}
         },
 
         {
-            text:["Mature suburbs"],
+            text:["Meanwhile, less-urbanized counties posted more modest increases in job density. Mature suburban counties (where 75% to 95% of residents lived in an urbanized area in 2000) collectively saw an increase in job density of 13% from 2004 to 2015.", "Emerging suburban counties (where 25% to 75% of residents lived in an urbanized area in 2000) collectively saw a small increase in job density of 1%."],
             step:function(s, c){step("MS", s, c)}
         },
 
         {
-            text:["Emerging suburbs"],
-            step:function(s, c){step("ES", s, c)}
-        },
-
-        {
-            text:["Exurbia!"],
+            text:["Exurban counties (where less than 25% of residents lived in urbanized areas in 2000) collectively saw job density decline by more than 18% from 2004 to 2015, largely as a result of new jobs spreading to less-dense parts of these counties."],
             step:function(s, c){step("EX", s, c)}
         }
     ]

@@ -6,21 +6,20 @@ library(jsonlite)
 #to do: revise with latest data
 # check counts against increase/greater_inc variables
 
-file <- here("Job_density_data_extract_20190527.xlsx")
-data <- read_xlsx(file) %>% rename(cbsa_old = cbsa) %>% mutate(cbsa = ifelse(cbsa_old == 19430, 19380, cbsa_old))
+file <- here("geog_jobs_data_final.xlsx")
+data <- read_xlsx(file) %>% rename(cbsa_old = cbsa) %>% mutate(cbsa = ifelse(cbsa_old == 19430, 19380, cbsa_old)) %>% filter(cntyfips=="00000")
 dayton <- filter(data, cbsa != cbsa_old)
 
 #totals
-tots <- data %>% filter(cbsa > 90000, type=="TOTAL", naics=="00") %>% select("cbsa", "year","measure","density","pchange")
+tots <- data %>% filter(cbsa > 90000, type=="TOTAL", naics=="00") %>% select("cbsa", "year","measure","pchange")
 types <- data %>% filter(cbsa == 99999, naics=="00", measure=="actual") %>% select("type", "year", "value"="pchange") %>% split(.$type)
 
 #trends
 trend_data <- data %>% filter(type=="TOTAL", naics=="00") %>% select("year", "measure", "pchange", "cbsa") %>% spread("measure", "pchange") %>% split(.$cbsa) %>% lapply(function(e){return(e %>% select(-cbsa))})
             
-tots_change <- tots %>% select(-density) %>% spread(key=measure, value=pchange) %>% split(.$cbsa)
-tots_density <- tots %>% select(-pchange) %>% spread(key=measure, value=density) %>% split(.$cbsa)
+tots_change <- tots %>% spread(key=measure, value=pchange) %>% split(.$cbsa)
             
-seq0data <- toJSON(list(changes=tots_change, levels=tots_density), pretty=TRUE, digits=5, na="null")
+seq0data <- toJSON(list(changes=tots_change), pretty=TRUE, digits=5, na="null")
 
 sector15_ <- data %>% filter(type=="TOTAL", year==2015, !(cbsa %in% c(99997, 99998)), !(naics %in% c("11", "21"))) %>% 
                 select(cbsa, naics, measure, pchange) %>% 

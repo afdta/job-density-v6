@@ -12,7 +12,7 @@ import scrolly from "../../../js-modules/d3-scrolly.js";
 
 //seqs = [setup0, setup1, setup2, ..., setupN];
 
-export default function sequence(container, seqs, header, threshold){
+export default function sequence(container, seqs, header_text, threshold){
     
     var wrap = d3.select(container).append("div").classed("sequence-wrap",true);
 
@@ -25,7 +25,10 @@ export default function sequence(container, seqs, header, threshold){
     if(scrolly.supported()){
 
         var stuck = wrap.append("div");
-        var header = stuck.append("div").style("border-bottom","1px solid #aaaaaa").html(header);
+
+        if(header_text != null){
+            var header = stuck.append("div").classed("meta-header-wrap",true).html(header_text);
+        }
 
         var scr = scrolly(stuck.node(), 90);
 
@@ -56,7 +59,9 @@ export default function sequence(container, seqs, header, threshold){
     else{
         wrap.style("margin-bottom", null);
 
-        var header = wrap.append("div").html(header);
+        if(header_text != null){
+            var header = wrap.append("div").html(header_text);
+        }
 
         function loop_to(i, views){
             var j = -1;

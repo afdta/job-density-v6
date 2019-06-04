@@ -9,7 +9,7 @@ function seq5(container, i){
     //one time setup
     var wrap = d3.select(container).classed("chart-view",true);
 
-    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Several industry sectors saw widespread increases in job density from 2004 to 2015");
+    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors’ job density increases were driven by a minority of metro areas ");
 
     var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
 
@@ -77,64 +77,51 @@ function seq5(container, i){
         
     }
 
+    var titles = [
+        "Most sectors’ job density increases were driven by a minority of metro areas",
+        "",
+        ""
+    ]
+    var current_view = null;
+
+    function step(vn, s, c){
+
+        if(c != "exit" && vn!== current_view){
+            wrap.style("opacity",1);
+            groups.style("opacity", function(d,i){
+                var o = "1"
+                if(vn == 0){o = "1"}
+                else if(vn == 1){
+                    return d.p >= 50 ? 1 : 0.25;
+                }
+                else if(vn == 2){
+                    return d.naics == 51 || d.naics == 31 || d.naics == 48 ? 1 : 0.25;
+                }
+            });
+
+            //title.text(titles[0])
+            current_view = vn;
+        }
+    }
+
 
     var views = [
         {
-            text:["Across the 94 large metro areas, only six sectors of the economy saw widespread increases in perceived job density from 2004 to 2015. The density of jobs in the health care and education sectors increased in 72 (or 77%) and 68 (72% of) metro areas, respectively."],
-            enter:function(){
-                wrap.style("opacity",1);
-                groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25}); 
-            },
-            step: function(s){
-                if(s > 0){
-                    groups.style("opacity", function(d,i){return i < 6 ? 1 : 0.25});
-                }
-            },
+            text:["In most sectors, the job density increases seen across metropolitan America as a whole were driven by a rather narrow set of metro areas."],
+            step:function(s, c){step(0, s, c)},
             exit:function(){
                 wrap.style("opacity",0.25);
             }
         },
         {
-            text:["Gains in job density were least widespread in manufacturing, information, and local services—less than 20 (or 18% of) metro areas saw job density increase in these sectors."],
-            enter:function(){
-                groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
-            },
-            step: function(s){
-                if(s > 0){
-                    groups.style("opacity", function(d,i){return i > 12 ? 1 : 0.25});
-                }
-            },
-            exit:function(){
-            }
+            text:["Across the 94 large metro areas, only two sectors of the economy saw widespread increases in perceived job density from 2004 to 2015. The density of jobs in the arts and entertainment and corporate headquarters sectors increased in 56 (or 60%) and 50 (53% of) metro areas, respectively."],
+            step:function(s, c){step(1, s, c)},   
         },
         {
-            text:["Although the information sector saw a 41% increase in overall job density in the 94 metro areas taken together, this was driven largely by the increasing concentration of information jobs in the large and dense metro areas of San Francisco, New York, and Seattle."],
-            enter:function(){
-                groups.style("opacity", function(d,i){return i == 13 ? 1 : 0.25});
-            },
-            step: function(s){
-                if(s > 0){
-                    groups.style("opacity", function(d,i){return i == 13 ? 1 : 0.25});
-                }
-            },
-            exit:function(){
-            }
+            text:["The 60% overall increase in the information sector’s job density across the 94 metro areas was driven largely by the increasing concentration of information jobs in a small number of large and dense metro areas, such as San Francisco, New York, and Seattle. Gains in job density were least widespread in the manufacturing and logistics sectors—less than 30 (or 30% of) metro areas saw job density increase in these sectors. "],
+            step:function(s, c){step(2, s, c)},
         }
     ]
-
-    //static, non-scrollytelling
-    if(arguments.length > 1){
-        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-        var j = -1;
-        while(++j <= i){
-            if(views[j].hasOwnProperty("enter")){
-                views[j].enter.call(p);
-            }
-            if(views[j].hasOwnProperty("step")){
-                views[j].step.call(p, 1);
-            }
-        }
-    }
 
     return {views:views, resize:redraw};
 

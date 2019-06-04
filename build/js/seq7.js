@@ -20,7 +20,7 @@ function seq7(container, i){
     //one time setup
     var wrap = d3.select(container).classed("chart-view",true);
 
-    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied within metro areas");
+    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job densification trends varied among counties of similar levels of urbanization across metro areas");
 
     var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
 
@@ -89,22 +89,42 @@ function seq7(container, i){
         
     }
 
+    var current_view = null;
+
+    function step(vn, s, c){
+
+        if(c != "exit" && vn!== current_view){
+            wrap.style("opacity",1);
+            groups.style("opacity", function(d){
+                if(vn=="TOTAL"){
+                    return "1";
+                }
+                else if(vn=="UC"){
+                    return d.type=="UC" || d.type=="EX" ? "1" : "0.25";
+                }
+            });          
+            current_view = vn;
+        }
+    }
+
     var views = [
         {
-            text:["Looking within metro areas we see a similar pattern—that is, job densification trends varied greatly within metro areas and seemed to be driven by a small set of already-dense parts of metro areas. While 64% of metro areas with core urban counties (where at least 95 percent of the residents live in urbanized areas) saw an increase in perceived job density in such counties, just 25% of metro areas saw perceived job density increase in their exurban counties (where less than 25 percent of residents live in urbanized areas)."],
-            enter:function(){
-                wrap.style("opacity",1);
-                groups.style("opacity", function(d,i){return "1"}); 
-            },
-            step: function(s){
-                if(s > 0){
-                    groups.style("opacity", function(d,i){return "1"});
-                }
-            },
+            text:["The job densification trends of similarly urbanized counties also varied among metro areas, and suggest that much of metropolitan America’s increasing job density during this period was driven by its most urbanized areas."],
+            step: function(s, c){step("TOTAL", s, c)},
             exit:function(){
                 wrap.style("opacity",0.25);
+                current_view = null;
             }
+        },
+        {
+            text:["While 73% of metro areas with core urban counties (where at least 95% of the residents live in an urbanized area) saw an increase in perceived job density in such counties, just 21% of metro areas saw perceived job density increase in their exurban counties."],
+            step: function(s, c){step("UC", s, c)},
+        },
+        {
+            text:["These trends in job density therefore suggest that jobs densified and sprawled from 2004 to 2015, growing both upwards and outwards: Almost every metro area had at least one county where jobs grew denser and almost every metro area also had at least one county in which job density declined."],
+            step: function(s, c){step("TOTAL", s, c)},
         }
+
     ]
 
     //static, non-scrollytelling

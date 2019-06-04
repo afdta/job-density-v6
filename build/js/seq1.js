@@ -27,14 +27,14 @@ function seq1(container, i){
     var groups = g_trend.selectAll("g").data(data).enter().append("g");
 
     var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
-                                .attr("stroke", function(d){return d.expected > d.actual ? palette.secondary.orange : palette.secondary.blue})
+                                .attr("stroke", function(d){return d.expected > d.actual ? palette.job_density.decline : palette.job_density.growth})
                                 .attr("stroke-width","1px")
                                 ;
 
     var group_circles = groups.selectAll("circle").data(function(d){return [d, d]})
-                .enter().append("circle").attr("r",4.5).attr("cx","0").attr("cy","0")
-                .attr("fill", function(d,i){return i==1 ? "#ffffff" : palette.primary.blue})
-                .attr("stroke", function(d,i){return i==1 ? palette.primary.blue : palette.primary.blue})
+                .enter().append("circle").attr("r", 5).attr("cx","0").attr("cy","0")
+                .attr("fill", function(d,i){return i==1 ? "#ffffff" : palette.job_density.darkblue})
+                .attr("stroke", function(d,i){return i==1 ? palette.job_density.darkblue : palette.job_density.darkblue})
                 .attr("stroke-width","1.5px")
                 ;
     
@@ -88,7 +88,7 @@ function seq1(container, i){
         var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
         var h = this.gh - 250;
         if(h < 200){h = 200};
-        w = w - 30;
+        //w = w - 30;
 
         scale_x.range([0, w - padding.right - padding.left]);
         
@@ -126,7 +126,7 @@ function seq1(container, i){
         if(c != "exit" && n!== current_view){
             wrap.style("opacity",1);
             if(n==0){
-                title.html("Most sectors’ jobs were expected to grow denser from 2004 to 2015 in metropolitan America"); 
+                title.html("Most sectors’ jobs were expected to grow slightly denser from 2004 to 2015 in metropolitan America"); 
                 show_just_expected();
                 groups.style("opacity", "1");
             }
@@ -145,7 +145,7 @@ function seq1(container, i){
 
     var views = [
         {
-            text:["If each sector’s job growth had accumulated according to where its existing jobs were located, we could have expected every industry sector except wholesale and manufacturing to post an increase in job density from 2004 to 2015."],
+            text:["If each major industry sector’s job growth had accumulated according to where its existing jobs were located, most sectors would have slightly increased their job density from 2004 to 2015."],
             step:function(s, c){step(0, s, c)},
             exit:function(){
                 current_view = null;
@@ -153,7 +153,7 @@ function seq1(container, i){
             }
         },
         {
-            text:["Actually, every sector but manufacturing and logistics posted an increase in job density from 2004 to 2015. In most sectors, the actual change in job density exceeded the expected change. In the professional, hospitality, information, and headquarters sectors, actual job density increase by more than 40%."],
+            text:["Every sector but manufacturing and logistics did in fact post an increase in job density from 2004 to 2015. The job density of most sectors actually increased more than their growth alone would predict. Especially, in the information and construction sectors, where job density increased by more than 40%."],
             step:function(s, c){step(1, s, c)},
         }
     ]
