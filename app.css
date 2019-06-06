@@ -28,6 +28,30 @@
 .metro-interactive span{
     white-space:nowrap;
 }
+
+.metro-interactive .mi-links{
+    border:1px solid #333333;
+    border-width:2px;
+    padding:16px 16px 24px 16px;
+    margin-top:2rem;
+    border-radius:0px;
+}
+
+.metro-interactive .mi-links p:first-child{
+    font-weight:bold;
+    font-size:24px;
+    margin:0px;  
+}
+
+.metro-interactive .mi-links a,
+.metro-interactive .mi-links a:hover{
+    text-decoration:none;
+    border:none;
+}
+
+.metro-interactive .rm-this{
+    display:none;
+}
  
 .metro-interactive span.circle-basic,
 .metro-interactive span.circle-srv,
