@@ -1,5 +1,4 @@
-import on_resize from './on_resize.js';
-import palette from '../../../js-modules/palette.js';
+import special_dims from './special_dims.js';
 
 function points_circle(w){
     var t = w/2;
@@ -39,8 +38,17 @@ function intro0(container, i){
     //one time setup
 
     var wrap = wrap_.append("div").classed("chart-view",true).style("opacity","1");
-    var title = wrap.append("div").classed("sticky-chart-title",true).style("border-bottom","2px solid #333333").append("p").html('Data and measures'); 
-    wrap.append("p").classed("chart-text",true).text("The analysis covers density trends of private, non-administrative sector jobs in 94 of the nation’s largest metro areas from 2004 through 2015 (the latest year of data available).");
+    
+    wrap.append("p").classed("chart-text",true).text("The analysis covers density trends of private, non-administrative sector jobs in 94 of the nation’s largest metro areas from 2004 through 2015 (the latest year of data available). To read more about data sources, coverage, and methods, see page 7 in the report. (LINKS TK)").style("margin-top","15px");
+    var title = wrap.append("div").classed("sticky-chart-title",true).style("border-bottom","2px solid #333333").append("p").html('What is perceived job density?'); 
+
+    var legend = wrap.append("div").style("padding","0px 0px");
+
+    var legend0 = legend.append("div");
+    legend0.html('<p><span class="circle-basic"></span>= 1 job</p>');
+
+    var legend1 = legend.append("div").style("display","none");
+    legend1.html('<p><span class="circle-srv"></span><span>Service sector job</span> <span class="circle-mfg"></span><span>Manufacturing job</span> <span class="circle-srv-new"></span><span>New service sector job</span> <span class="circle-mfg-new"></span><span>New manufacturing job</span></p>');
 
     var svg = wrap.append("svg").style("width","100%");
 
@@ -132,26 +140,49 @@ function intro0(container, i){
     key.text = key.g.append("text").text("1 mile").style("font-size","15px").attr("text-anchor","middle").attr("dy",-3);
     key.mark = key.g.append("path").style("shape-rendering","crispEdges").attr("stroke","#333333").attr("fill","none");
 
+    //captions
+    key.g0 = svg.append("g").selectAll("g").data([
+        [
+            ["Low perceived density", "Standard: 1 job/sq. mile", "Perceived: 1 jobs/sq. mile"],
+            ["Medium perceived density", "Standard: 1 job/sq. mile", "Perceived: 2.3 jobs/sq. mile"],
+            ["Low perceived density", "Standard: 1 job/sq. mile", "Perceived: 9 jobs/sq. mile"]
+        ],
+        [   
+            ["Yr1. Actual job concentration", "Standard: 1 job/sq. mile", "Perceived: 2.33 job/sq. mile"],
+            ["Yr2. Expected job concentration", "Standard: 1.78 jobs/sq. mile", "Perceived: 4.67 jobs/sq. mile"],
+            ["Yr2. Actual job concentration", "Standard: 1.78 jobs/sq. mile", "Perceived: 5.00 jobs/sq. mile"]
+        ]
+    ]).enter().append("g").style("visibility","hidden");
+
+    key.g1 = key.g0.selectAll("g").data(function(d){return d}).enter().append("g");
+    
+    key.t0 = key.g1.selectAll("text").data(function(d){return d}).enter().append("text")
+                .text(function(d){return d})
+                .attr("x","9").attr("y", function(d,i){return i*20})
+                .attr("dy","28")
+                .style("font-size","15px")
+                .style("font-weight", function(d,i){return i==0 ? "bold" : "normal"});
+
     var current_view = -1;
     
     function redraw(){
-        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
-        w = w-30;
-        var h = this.gh - 250;
-        
-        if(h < 220){h = 220};
+        var wh = special_dims(this);
+        var w = wh.w;
+
+
+        if(w < 800){w = 800}
 
         var pad_left = 9;
         var pad_top = 35;
 
         var w_gap = Math.floor((w-pad_left-pad_left)/11);
         var w_square = Math.floor((w - w_gap - w_gap - pad_left - pad_left)/3);
-        var h_square = w_square;
+
         var w_ = w_gap + w_square;
         var w_3 = Math.floor(w_square/3);
         
 
-        svg.attr("viewBox", "0 0 " + w + " " + (w_square*2));
+        svg.attr("viewBox", "0 0 " + w + " " + (w_square + 150));
         
         key.g.attr("transform", "translate(" + pad_left + "," + (pad_top-8) + ")");
         key.mark.attr("d", "M0.5,5 l0,-5 l" + (w_3-0.5) + ",0 l0,5");
@@ -159,6 +190,10 @@ function intro0(container, i){
 
         groups.attr("transform", function(d,i){
             return "translate(" + ((i*w_)+pad_left+0.5) + "," + (pad_top + 0.5) + ")"
+        });
+
+        key.g1.attr("transform", function(d,i){
+            return "translate(" + ((i*w_)+pad_left+0.5) + "," + (pad_top + w_square) + ")"
         });
 
         subgroups.attr("transform", function(d,i){
@@ -179,17 +214,7 @@ function intro0(container, i){
         dots.style("display", current_view < 1 || current_view == 4 ? "none" : null);
         ;
 
-        
-
-        //vlines.attr("y2", h_square)
-        //      .attr("x1", function(d,i){return d*(w_3)})
-        //      .attr("x2", function(d,i){return d*(w_3)});
-
-        //hlines.attr("x2", h_square)
-        //      .attr("y1", function(d,i){return d*(w_3)})
-        //      .attr("y2", function(d,i){return d*(w_3)});
-
-        //rects.attr("width", w_square).attr("height", h_square);
+        key.g0.selectAll("circle").attr("r", w_3/9);
 
     }
 
@@ -219,9 +244,15 @@ function intro0(container, i){
 
             if(n < 4){
                 title.text("What is perceived job density?");
+                legend0.style("display","block");
+                legend1.style("display","none");
+                key.g0.style("visibility", function(d,i){return i==0 ? "visible" : "hidden"});
             }
             else{
                 title.text("What is the difference between actual and expected changes in job density?");
+                legend1.style("display","block");
+                legend0.style("display","none");
+                key.g0.style("visibility", function(d,i){return i==1 ? "visible" : "hidden"});
             }
 
             current_view = n;
@@ -237,7 +268,7 @@ function intro0(container, i){
             }
         },
         {
-            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile.", '<span style="color:red">Finalized chart labels TK</span>'],
+            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile."],
             step:function(s, c){step(1, s, c)}
         },
         {

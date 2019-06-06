@@ -1,5 +1,5 @@
 import {seq0data} from './data.js';
-import palette from '../../../js-modules/palette.js';
+import special_dims from './special_dims.js';
 import pal from './pal.js';
 
 function seq0(container){
@@ -97,10 +97,9 @@ function seq0(container){
     var padding = {top:20, right:120, bottom: 40, left: 60 }
 
     function redraw(){
-        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);        
-        var h = this.gh - 250;
-        if(h < 200){h = 200};
-        w = w - 30;
+        var wh = special_dims(this);
+        var w = wh.w;
+        var h = wh.h;
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
         
@@ -189,7 +188,5 @@ function seq0(container){
     return {resize: redraw, views:views};
 
 }
-
-//seq0.nviews = 5;
 
 export default seq0;

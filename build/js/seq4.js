@@ -1,6 +1,6 @@
-import on_resize from './on_resize.js';
+
 import {naics00, metro_names} from './data.js';
-import palette from '../../../js-modules/palette.js';
+
 
 import map from '../../../js-modules/state-map.js';
 import {geos_state} from '../../../js-modules/geos-state.js';
@@ -9,36 +9,36 @@ import geos_cbsa from '../../../js-modules/geos-cbsa';
 function seq4(container, i){
 
     //one time setup
-    var wrap = d3.select(container).attr("id","sequence-1").classed("chart-view big-chart",true);
+    var wrap = d3.select(container).attr("id","sequence-1").append("div").classed("chart-view big-chart",true);
 
     wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas from 2004 to 2015");
 
     var t94 = geos_cbsa.filter(function(d){return naics00.hasOwnProperty(d.cbsa)});
 
-    var plus = d3.interpolateRgb("#ffffff", palette.primary.blue);
-    var minus = d3.interpolateRgb("#ffffff", palette.primary.red);
+    var plus = d3.interpolateRgb("#ffffff", "#3461B7");
+    var minus = d3.interpolateRgb("#ffffff", "#E50374");
 
     var main_fill = function(d){
         var col = "#dddddd";
         try{
             var v = naics00[d].actual;
             if(v >= 0.3){
-                col = plus(0.9);
+                col = plus(1);
             }
             else if(v >= 0.1){
                 col = plus(0.6);
             }
             else if(v >= 0){
-                col = plus(0.3);
+                col = plus(0.25);
             }
             else if(v >= -0.1){
-                col = minus(0.3);
+                col = minus(0.25);
             }
             else if(v >= -0.3){
                 col = minus(0.6);
             }
             else if(v < -0.3){
-                col = minus(0.9);
+                col = minus(1);
             }
         }
         catch(e){
@@ -48,8 +48,18 @@ function seq4(container, i){
         return col;
     }
 
+    //
+    //console.log(plus(1))
+    //console.log(plus(0.6))
+    //console.log(plus(0.25))
+    //console.log(minus(0.25))
+    //console.log(minus(0.6))
+    //console.log(minus(1))
+
+    
+
     var main_map = map(wrap.append("div").node());
-    var legend = wrap.append("p").classed("legend",true).html("To do: add legend<br />Blue = increase in density, Red = decrease");
+    wrap.append("div").classed("legend",true).append("div").classed("map-legend",true);
 
     var state_layer = main_map.add_states(geos_state, function(d){return d.properties.geo_id}).attr({fill:"#ffffff", stroke:"#aaaaaa"});
     
@@ -63,16 +73,16 @@ function seq4(container, i){
     var labels = cbsa_layer.labels();
     var points = cbsa_layer.points();
     var mapaspect = 1.8;
+    var vpw;
 
     function redraw(){
+        vpw = this.vw;
         var h = this.gh - 250;
         if(h < 300){h = 300};
 
         var w0 = h*mapaspect;
         var w1 = this.vw > 900 ? 900 : this.vw;
         w1 = w1 - 30; //subtract padding
-
-        console.log(this.vw);
 
         var w = Math.min(w0, w1);
 
@@ -100,7 +110,7 @@ function seq4(container, i){
             step: function(s){
                 if(s > 0){
                     points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 0.25});
-                    labels.style("opacity", function(d){return d.key in {41860:1, 46520:1, 16740:1, 37100:1, 10580:1} ? 1 : 0});
+                    labels.style("opacity", function(d){return d.key in {41860:1, 46520:1, 16740:1, 37100:1, 10580:1} && vpw > 925 ? 1 : 0});
                 }
             }
         },
@@ -109,26 +119,12 @@ function seq4(container, i){
             step: function(s){
                 if(s > 0){
                     points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
-                    labels.style("opacity", function(d){return d.key in {15980:1, 42540:1, 35300:1, 40380:1, 40900:1, 49660:1} ? 1 : 0});
+                    labels.style("opacity", function(d){return d.key in {15980:1, 42540:1, 35300:1, 40380:1, 40900:1, 49660:1} && vpw >= 925 ? 1 : 0});
                 }
             }
         }
 
     ]
-
-    //static, non-scrollytelling
-    if(arguments.length > 1){
-        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-        var j = -1;
-        while(++j <= i){
-            if(views[j].hasOwnProperty("enter")){
-                views[j].enter.call(p);
-            }
-            if(views[j].hasOwnProperty("step")){
-                views[j].step.call(p, 1);
-            }
-        }
-    }
 
     return {resize:redraw, views:views};
 

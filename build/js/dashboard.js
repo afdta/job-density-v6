@@ -12,11 +12,14 @@ var wrap = d3.select(container).classed("c-fix", true).classed("dashboard-contai
 function dash_sector(container){
 
     //setup
-    var wrap = d3.select(container).classed("dashboard-panel",true);
-    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html('Actual versus expected change in perceived job density by industry sector, <span style="white-space:nowrap;">2004 to 2015</span>'); 
+    var wrap = d3.select(container);
+    var title = wrap.append("div").classed("sticky-chart-title",true);
+    title.append("p").html('Actual versus expected change in perceived job density by industry sector, <span style="white-space:nowrap;">2004 to 2015</span>')
+    title.append("div").classed("ae-legend",true);
+
     var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 640 480");
 
-    var padding = {top:25, right:25, bottom: 5, left: 150}
+    var padding = {top:25, right:25, bottom: 5, left: 170}
 
     var g_main = svg.append("g").attr("transform","translate("+ padding.left + "," +padding.top + ")");
     
@@ -32,7 +35,20 @@ function dash_sector(container){
 
 
     function redraw(cbsa){
-        var data = sector_data[cbsa].slice(0).sort(function(a,b){return d3.descending(a.actual, b.actual)});
+        var data = sector_data[cbsa].slice(0).sort(function(a,b){
+            var o = 0;
+            if(a.naics == "00"){
+                o = -1;
+            }
+            else if(b.naics == "00"){
+                o = 1;
+            }
+            else{
+                o = d3.descending(a.actual, b.actual);
+            }
+            return o;         
+        });
+
         var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
         var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
         
@@ -109,7 +125,7 @@ function dash_sector(container){
 function trend_lines(container){
 
     //setup
-    var wrap = d3.select(container).classed("dashboard-panel",true);
+    var wrap = d3.select(container);
     var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html('Change, <span style="white-space:nowrap;">2004 to 2015</span>'); 
     var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 640 480");
 
@@ -211,8 +227,6 @@ function trend_lines(container){
         axis_x(g_x_axis);
         axis_y(g_y_axis);
 
-        console.log(dmap(data, "expected"))
-
         lines.attr("d", function(key){return line(dmap(data, key))});
 
     }
@@ -225,18 +239,21 @@ function trend_lines(container){
 
 function types(container){
     //setup
-     var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
-     var ordering = {TOTAL: "4", UC: "0", MS: "1", ES: "2", EX: "3"};
+     var names = {TOTAL: "Total", UC: "Core urban", MS: "Mature suburban", ES: "Emerging suburban", EX: "Exurban"};
+     var ordering = {TOTAL: 0, UC: 1, MS: 2, ES: 3, EX: 4};
  
      var types = ["UC", "MS", "ES", "EX", "TOTAL"];
      var cols = pal(types);
 
     //setup
-    var wrap = d3.select(container).classed("dashboard-panel",true);
-    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html('Actual versus expected change in perceived job density by county type, <span style="white-space:nowrap;">2004 to 2015</span>'); 
+    var wrap = d3.select(container);
+    var title = wrap.append("div").classed("sticky-chart-title",true);
+    title.append("p").html('Actual versus expected change in perceived job density by county type, <span style="white-space:nowrap;">2004 to 2015</span>'); 
+    title.append("div").classed("ae-legend",true);
+    
     var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 640 480");
 
-    var padding = {top:25, right:25, bottom: 5, left: 150}
+    var padding = {top:25, right:25, bottom: 5, left: 170}
 
     var g_main = svg.append("g").attr("transform","translate("+ padding.left + "," +padding.top + ")");
 
@@ -252,10 +269,13 @@ function types(container){
 
     function redraw(cbsa){
         var data = county_data[cbsa].slice(0).sort(function(a,b){
-            var o = 0;
-            if(a.type == "TOTAL"){o = 1}
-            else if(b.type == "TOTAL"){o = -1}
-            else{o = d3.descending(a.actual, b.actual)}
+            var o;
+            try{
+                o = ordering[a.type] - ordering[b.type];
+            }
+            catch(e){
+                o = 0;
+            }
             return o;
         });
         var lookup = {TOTAL: null, UC: null, MS: null, ES: null, EX: null};
@@ -345,9 +365,13 @@ return redraw;
 }
 
 //setup
-var redraw_sectors = dash_sector(wrap.append("div").node());
-var redraw_lines = trend_lines(wrap.append("div").node());
-var redraw_types = types(wrap.append("div").node());
+var panel0 = wrap.append("div").classed("dashboard-panel",true);
+var panel1 = wrap.append("div").classed("dashboard-panel",true);
+
+var redraw_sectors = dash_sector(panel1.append("div").node());
+
+var redraw_lines = trend_lines(panel0.append("div").node());
+var redraw_types = types(panel0.append("div").node());
 
 
 //redraw

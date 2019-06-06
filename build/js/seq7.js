@@ -1,12 +1,12 @@
-import on_resize from './on_resize.js';
+import special_dims from './special_dims.js';
 import {county_counts} from './data.js';
-import palette from '../../../js-modules/palette.js';
 import pal from './pal.js';
+import palette from '../../../js-modules/palette.js';
 
 function seq7(container, i){
 
     //one time setup
-    var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
+    var names = {TOTAL: "Total", UC: "Core urban", MS: "Mature suburban", ES: "Emerging suburban", EX: "Exurban"};
     var ordering = {TOTAL: "4", UC: "0", MS: "1", ES: "2", EX: "3"};
 
     var types = ["UC", "TOTAL", "MS", "ES", "EX"];
@@ -18,14 +18,14 @@ function seq7(container, i){
 
 
     //one time setup
-    var wrap = d3.select(container).classed("chart-view",true);
+    var wrap = d3.select(container).append("div").classed("chart-view",true);
 
     wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job densification trends varied among counties of similar levels of urbanization across metro areas");
 
     var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
 
     var aspect = 2/3;
-    var padding = {top:50, right:25, bottom: 5, left: 150 }
+    var padding = {top:55, right:25, bottom: 5, left: 150 }
 
     var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")")
 
@@ -37,14 +37,16 @@ function seq7(container, i){
 
     var rects = groups.selectAll("rect").data(function(d){return [d]})
                                 .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
-                                .attr("fill", function(d){return cols(d.type)}).style("shape-rendering","crispEdges")
+                                .style("shape-rendering","crispEdges")
+                                .attr("fill", palette.job_density.darkblue)
+                                //.attr("fill", function(d){return cols(d.type)})
                                 ;
 
     var scale_x = d3.scaleLinear().domain([0, 1]);
     var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return Math.round(v*100)+"%"});
 
 
-    var axis_title = svg.append("text").attr("y",20).attr("text-anchor","end").style("font-size","15px");
+    var axis_title = svg.append("text").attr("y",15).attr("text-anchor","end").style("font-size","15px").style("fill","#555555");
     axis_title.append("tspan").text("% of metro areas where job density increased");
 
     var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
@@ -60,10 +62,9 @@ function seq7(container, i){
     var group_h;
 
     function redraw(){
-        var w = this.vw < 320 ? 320 : (this.vw > 800 ? 800 : this.vw);
-        var h = this.gh - 350;
-        if(h < 200){h = 200};
-        w = w - 30;
+        var wh = special_dims(this);
+        var w = wh.w;
+        var h = wh.h;
 
         scale_x.range([0, w - padding.right - padding.left]);
         
@@ -126,20 +127,6 @@ function seq7(container, i){
         }
 
     ]
-
-    //static, non-scrollytelling
-    if(arguments.length > 1){
-        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-        var j = -1;
-        while(++j <= i){
-            if(views[j].hasOwnProperty("enter")){
-                views[j].enter.call(p);
-            }
-            if(views[j].hasOwnProperty("step")){
-                views[j].step.call(p, 1);
-            }
-        }
-    }
 
     return {views:views, resize:redraw};
 

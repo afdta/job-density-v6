@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="200"
+   height="20"
+   viewBox="0 0 52.916666 5.2916666"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="actual-expected-legend.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="185.87622"
+     inkscape:cy="26.987687"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="2507"
+     inkscape:window-height="1025"
+     inkscape:window-x="1973"
+     inkscape:window-y="109"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-42.531771,-15.730275)">
+    <circle
+       style="opacity:1;fill:#3471bf;fill-opacity:0.94117647;stroke:#3471bf;stroke-width:0.45357144;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.94117647"
+       id="path815"
+       cx="73.433571"
+       cy="18.111526"
+       r="1.3607143" />
+    <circle
+       style="opacity:1;fill:#ffffff;fill-opacity:0.94117647;stroke:#3471bf;stroke-width:0.45357144;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.94117647"
+       id="path815-3"
+       cx="44.251564"
+       cy="18.111526"
+       r="1.3607143" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611195px;line-height:1.25;font-family:'PT Serif';-inkscape-font-specification:'PT Serif';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#111111;fill-opacity:1;stroke:none;stroke-width:0.26458332;"
+       x="75.803131"
+       y="19.8419"
+       id="text846"><tspan
+         sodipodi:role="line"
+         id="tspan844"
+         x="75.803131"
+         y="19.8419"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611195px;font-family:'PT Serif';-inkscape-font-specification:'PT Serif';fill:#111111;fill-opacity:1;stroke-width:0.26458332;">Actual</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611195px;line-height:1.25;font-family:'PT Serif';-inkscape-font-specification:'PT Serif';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#111111;fill-opacity:1;stroke:none;stroke-width:0.26458332;"
+       x="46.614292"
+       y="19.8419"
+       id="text850"><tspan
+         sodipodi:role="line"
+         id="tspan848"
+         x="46.614292"
+         y="19.8419"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611195px;font-family:'PT Serif';-inkscape-font-specification:'PT Serif';fill:#111111;fill-opacity:1;stroke-width:0.26458332;">Expected</tspan></text>
+  </g>
+</svg>

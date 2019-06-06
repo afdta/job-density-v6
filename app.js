@@ -167,8 +167,8 @@
 
 	    var default_threshold = default_threshold_ != null ? default_threshold_ : 0.15;
 
-	    var current_view_id = null;
-	    var active_view_id = null;
+	    var current_view_id = null; //what is currently displayed
+	    var active_view_id = null; //what is calculated to be (should be next) in view
 	    var all_views = {};
 	    function show_active_view(){
 
@@ -226,6 +226,7 @@
 	            //share of element that is over (above) the threshold
 	            try{
 	                if(h == 0){throw new Error("Zero height")}                var proportion = (px_threshold - box.top) / h;
+	                //has stepped always between 0 and 1
 	                has_stepped = proportion > 1 ? 1 : (proportion < 0 ? 0 : proportion);
 	            }
 	            catch(e){
@@ -267,7 +268,9 @@
 	                o.step.call(o.el, has_stepped, action_code);
 	            }
 
-	            if(action_code == "scrolling"){
+	            //passed is useful if the user reloads page beyond the first element 
+	            //(e.g. avoids flashing v0 before v1 when then scrolling back)
+	            if(action_code == "scrolling" || action_code == "passed"){
 	                active_view_id = o.id;
 	            }
 
@@ -286,6 +289,8 @@
 	        is_scrolling = false;
 
 	        show_active_view();
+
+	        //console.log(current_view_id);
 	    }
 
 	    function on_scroll(){
@@ -510,49 +515,19 @@
 
 	}
 
-	var palette = {
-		primary:{
-			blue: "#053769",
-			red: "#dc2a2a",
-			yellow: "#ffcf1a",
-			gray: "#4c4c4c",
-			orange: "#ffa500",
-			green: "#008000",
-			purple: "#800080"
-		},
-		secondary:{
-			blue: "#a4c7f2",
-			red: "#e26f6f",
-			yellow: "#ffdf66",
-			gray: "#aaaaaa",
-			orange: "#ffc04c",
-			green: "#00b400",
-			purple: "#cc00cc"
-		},
-		text: "#111111",
-		gray: "#555555",
-		mediumgray: "#aaaaaa",
-		lightgray: "#eeeeee"
-	};
+	function special_dims(thiz){
+	    var w = thiz.vw < 320 ? 320 : (thiz.vw > 930 ? 930 : thiz.vw);
 
-	//palette from job density report, june 2019
+	    //remove padding
+	    w = w - 30;
 
-	palette.job_density = {};
+	    var h = thiz.gh - 350;
 
-	palette.job_density.darkblue = "#3471B7";
-	palette.job_density.growth = "#5FB7ED";
-	palette.job_density.decline = "#E50374";
-	palette.job_density.gray = "#767576";
+	    //enforce minimum
+	    if(h < 200){h = 200;}    
 
-	palette.job_density.blue = "#02b6ed";
-	palette.job_density.orange = "#ea9706";
-
-	palette.job_density.header0 = "#024F9C";
-	palette.job_density.header1 = "#0D73D6";
-	palette.job_density.header2 = "#02B6ED";
-	palette.job_density.header3 = "#02E3DD";
-
-	palette.job_density.darkline = "#333333";
+	    return {h:h, w:w}
+	}
 
 	function points_circle(w){
 	    var t = w/2;
@@ -592,8 +567,17 @@
 	    //one time setup
 
 	    var wrap = wrap_.append("div").classed("chart-view",true).style("opacity","1");
-	    var title = wrap.append("div").classed("sticky-chart-title",true).style("border-bottom","2px solid #333333").append("p").html('Data and measures'); 
-	    wrap.append("p").classed("chart-text",true).text("The analysis covers density trends of private, non-administrative sector jobs in 94 of the nation’s largest metro areas from 2004 through 2015 (the latest year of data available).");
+	    
+	    wrap.append("p").classed("chart-text",true).text("The analysis covers density trends of private, non-administrative sector jobs in 94 of the nation’s largest metro areas from 2004 through 2015 (the latest year of data available). To read more about data sources, coverage, and methods, see page 7 in the report. (LINKS TK)").style("margin-top","15px");
+	    var title = wrap.append("div").classed("sticky-chart-title",true).style("border-bottom","2px solid #333333").append("p").html('What is perceived job density?'); 
+
+	    var legend = wrap.append("div").style("padding","0px 0px");
+
+	    var legend0 = legend.append("div");
+	    legend0.html('<p><span class="circle-basic"></span>= 1 job</p>');
+
+	    var legend1 = legend.append("div").style("display","none");
+	    legend1.html('<p><span class="circle-srv"></span><span>Service sector job</span> <span class="circle-mfg"></span><span>Manufacturing job</span> <span class="circle-srv-new"></span><span>New service sector job</span> <span class="circle-mfg-new"></span><span>New manufacturing job</span></p>');
 
 	    var svg = wrap.append("svg").style("width","100%");
 
@@ -685,24 +669,49 @@
 	    key.text = key.g.append("text").text("1 mile").style("font-size","15px").attr("text-anchor","middle").attr("dy",-3);
 	    key.mark = key.g.append("path").style("shape-rendering","crispEdges").attr("stroke","#333333").attr("fill","none");
 
+	    //captions
+	    key.g0 = svg.append("g").selectAll("g").data([
+	        [
+	            ["Low perceived density", "Standard: 1 job/sq. mile", "Perceived: 1 jobs/sq. mile"],
+	            ["Medium perceived density", "Standard: 1 job/sq. mile", "Perceived: 2.3 jobs/sq. mile"],
+	            ["Low perceived density", "Standard: 1 job/sq. mile", "Perceived: 9 jobs/sq. mile"]
+	        ],
+	        [   
+	            ["Yr1. Actual job concentration", "Standard: 1 job/sq. mile", "Perceived: 2.33 job/sq. mile"],
+	            ["Yr2. Expected job concentration", "Standard: 1.78 jobs/sq. mile", "Perceived: 4.67 jobs/sq. mile"],
+	            ["Yr2. Actual job concentration", "Standard: 1.78 jobs/sq. mile", "Perceived: 5.00 jobs/sq. mile"]
+	        ]
+	    ]).enter().append("g").style("visibility","hidden");
+
+	    key.g1 = key.g0.selectAll("g").data(function(d){return d}).enter().append("g");
+	    
+	    key.t0 = key.g1.selectAll("text").data(function(d){return d}).enter().append("text")
+	                .text(function(d){return d})
+	                .attr("x","9").attr("y", function(d,i){return i*20})
+	                .attr("dy","28")
+	                .style("font-size","15px")
+	                .style("font-weight", function(d,i){return i==0 ? "bold" : "normal"});
+
 	    var current_view = -1;
 	    
 	    function redraw(){
-	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
-	        w = w-30;
-	        var h = this.gh - 250;
-	        
-	        if(h < 220){h = 220;}
+	        var wh = special_dims(this);
+	        var w = wh.w;
+
+
+	        if(w < 800){w = 800;}
+
 	        var pad_left = 9;
 	        var pad_top = 35;
 
 	        var w_gap = Math.floor((w-pad_left-pad_left)/11);
 	        var w_square = Math.floor((w - w_gap - w_gap - pad_left - pad_left)/3);
+
 	        var w_ = w_gap + w_square;
 	        var w_3 = Math.floor(w_square/3);
 	        
 
-	        svg.attr("viewBox", "0 0 " + w + " " + (w_square*2));
+	        svg.attr("viewBox", "0 0 " + w + " " + (w_square + 150));
 	        
 	        key.g.attr("transform", "translate(" + pad_left + "," + (pad_top-8) + ")");
 	        key.mark.attr("d", "M0.5,5 l0,-5 l" + (w_3-0.5) + ",0 l0,5");
@@ -710,6 +719,10 @@
 
 	        groups.attr("transform", function(d,i){
 	            return "translate(" + ((i*w_)+pad_left+0.5) + "," + (pad_top + 0.5) + ")"
+	        });
+
+	        key.g1.attr("transform", function(d,i){
+	            return "translate(" + ((i*w_)+pad_left+0.5) + "," + (pad_top + w_square) + ")"
 	        });
 
 	        subgroups.attr("transform", function(d,i){
@@ -729,17 +742,7 @@
 	        .attr("class", function(d){return d.d == null ? "intro" : "intro " + d.d});
 	        dots.style("display", current_view < 1 || current_view == 4 ? "none" : null);
 
-	        
-
-	        //vlines.attr("y2", h_square)
-	        //      .attr("x1", function(d,i){return d*(w_3)})
-	        //      .attr("x2", function(d,i){return d*(w_3)});
-
-	        //hlines.attr("x2", h_square)
-	        //      .attr("y1", function(d,i){return d*(w_3)})
-	        //      .attr("y2", function(d,i){return d*(w_3)});
-
-	        //rects.attr("width", w_square).attr("height", h_square);
+	        key.g0.selectAll("circle").attr("r", w_3/9);
 
 	    }
 
@@ -769,9 +772,15 @@
 
 	            if(n < 4){
 	                title.text("What is perceived job density?");
+	                legend0.style("display","block");
+	                legend1.style("display","none");
+	                key.g0.style("visibility", function(d,i){return i==0 ? "visible" : "hidden"});
 	            }
 	            else{
 	                title.text("What is the difference between actual and expected changes in job density?");
+	                legend1.style("display","block");
+	                legend0.style("display","none");
+	                key.g0.style("visibility", function(d,i){return i==1 ? "visible" : "hidden"});
 	            }
 
 	            current_view = n;
@@ -787,7 +796,7 @@
 	            }
 	        },
 	        {
-	            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile.", '<span style="color:red">Finalized chart labels TK</span>'],
+	            text:["In the first example, jobs are spread evenly across the metro area, giving it the same standard and perceived job density of one job per square mile."],
 	            step:function(s, c){step(1, s, c);}
 	        },
 	        {
@@ -20181,9 +20190,9 @@
 	    var padding = {top:20, right:120, bottom: 40, left: 60 };
 
 	    function redraw(){
-	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);        
-	        var h = this.gh - 250;
-	        if(h < 200){h = 200;}        w = w - 30;
+	        var wh = special_dims(this);
+	        var w = wh.w;
+	        var h = wh.h;
 
 	        svg.attr("viewBox", "0 0 " + w + " " + h);
 	        
@@ -20273,6 +20282,50 @@
 
 	}
 
+	var palette = {
+		primary:{
+			blue: "#053769",
+			red: "#dc2a2a",
+			yellow: "#ffcf1a",
+			gray: "#4c4c4c",
+			orange: "#ffa500",
+			green: "#008000",
+			purple: "#800080"
+		},
+		secondary:{
+			blue: "#a4c7f2",
+			red: "#e26f6f",
+			yellow: "#ffdf66",
+			gray: "#aaaaaa",
+			orange: "#ffc04c",
+			green: "#00b400",
+			purple: "#cc00cc"
+		},
+		text: "#111111",
+		gray: "#555555",
+		mediumgray: "#aaaaaa",
+		lightgray: "#eeeeee"
+	};
+
+	//palette from job density report, june 2019
+
+	palette.job_density = {};
+
+	palette.job_density.darkblue = "#3471B7";
+	palette.job_density.growth = "#5FB7ED";
+	palette.job_density.decline = "#E50374";
+	palette.job_density.gray = "#767576";
+
+	palette.job_density.blue = "#02b6ed";
+	palette.job_density.orange = "#ea9706";
+
+	palette.job_density.header0 = "#024F9C";
+	palette.job_density.header1 = "#0D73D6";
+	palette.job_density.header2 = "#02B6ED";
+	palette.job_density.header3 = "#02E3DD";
+
+	palette.job_density.darkline = "#333333";
+
 	function seq1(container, i){
 
 	    var wrap_ = d3.select(container).append("div");
@@ -20280,10 +20333,24 @@
 	    //one time setup
 	    var wrap = wrap_.append("div").classed("chart-view",true);
 	    
-	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
+	    var title0 = wrap.append("div").classed("sticky-chart-title",true);
+	    var title = title0.append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
 
-	    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.expected, b.expected)});
+	    var data = sector_data["99999"].slice(0).sort(function(a,b){
+	        var o = 0;
+	        if(a.naics == "00"){
+	            o = -1;
+	        }
+	        else if(b.naics == "00"){
+	            o = 1;
+	        }
+	        else{
+	            o = d3.descending(a.actual, b.actual);
+	        }
+	        return o; 
+	    });
 
+	    var legend = wrap.append("div").classed("ae-legend",true).style("margin-left","9px").style("opacity","0");
 	    var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 320 240");
 	    var padding = {top:50, right:25, bottom: 5, left: 150};
 
@@ -20328,6 +20395,7 @@
 	    var group_shown = "expected";
 
 	    function show_just_expected(){
+	        legend.style("opacity","0");
 	        group_shown = "expected";
 	        group_circles.interrupt().transition().duration(1000)
 	                    .attr("cx", function(d,i){return scale_x(d.expected)})
@@ -20340,6 +20408,7 @@
 	    }
 
 	    function show_actual(){
+	        legend.style("opacity","1");
 	        group_shown = "actual";
 	        group_circles.style("opacity", "1")
 	                    .interrupt().transition().duration(1000)
@@ -20353,9 +20422,9 @@
 
 
 	    function redraw(){
-	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
-	        var h = this.gh - 250;
-	        if(h < 200){h = 200;}        //w = w - 30;
+	        var wh = special_dims(this);
+	        var w = wh.w;
+	        var h = wh.h;
 
 	        scale_x.range([0, w - padding.right - padding.left]);
 	        
@@ -20420,25 +20489,10 @@
 	            }
 	        },
 	        {
-	            text:["Every sector but manufacturing and logistics did in fact post an increase in job density from 2004 to 2015. The job density of most sectors actually increased more than their growth alone would predict. Especially, in the information and construction sectors, where job density increased by more than 40%.", '<span style="color:red">LEGEND TK</span>'],
+	            text:["Every sector but manufacturing and logistics did in fact post an increase in job density from 2004 to 2015. The job density of most sectors actually increased more than their growth alone would predict. Especially, in the information and construction sectors, where job density increased by more than 40%."],
 	            step:function(s, c){step(1, s, c);},
 	        }
 	    ];
-
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        //panel_number.style("display","block");
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
 
 	    return {resize:redraw, views:views};
 
@@ -21166,36 +21220,36 @@
 	function seq4(container, i){
 
 	    //one time setup
-	    var wrap = d3.select(container).attr("id","sequence-1").classed("chart-view big-chart",true);
+	    var wrap = d3.select(container).attr("id","sequence-1").append("div").classed("chart-view big-chart",true);
 
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job density trends varied among large metro areas from 2004 to 2015");
 
 	    var t94 = geos_cbsa.filter(function(d){return naics00.hasOwnProperty(d.cbsa)});
 
-	    var plus = d3.interpolateRgb("#ffffff", palette.primary.blue);
-	    var minus = d3.interpolateRgb("#ffffff", palette.primary.red);
+	    var plus = d3.interpolateRgb("#ffffff", "#3461B7");
+	    var minus = d3.interpolateRgb("#ffffff", "#E50374");
 
 	    var main_fill = function(d){
 	        var col = "#dddddd";
 	        try{
 	            var v = naics00[d].actual;
 	            if(v >= 0.3){
-	                col = plus(0.9);
+	                col = plus(1);
 	            }
 	            else if(v >= 0.1){
 	                col = plus(0.6);
 	            }
 	            else if(v >= 0){
-	                col = plus(0.3);
+	                col = plus(0.25);
 	            }
 	            else if(v >= -0.1){
-	                col = minus(0.3);
+	                col = minus(0.25);
 	            }
 	            else if(v >= -0.3){
 	                col = minus(0.6);
 	            }
 	            else if(v < -0.3){
-	                col = minus(0.9);
+	                col = minus(1);
 	            }
 	        }
 	        catch(e){
@@ -21205,8 +21259,18 @@
 	        return col;
 	    };
 
+	    //
+	    //console.log(plus(1))
+	    //console.log(plus(0.6))
+	    //console.log(plus(0.25))
+	    //console.log(minus(0.25))
+	    //console.log(minus(0.6))
+	    //console.log(minus(1))
+
+	    
+
 	    var main_map = map(wrap.append("div").node());
-	    var legend = wrap.append("p").classed("legend",true).html("To do: add legend<br />Blue = increase in density, Red = decrease");
+	    wrap.append("div").classed("legend",true).append("div").classed("map-legend",true);
 
 	    var state_layer = main_map.add_states(geos_state, function(d){return d.properties.geo_id}).attr({fill:"#ffffff", stroke:"#aaaaaa"});
 	    
@@ -21220,15 +21284,15 @@
 	    var labels = cbsa_layer.labels();
 	    var points = cbsa_layer.points();
 	    var mapaspect = 1.8;
+	    var vpw;
 
 	    function redraw(){
+	        vpw = this.vw;
 	        var h = this.gh - 250;
 	        if(h < 300){h = 300;}
 	        var w0 = h*mapaspect;
 	        var w1 = this.vw > 900 ? 900 : this.vw;
 	        w1 = w1 - 30; //subtract padding
-
-	        console.log(this.vw);
 
 	        var w = Math.min(w0, w1);
 
@@ -21256,7 +21320,7 @@
 	            step: function(s){
 	                if(s > 0){
 	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 1 : 0.25});
-	                    labels.style("opacity", function(d){return d.key in {41860:1, 46520:1, 16740:1, 37100:1, 10580:1} ? 1 : 0});
+	                    labels.style("opacity", function(d){return d.key in {41860:1, 46520:1, 16740:1, 37100:1, 10580:1} && vpw > 925 ? 1 : 0});
 	                }
 	            }
 	        },
@@ -21265,26 +21329,12 @@
 	            step: function(s){
 	                if(s > 0){
 	                    points.style("opacity", function(d){return naics00[d.key].actual >= 0 ? 0.25 : 1});
-	                    labels.style("opacity", function(d){return d.key in {15980:1, 42540:1, 35300:1, 40380:1, 40900:1, 49660:1} ? 1 : 0});
+	                    labels.style("opacity", function(d){return d.key in {15980:1, 42540:1, 35300:1, 40380:1, 40900:1, 49660:1} && vpw >= 925 ? 1 : 0});
 	                }
 	            }
 	        }
 
 	    ];
-
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
 
 	    return {resize:redraw, views:views};
 
@@ -21295,12 +21345,12 @@
 	    var data = sector_counts.slice(0).filter(function(d){return d.naics != "00"}).sort(function(a,b){return d3.descending(a.p, b.p)});
 
 	    //one time setup
-	    var wrap = d3.select(container).classed("chart-view",true);
+	    var wrap = d3.select(container).append("div").classed("chart-view",true);
 
 	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors’ job density increases were driven by a minority of metro areas ");
 
 	    var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-	    var padding = {top:50, right:25, bottom: 5, left: 150 };
+	    var padding = {top:55, right:25, bottom: 5, left: 150 };
 
 	    var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")");
 
@@ -21312,14 +21362,13 @@
 
 	    var rects = groups.selectAll("rect").data(function(d){return [d]})
 	                                .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
-	                                .attr("fill", palette.primary.blue).style("shape-rendering","crispEdges")
+	                                .attr("fill", palette.job_density.darkblue).style("shape-rendering","crispEdges")
 	                                ;
 
 	    var scale_x = d3.scaleLinear().domain([0, 1]);
 	    var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return Math.round(v*100)+"%"});
 
-
-	    var axis_title = svg.append("text").attr("y",20).attr("x", padding.left - 5);
+	    var axis_title = svg.append("text").attr("y",15).attr("text-anchor","end").style("font-size","15px").style("fill","#555555");
 	    axis_title.append("tspan").text("% of metro areas where job density increased");
 
 	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
@@ -21335,9 +21384,9 @@
 	    var group_h;
 
 	    function redraw(){
-	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
-	        var h = this.gh - 250;
-	        if(h < 200){h = 200;}        w = w - 30;
+	        var wh = special_dims(this);
+	        var w = wh.w;
+	        var h = wh.h;
 
 	        scale_x.range([0, w - padding.right - padding.left]);
 	        
@@ -21354,6 +21403,8 @@
 	        });
 
 	        axis_x(g_x_axis);
+
+	        axis_title.attr("x", 150 + scale_x(1));
 
 	        var half_height = Math.floor(group_h/2);
 
@@ -21422,7 +21473,7 @@
 
 	    //one time setup
 	    var types = ["UC", "TOTAL", "MS", "ES", "EX"];
-	    var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
+	    var names = {TOTAL: "Total", UC: "Core urban", MS: "Mature suburban", ES: "Emerging suburban", EX: "Exurban"};
 	    var pchanges = {TOTAL: 0.295310915, UC: 0.353635699, MS: 0.126305595, ES: 0.010075171, EX: -0.180935696};
 
 	    var cols = pal(types);
@@ -21466,9 +21517,9 @@
 	    var padding = {top:20, right:120, bottom: 40, left: 60 };
 
 	    function redraw(){
-	        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
-	        var h = this.gh - 250;
-	        if(h < 200){h = 200;}        w = w - 30;
+	        var wh = special_dims(this);
+	        var w = wh.w;
+	        var h = wh.h;
 
 	        svg.attr("viewBox", "0 0 " + w + " " + h);
 	        
@@ -21550,20 +21601,20 @@
 	        }
 	    ];
 
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
+	    //static, non-scrollytelling -- deprecated here
+	    //if(arguments.length > 1){
 	        //panel_number.style("display","block");
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
+	    //    var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+	    //    var j = -1;
+	    //    while(++j <= i){
+	    //        if(views[j].hasOwnProperty("enter")){
+	    //            views[j].enter.call(p);
+	    //        }
+	    //        if(views[j].hasOwnProperty("step")){
+	    //            views[j].step.call(p, 1);
+	    //        }
+	    //    }
+	    //}
 
 	    return {views:views, resize:redraw};
 
@@ -21574,7 +21625,7 @@
 	function seq7(container, i){
 
 	    //one time setup
-	    var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
+	    var names = {TOTAL: "Total", UC: "Core urban", MS: "Mature suburban", ES: "Emerging suburban", EX: "Exurban"};
 	    var ordering = {TOTAL: "4", UC: "0", MS: "1", ES: "2", EX: "3"};
 
 	    var types = ["UC", "TOTAL", "MS", "ES", "EX"];
@@ -21586,12 +21637,12 @@
 
 
 	    //one time setup
-	    var wrap = d3.select(container).classed("chart-view",true);
+	    var wrap = d3.select(container).append("div").classed("chart-view",true);
 
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job densification trends varied among counties of similar levels of urbanization across metro areas");
 
 	    var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-	    var padding = {top:50, right:25, bottom: 5, left: 150 };
+	    var padding = {top:55, right:25, bottom: 5, left: 150 };
 
 	    var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")");
 
@@ -21603,14 +21654,16 @@
 
 	    var rects = groups.selectAll("rect").data(function(d){return [d]})
 	                                .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
-	                                .attr("fill", function(d){return cols(d.type)}).style("shape-rendering","crispEdges")
+	                                .style("shape-rendering","crispEdges")
+	                                .attr("fill", palette.job_density.darkblue)
+	                                //.attr("fill", function(d){return cols(d.type)})
 	                                ;
 
 	    var scale_x = d3.scaleLinear().domain([0, 1]);
 	    var axis_x = d3.axisTop(scale_x).ticks(5).tickFormat(function(v){return Math.round(v*100)+"%"});
 
 
-	    var axis_title = svg.append("text").attr("y",20).attr("text-anchor","end").style("font-size","15px");
+	    var axis_title = svg.append("text").attr("y",15).attr("text-anchor","end").style("font-size","15px").style("fill","#555555");
 	    axis_title.append("tspan").text("% of metro areas where job density increased");
 
 	    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
@@ -21626,9 +21679,9 @@
 	    var group_h;
 
 	    function redraw(){
-	        var w = this.vw < 320 ? 320 : (this.vw > 800 ? 800 : this.vw);
-	        var h = this.gh - 350;
-	        if(h < 200){h = 200;}        w = w - 30;
+	        var wh = special_dims(this);
+	        var w = wh.w;
+	        var h = wh.h;
 
 	        scale_x.range([0, w - padding.right - padding.left]);
 	        
@@ -21692,20 +21745,6 @@
 
 	    ];
 
-	    //static, non-scrollytelling
-	    if(arguments.length > 1){
-	        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	        var j = -1;
-	        while(++j <= i){
-	            if(views[j].hasOwnProperty("enter")){
-	                views[j].enter.call(p);
-	            }
-	            if(views[j].hasOwnProperty("step")){
-	                views[j].step.call(p, 1);
-	            }
-	        }
-	    }
-
 	    return {views:views, resize:redraw};
 
 	}
@@ -21720,11 +21759,14 @@
 	function dash_sector(container){
 
 	    //setup
-	    var wrap = d3.select(container).classed("dashboard-panel",true);
-	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html('Actual versus expected change in perceived job density by industry sector, <span style="white-space:nowrap;">2004 to 2015</span>'); 
+	    var wrap = d3.select(container);
+	    var title = wrap.append("div").classed("sticky-chart-title",true);
+	    title.append("p").html('Actual versus expected change in perceived job density by industry sector, <span style="white-space:nowrap;">2004 to 2015</span>');
+	    title.append("div").classed("ae-legend",true);
+
 	    var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 640 480");
 
-	    var padding = {top:25, right:25, bottom: 5, left: 150};
+	    var padding = {top:25, right:25, bottom: 5, left: 170};
 
 	    var g_main = svg.append("g").attr("transform","translate("+ padding.left + "," +padding.top + ")");
 	    
@@ -21740,7 +21782,20 @@
 
 
 	    function redraw(cbsa){
-	        var data = sector_data[cbsa].slice(0).sort(function(a,b){return d3.descending(a.actual, b.actual)});
+	        var data = sector_data[cbsa].slice(0).sort(function(a,b){
+	            var o = 0;
+	            if(a.naics == "00"){
+	                o = -1;
+	            }
+	            else if(b.naics == "00"){
+	                o = 1;
+	            }
+	            else{
+	                o = d3.descending(a.actual, b.actual);
+	            }
+	            return o;         
+	        });
+
 	        var min = d3.min(data.map(function(d){return Math.min(d.actual, d.expected)}));
 	        var max = d3.max(data.map(function(d){return Math.max(d.actual, d.expected)}));
 	        
@@ -21817,7 +21872,7 @@
 	function trend_lines(container){
 
 	    //setup
-	    var wrap = d3.select(container).classed("dashboard-panel",true);
+	    var wrap = d3.select(container);
 	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html('Change, <span style="white-space:nowrap;">2004 to 2015</span>'); 
 	    var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 640 480");
 
@@ -21919,8 +21974,6 @@
 	        axis_x(g_x_axis);
 	        axis_y(g_y_axis);
 
-	        console.log(dmap(data, "expected"));
-
 	        lines.attr("d", function(key){return line(dmap(data, key))});
 
 	    }
@@ -21933,17 +21986,21 @@
 
 	function types(container){
 	    //setup
-	     var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
+	     var names = {TOTAL: "Total", UC: "Core urban", MS: "Mature suburban", ES: "Emerging suburban", EX: "Exurban"};
+	     var ordering = {TOTAL: 0, UC: 1, MS: 2, ES: 3, EX: 4};
 	 
 	     var types = ["UC", "MS", "ES", "EX", "TOTAL"];
 	     var cols = pal(types);
 
 	    //setup
-	    var wrap = d3.select(container).classed("dashboard-panel",true);
-	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html('Actual versus expected change in perceived job density by county type, <span style="white-space:nowrap;">2004 to 2015</span>'); 
+	    var wrap = d3.select(container);
+	    var title = wrap.append("div").classed("sticky-chart-title",true);
+	    title.append("p").html('Actual versus expected change in perceived job density by county type, <span style="white-space:nowrap;">2004 to 2015</span>'); 
+	    title.append("div").classed("ae-legend",true);
+	    
 	    var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 640 480");
 
-	    var padding = {top:25, right:25, bottom: 5, left: 150};
+	    var padding = {top:25, right:25, bottom: 5, left: 170};
 
 	    var g_main = svg.append("g").attr("transform","translate("+ padding.left + "," +padding.top + ")");
 
@@ -21959,10 +22016,13 @@
 
 	    function redraw(cbsa){
 	        var data = county_data[cbsa].slice(0).sort(function(a,b){
-	            var o = 0;
-	            if(a.type == "TOTAL"){o = 1;}
-	            else if(b.type == "TOTAL"){o = -1;}
-	            else{o = d3.descending(a.actual, b.actual);}
+	            var o;
+	            try{
+	                o = ordering[a.type] - ordering[b.type];
+	            }
+	            catch(e){
+	                o = 0;
+	            }
 	            return o;
 	        });
 	        var lookup = {TOTAL: null, UC: null, MS: null, ES: null, EX: null};
@@ -22052,9 +22112,13 @@
 	}
 
 	//setup
-	var redraw_sectors = dash_sector(wrap.append("div").node());
-	var redraw_lines = trend_lines(wrap.append("div").node());
-	var redraw_types = types(wrap.append("div").node());
+	var panel0 = wrap.append("div").classed("dashboard-panel",true);
+	var panel1 = wrap.append("div").classed("dashboard-panel",true);
+
+	var redraw_sectors = dash_sector(panel1.append("div").node());
+
+	var redraw_lines = trend_lines(panel0.append("div").node());
+	var redraw_types = types(panel0.append("div").node());
 
 
 	//redraw
@@ -22111,15 +22175,9 @@
 
 	  //browser degradation
 	  if(compat.browser()){
-	    sequence(container, [intro0]); // '<p class="meta-header meta-header-0"><span>Methodology</span></p>');
-
-	    wrap.append("div").classed("sequence-wrap",true).append("div").classed("center-col",true).html("<p>To read more about data sources, coverage, and limitations, see page 7 in the report.</p>");
+	    sequence(container, [intro0], '<p class="meta-header meta-header-i"><span>Data and measures</span></p>');
 
 	    sequence(container, [seq0, seq1], '<p id="group-seqs-1" class="meta-header meta-header-0"><span>Job density increased in metropolitan America</span></p>');
-	    
-	    wrap.append("div").classed("sequence-wrap",true).append("div").classed("center-col",true)
-	        .append("p").html("Although metropolitan America as a whole saw a notable and greater-than-expected increase in job density, trends across individual metro areas varied considerably, and only a few saw greater-than-expected increases in job density.");
-
 	    
 	    sequence(container, [seq4, seq5], '<p id="group-seqs-2" class="meta-header meta-header-1"><span>Job density trends varied among metropolitan areas</span></p>');
 	  

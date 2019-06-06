@@ -33,15 +33,9 @@ function main(){
 
   //browser degradation
   if(compat.browser()){
-    sequence(container, [intro0]) // '<p class="meta-header meta-header-0"><span>Methodology</span></p>');
-
-    wrap.append("div").classed("sequence-wrap",true).append("div").classed("center-col",true).html("<p>To read more about data sources, coverage, and limitations, see page 7 in the report.</p>");
+    sequence(container, [intro0], '<p class="meta-header meta-header-i"><span>Data and measures</span></p>');
 
     sequence(container, [seq0, seq1], '<p id="group-seqs-1" class="meta-header meta-header-0"><span>Job density increased in metropolitan America</span></p>');
-    
-    wrap.append("div").classed("sequence-wrap",true).append("div").classed("center-col",true)
-        .append("p").html("Although metropolitan America as a whole saw a notable and greater-than-expected increase in job density, trends across individual metro areas varied considerably, and only a few saw greater-than-expected increases in job density.")
-
     
     sequence(container, [seq4, seq5], '<p id="group-seqs-2" class="meta-header meta-header-1"><span>Job density trends varied among metropolitan areas</span></p>');
   

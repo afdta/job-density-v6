@@ -1,4 +1,4 @@
-import on_resize from './on_resize.js';
+import special_dims from './special_dims.js';
 import {sector_data, sector_names} from './data.js';
 import palette from '../../../js-modules/palette.js';
 
@@ -10,10 +10,24 @@ function seq1(container, i){
     //one time setup
     var wrap = wrap_.append("div").classed("chart-view",true);
     
-    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
+    var title0 = wrap.append("div").classed("sticky-chart-title",true);
+    var title = title0.append("p").html("Most sectors saw job density increase from 2004 to 2015"); 
 
-    var data = sector_data["99999"].slice(0).sort(function(a,b){return d3.descending(a.expected, b.expected)});
+    var data = sector_data["99999"].slice(0).sort(function(a,b){
+        var o = 0;
+        if(a.naics == "00"){
+            o = -1;
+        }
+        else if(b.naics == "00"){
+            o = 1;
+        }
+        else{
+            o = d3.descending(a.actual, b.actual);
+        }
+        return o; 
+    });
 
+    var legend = wrap.append("div").classed("ae-legend",true).style("margin-left","9px").style("opacity","0");
     var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 320 240");
 
     var aspect = 2/3;
@@ -60,6 +74,7 @@ function seq1(container, i){
     var group_shown = "expected";
 
     function show_just_expected(){
+        legend.style("opacity","0");
         group_shown = "expected";
         group_circles.interrupt().transition().duration(1000)
                     .attr("cx", function(d,i){return scale_x(d.expected)})
@@ -72,6 +87,7 @@ function seq1(container, i){
     }
 
     function show_actual(){
+        legend.style("opacity","1");
         group_shown = "actual";
         group_circles.style("opacity", "1")
                     .interrupt().transition().duration(1000)
@@ -85,10 +101,9 @@ function seq1(container, i){
 
 
     function redraw(){
-        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
-        var h = this.gh - 250;
-        if(h < 200){h = 200};
-        //w = w - 30;
+        var wh = special_dims(this);
+        var w = wh.w;
+        var h = wh.h;
 
         scale_x.range([0, w - padding.right - padding.left]);
         
@@ -153,25 +168,10 @@ function seq1(container, i){
             }
         },
         {
-            text:["Every sector but manufacturing and logistics did in fact post an increase in job density from 2004 to 2015. The job density of most sectors actually increased more than their growth alone would predict. Especially, in the information and construction sectors, where job density increased by more than 40%.", '<span style="color:red">LEGEND TK</span>'],
+            text:["Every sector but manufacturing and logistics did in fact post an increase in job density from 2004 to 2015. The job density of most sectors actually increased more than their growth alone would predict. Especially, in the information and construction sectors, where job density increased by more than 40%."],
             step:function(s, c){step(1, s, c)},
         }
     ]
-
-    //static, non-scrollytelling
-    if(arguments.length > 1){
-        //panel_number.style("display","block");
-        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-        var j = -1;
-        while(++j <= i){
-            if(views[j].hasOwnProperty("enter")){
-                views[j].enter.call(p);
-            }
-            if(views[j].hasOwnProperty("step")){
-                views[j].step.call(p, 1);
-            }
-        }
-    }
 
     return {resize:redraw, views:views};
 

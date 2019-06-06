@@ -1,4 +1,4 @@
-import on_resize from './on_resize.js';
+import special_dims from './special_dims.js';
 import {county_trend} from './data.js';
 
 import pal from './pal.js';
@@ -6,14 +6,6 @@ import pal from './pal.js';
 function seq6(container, i){
 
     var wrap_ = d3.select(container).attr("id", "sequence-0").append("div");
-
-    var titles = {
-        TOTAL:"ALL 94",
-        UC:"Urban core",
-        MS:"Mature suburbs",
-        ES:"Emergins suburbs",
-        EX:"Exurbia!"
-    }
 
     //what lines to show when a given view code is selected
 
@@ -27,7 +19,7 @@ function seq6(container, i){
 
     //one time setup
     var types = ["UC", "TOTAL", "MS", "ES", "EX"];
-    var names = {TOTAL: "Total", UC: "Urban core", MS: "Mature suburb", ES: "Emerging suburb", EX: "Exurban"};
+    var names = {TOTAL: "Total", UC: "Core urban", MS: "Mature suburban", ES: "Emerging suburban", EX: "Exurban"};
     var pchanges = {TOTAL: 0.295310915, UC: 0.353635699, MS: 0.126305595, ES: 0.010075171, EX: -0.180935696};
 
     var cols = pal(types);
@@ -73,10 +65,9 @@ function seq6(container, i){
     var padding = {top:20, right:120, bottom: 40, left: 60 }
 
     function redraw(){
-        var w = this.vw < 320 ? 320 : (this.vw > 900 ? 900 : this.vw);
-        var h = this.gh - 250;
-        if(h < 200){h = 200};
-        w = w - 30;
+        var wh = special_dims(this);
+        var w = wh.w;
+        var h = wh.h;
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
         
@@ -159,20 +150,20 @@ function seq6(container, i){
         }
     ]
 
-    //static, non-scrollytelling
-    if(arguments.length > 1){
+    //static, non-scrollytelling -- deprecated here
+    //if(arguments.length > 1){
         //panel_number.style("display","block");
-        var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-        var j = -1;
-        while(++j <= i){
-            if(views[j].hasOwnProperty("enter")){
-                views[j].enter.call(p);
-            }
-            if(views[j].hasOwnProperty("step")){
-                views[j].step.call(p, 1);
-            }
-        }
-    }
+    //    var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
+    //    var j = -1;
+    //    while(++j <= i){
+    //        if(views[j].hasOwnProperty("enter")){
+    //            views[j].enter.call(p);
+    //        }
+    //        if(views[j].hasOwnProperty("step")){
+    //            views[j].step.call(p, 1);
+    //        }
+    //    }
+    //}
 
     return {views:views, resize:redraw};
 
