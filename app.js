@@ -20352,7 +20352,7 @@
 
 	    var legend = wrap.append("div").classed("ae-legend",true).style("margin-left","9px").style("opacity","0");
 	    var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 320 240");
-	    var padding = {top:50, right:25, bottom: 5, left: 150};
+	    var padding = {top:50, right:25, bottom: 5, left: 165};
 
 	    var g_main = svg.append("g").attr("transform","translate("+ padding.left + "," +padding.top + ")");
 	    var g_x_axis = g_main.append("g").classed("axis-group",true);
@@ -21350,7 +21350,7 @@
 	    var title = wrap.append("div").classed("sticky-chart-title",true).append("p").html("Most sectors’ job density increases were driven by a minority of metro areas ");
 
 	    var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-	    var padding = {top:55, right:25, bottom: 5, left: 150 };
+	    var padding = {top:55, right:25, bottom: 5, left: 165 };
 
 	    var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")");
 
@@ -21642,7 +21642,7 @@
 	    wrap.append("div").classed("sticky-chart-title",true).append("p").html("Job densification trends varied among counties of similar levels of urbanization across metro areas");
 
 	    var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
-	    var padding = {top:55, right:25, bottom: 5, left: 150 };
+	    var padding = {top:55, right:25, bottom: 5, left: 165 };
 
 	    var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")");
 

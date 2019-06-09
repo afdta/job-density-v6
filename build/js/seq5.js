@@ -14,7 +14,7 @@ function seq5(container, i){
     var svg = wrap.append("div").style("margin","0px auto").append("svg").attr("viewBox", "0 0 320 240");
 
     var aspect = 2/3;
-    var padding = {top:55, right:25, bottom: 5, left: 150 }
+    var padding = {top:55, right:25, bottom: 5, left: 165 }
 
     var g_main = svg.append("g").attr("transform", "translate(" + padding.left + ", " + padding.top + ")")
 

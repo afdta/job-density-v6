@@ -6,4 +6,5 @@ css64 <- function(file, type="svg"){
   return(css)
 }
 
-css64("/home/alec/Projects/Brookings/job-density/build/design/actual_expected_legend.svg")
+css64("/home/alec/Projects/Brookings/job-density/build/design/actual-expected-legend.svg")
+css64("/home/alec/Projects/Brookings/job-density/build/design/map-legend.svg")

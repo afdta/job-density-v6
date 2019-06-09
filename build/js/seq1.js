@@ -31,7 +31,7 @@ function seq1(container, i){
     var svg = wrap.append("div").append("svg").attr("viewBox", "0 0 320 240");
 
     var aspect = 2/3;
-    var padding = {top:50, right:25, bottom: 5, left: 150}
+    var padding = {top:50, right:25, bottom: 5, left: 165}
 
     var g_main = svg.append("g").attr("transform","translate("+ padding.left + "," +padding.top + ")");
     var g_x_axis = g_main.append("g").classed("axis-group",true);
