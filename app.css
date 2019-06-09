@@ -7,6 +7,7 @@
 
 .metro-interactive *{
     color:#111111;
+    font-family:'PT Serif', serif;
 }
 
 .metro-interactive text{
@@ -151,7 +152,7 @@
 .metro-interactive div.scrolling-panel > p{
     padding:10px 15px;
     line-height:1.7em;
-    background-color:#ffffff;
+    background-color:#fafafa;
     border-width:0px;
     border-style:solid;
     border-color:#333333;

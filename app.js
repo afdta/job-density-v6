@@ -233,6 +233,8 @@
 	                has_stepped = 0;
 	            }
 
+	            //note: proportion == 1 implies box.bottom == px_threshold
+
 	            //case 1: enter (for the first time) / re-enter (after an exit)
 	            if(en && !o.has_entered){
 	                action_code = "enter";
@@ -20169,7 +20171,7 @@
 	                       .style("opacity","0")
 	                       .attr("fill","none")
 	                       .attr("stroke", function(d,i){
-	                           return cols(i);
+	                           return cols(d);
 	                        })
 	                        .attr("stroke-dasharray", function(d,i){return d=="all_expected" ? "2,2" : null})
 	                        ;
@@ -20263,7 +20265,7 @@
 	        },
 	        {
 	            text:["These 94 large metro areas actually posted a greater-than-expected increase in job density of 30%, which suggests that job growth during this period disproportionately favored already-dense parts of metro areas."],
-	            step:function(s, c){step("all", s, c);},
+	            step:function(s, c){step("all", s, c);}
 
 	        },
 
