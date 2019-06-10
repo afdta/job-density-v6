@@ -35,10 +35,6 @@ function seq5(container, i){
     var axis_title = svg.append("text").attr("y",15).attr("text-anchor","end").style("font-size","15px").style("fill","#555555");
     axis_title.append("tspan").text("% of metro areas where job density increased");
 
-    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
-                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
-                        .style("shape-rendering","crispEdges");
-
     var group_labels = groups.append("text").text(function(d){return sector_names[d.naics]})
                               .attr("x", "0")
                               .attr("dx","-5")
@@ -61,27 +57,29 @@ function seq5(container, i){
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
 
-        gridlines.attr("d", function(d){
-            var x = Math.floor(scale_x(d))+0.5;
-            return "M" + x + "," + "0" + " l0," + (h - padding.bottom);
-        })
+        var nticks = w < 500 ? 3 : 5;
 
+        var gridlines_ = g_back.selectAll("path").data(scale_x.ticks(nticks));
+        gridlines_.exit().remove();
+        
+        gridlines_.enter().append("path").merge(gridlines_)
+            .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
+            .style("shape-rendering","crispEdges")
+            .attr("d", function(d){
+                var x = Math.floor(scale_x(d))+0.5;
+                return "M" + x + "," + "0" + " l0," + (h - padding.bottom);
+            });
+
+        axis_x.ticks(nticks);
         axis_x(g_x_axis);
 
         axis_title.attr("x", 150 + scale_x(1));
 
-        var half_height = Math.floor(group_h/2);
-
-        rects.attr("height", half_height).attr("width", function(d){return scale_x(d.p / d.n)});
-        group_labels.attr("dy", half_height-2);
+        rects.attr("height", group_h2).attr("width", function(d){return scale_x(d.p / d.n)});
+        group_labels.attr("dy", group_h2-2);
         
     }
 
-    var titles = [
-        "Most sectors’ job density increases were driven by a minority of metro areas",
-        "",
-        ""
-    ]
     var current_view = null;
 
     function step(vn, s, c){
@@ -99,7 +97,6 @@ function seq5(container, i){
                 }
             });
 
-            //title.text(titles[0])
             current_view = vn;
         }
     }
@@ -110,17 +107,17 @@ function seq5(container, i){
             text:["In most sectors, the job density increases seen across metropolitan America as a whole were driven by a rather narrow set of metro areas."],
             step:function(s, c){step(0, s, c)},
             exit:function(){
-                wrap.style("opacity",0.25);
+                wrap.style("opacity",null);
                 current_view = null;
             }
         },
         {
             text:["Across the 94 large metro areas, only two sectors of the economy saw widespread increases in perceived job density from 2004 to 2015. The density of jobs in the arts and entertainment and corporate headquarters sectors increased in 56 (or 60%) and 50 (53% of) metro areas, respectively."],
-            step:function(s, c){step(1, s, c)},   
+            step:function(s, c){step(1, s, c)}  
         },
         {
             text:["The 60% overall increase in the information sector’s job density across the 94 metro areas was driven largely by the increasing concentration of information jobs in a small number of large and dense metro areas, such as San Francisco, New York, and Seattle. Gains in job density were least widespread in the manufacturing and logistics sectors—less than 30 (or 30% of) metro areas saw job density increase in these sectors. "],
-            step:function(s, c){step(2, s, c)},
+            step:function(s, c){step(2, s, c)}
         }
     ]
 
