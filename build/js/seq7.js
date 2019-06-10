@@ -7,7 +7,7 @@ function seq7(container, i){
 
     //one time setup
     var names = {TOTAL: "Total", UC: "Core urban", MS: "Mature suburban", ES: "Emerging suburban", EX: "Exurban"};
-    var ordering = {TOTAL: "4", UC: "0", MS: "1", ES: "2", EX: "3"};
+    var ordering = {TOTAL: 4, UC: 0, MS: 1, ES: 2, EX: 3};
 
     var types = ["UC", "TOTAL", "MS", "ES", "EX"];
     var cols = pal(types);
@@ -39,7 +39,6 @@ function seq7(container, i){
                                 .enter().append("rect").attr("height",10).attr("x","0").attr("y","0")
                                 .style("shape-rendering","crispEdges")
                                 .attr("fill", palette.job_density.darkblue)
-                                //.attr("fill", function(d){return cols(d.type)})
                                 ;
 
     var scale_x = d3.scaleLinear().domain([0, 1]);
@@ -48,10 +47,6 @@ function seq7(container, i){
 
     var axis_title = svg.append("text").attr("y",15).attr("text-anchor","end").style("font-size","15px").style("fill","#555555");
     axis_title.append("tspan").text("% of metro areas where job density increased");
-
-    var gridlines = g_back.selectAll("path").data(scale_x.ticks(5)).enter().append("path")
-                        .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
-                        .style("shape-rendering","crispEdges");
 
     var group_labels = groups.append("text").text(function(d){return names[d.type]})
                               .attr("x", "0")
@@ -76,14 +71,24 @@ function seq7(container, i){
 
         svg.attr("viewBox", "0 0 " + w + " " + h);
 
-        gridlines.attr("d", function(d){
-            var x = Math.floor(scale_x(d))+0.5;
-            return "M" + x + "," + "0" + " l0," + (h - padding.bottom);
-        })
 
+        var nticks = w < 500 ? 3 : 5;
+
+        var gridlines_ = g_back.selectAll("path").data(scale_x.ticks(nticks));
+        gridlines_.exit().remove();
+        
+        gridlines_.enter().append("path").merge(gridlines_)
+            .attr("stroke", function(d){return d==0 ? "#aaaaaa" : "#dddddd"})
+            .style("shape-rendering","crispEdges")
+            .attr("d", function(d){
+                var x = Math.floor(scale_x(d))+0.5;
+                return "M" + x + "," + "0" + " l0," + (h - padding.bottom);
+            });
+
+        axis_x.ticks(nticks);
         axis_x(g_x_axis);
 
-        axis_title.attr("x", 150 + scale_x(1));
+        axis_title.attr("x", padding.left + scale_x(1));
 
         rects.attr("height", group_h2).attr("width", function(d){return scale_x(d.p / d.n)});
         group_labels.attr("dy", group_h2/1.5);
@@ -113,17 +118,17 @@ function seq7(container, i){
             text:["The job densification trends of similarly urbanized counties also varied among metro areas, and suggest that much of metropolitan America’s increasing job density during this period was driven by its most urbanized areas."],
             step: function(s, c){step("TOTAL", s, c)},
             exit:function(){
-                wrap.style("opacity",0.25);
+                wrap.style("opacity",null);
                 current_view = null;
             }
         },
         {
             text:["While 73% of metro areas with core urban counties (where at least 95% of the residents live in an urbanized area) saw an increase in perceived job density in such counties, just 21% of metro areas saw perceived job density increase in their exurban counties."],
-            step: function(s, c){step("UC", s, c)},
+            step: function(s, c){step("UC", s, c)}
         },
         {
             text:["These trends in job density therefore suggest that jobs densified and sprawled from 2004 to 2015, growing both upwards and outwards: Almost every metro area had at least one county where jobs grew denser and almost every metro area also had at least one county in which job density declined."],
-            step: function(s, c){step("TOTAL", s, c)},
+            step: function(s, c){step("TOTAL", s, c)}
         }
 
     ]
