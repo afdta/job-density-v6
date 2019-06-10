@@ -21453,7 +21453,7 @@
 
 	}
 
-	function seq6(container, i){
+	function seq6(container){
 
 	    var wrap_ = d3.select(container).attr("id", "sequence-0").append("div");
 
@@ -21510,7 +21510,7 @@
 
 	    var axis_y = d3.axisLeft(scale_y).ticks(4, "+,.0%");
 	    var axis_x = d3.axisBottom(scale_x).tickValues([2005, 2007, 2009, 2011, 2013, 2015]).tickFormat(function(v){return v});
-	    var padding = {top:20, right:120, bottom: 40, left: 60 };
+	    var padding = {top:20, right:130, bottom: 40, left: 60 };
 
 	    function redraw(){
 	        var wh = special_dims(this);
@@ -21531,6 +21531,8 @@
 	        .attr("x", function(d){
 	            return scale_x(2015);
 	        });
+
+	        axis_x.tickValues(w < 500 ? [2005, 2010, 2015] : [2005, 2007, 2009, 2011, 2013, 2015]);
 
 	        var grid_lines_ = g_back.selectAll("line").data(scale_y.ticks(4));
 	        grid_lines_.exit().remove();
@@ -21564,8 +21566,6 @@
 	            lines.style("opacity", function(d,i){return seq[d]});
 	            t_.style("opacity", function(d,i){return seq[d]});
 	            
-	            //title.text(titles[vn])
-	            
 	            current_view = vn;
 	        }
 	    }
@@ -21597,26 +21597,9 @@
 	        }
 	    ];
 
-	    //static, non-scrollytelling -- deprecated here
-	    //if(arguments.length > 1){
-	        //panel_number.style("display","block");
-	    //    var p = wrap.append("p").classed("chart-view-caption",true).html(views[i].text).node();
-	    //    var j = -1;
-	    //    while(++j <= i){
-	    //        if(views[j].hasOwnProperty("enter")){
-	    //            views[j].enter.call(p);
-	    //        }
-	    //        if(views[j].hasOwnProperty("step")){
-	    //            views[j].step.call(p, 1);
-	    //        }
-	    //    }
-	    //}
-
 	    return {views:views, resize:redraw};
 
 	}
-
-	seq6.nviews = 5;
 
 	function seq7(container, i){
 
