@@ -581,7 +581,7 @@
 	    var legend1 = legend.append("div").style("display","none");
 	    legend1.html('<p><span class="circle-srv"></span><span>Service sector job</span> <span class="circle-mfg"></span><span>Manufacturing job</span> <span class="circle-srv-new"></span><span>New service sector job</span> <span class="circle-mfg-new"></span><span>New manufacturing job</span></p>');
 
-	    var svg = wrap.append("svg").style("width","100%");
+	    var svg = wrap.append("svg").style("width","100%").style("min-width","520px");
 
 	    var sub_group_data = {
 	        "a": [
@@ -659,8 +659,13 @@
 	        ]
 	    };
 
+	    //row
 	    var groups0 = svg.selectAll("g").data([["a","b","c"], ["d","e","f"]]).enter().append("g").style("visibility", function(d,i){return i==0 ? "visible" : "hidden"});
+	    
+	    //big squares
 	    var groups = groups0.selectAll("g").data(function(d){return d}).enter().append("g").style("opacity","0.25");
+	    
+	    //little squares
 	    var subgroups = groups.selectAll("g").data(function(d){return sub_group_data[d]}).enter().append("g");
 	    var lrects = subgroups.append("rect").classed("little-square",true).attr("x","0").attr("y","0").attr("stroke","#333333").attr("stroke-dasharray","2,4").attr("fill","#ffffff");
 	    var brects = groups.append("rect").classed("big-square",true).attr("x","0").attr("y","0").attr("stroke","#333333").attr("stroke-width","2px").attr("fill","none").style("shape-rendering","crispEdges");
@@ -750,7 +755,7 @@
 
 	    function step(n, s, c){
 	        if(c != "exit" && n!== current_view){
-	            //wrap.style("opacity", n < 0 ? null : "1");
+
 	            groups0.style("visibility", function(d,i){
 	                if(i==0){
 	                    return n < 4 ? "visible" : "hidden";
