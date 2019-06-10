@@ -43,6 +43,7 @@ function seq1(container, i){
     var group_connectors = groups.append("line").style("shape-rendering","crispEdges")
                                 .attr("stroke", function(d){return d.expected > d.actual ? palette.job_density.decline : palette.job_density.growth})
                                 .attr("stroke-width","1px")
+                                .attr("y1", 0).attr("y2", 0)
                                 ;
 
     var group_circles = groups.selectAll("circle").data(function(d){return [d, d]})
@@ -120,11 +121,6 @@ function seq1(container, i){
         })
 
         axis_x(g_x_axis);
-        
-        group_connectors.attr("y1", 0).attr("y2", 0)
-                        .attr("x1", "0")
-                        .attr("x2", "0")
-                        ;
 
         if(group_shown == "expected"){
             show_just_expected();
