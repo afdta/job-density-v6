@@ -147,6 +147,7 @@
     padding:100px 15px;
     position:relative;
     z-index:1000;
+    -webkit-transform: translate3d(0,0,0);
 }
 
 .metro-interactive div.scrolling-panel > div{
