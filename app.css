@@ -48,6 +48,7 @@
 .metro-interactive .mi-links a:hover{
     text-decoration:none;
     border:none;
+    display:block;
 }
 
 .metro-interactive .rm-this{
@@ -146,20 +147,28 @@
     padding:100px 15px;
     position:relative;
     z-index:1000;
-    pointer-events:none;
 }
 
-.metro-interactive div.scrolling-panel > p{
-    padding:10px 15px;
-    line-height:1.7em;
+.metro-interactive div.scrolling-panel > div{
+    padding:10px 20px;
     background-color:#fafafa;
     border-width:0px;
     border-style:solid;
     border-color:#333333;
     display:inline-block;
     border-radius:3px;
+    z-index:1000;
+}
+
+.metro-interactive div.scrolling-panel p{
+    line-height:1.7em;
     text-shadow: 0px 0px 4px #ffffff;
     font-size:1rem;
+    margin:0px 0px 1em 0px;
+}
+
+.metro-interactive div.scrolling-panel p:last-child{
+    margin-bottom:0px;
 }
 
 .metro-interactive div.center-col{
@@ -218,6 +227,7 @@
     position:sticky;
     height:100%;
     height:100vh;
+    z-index:10;
 }
 
 .metro-interactive .sticky-chart-title{
@@ -461,8 +471,8 @@ background-repeat: no-repeat;
         margin:20px auto;
     }
 
-    .metro-interactive div.scrolling-panel > p{
-        border-width:1px;
+    .metro-interactive div.scrolling-panel > div{
+        border-width:1px 1px;
         box-shadow:2px 2px 6px rgba(0,0,0,0.3);
     }
 }
@@ -494,7 +504,7 @@ background-repeat: no-repeat;
         margin:0rem 15px 1rem 15px;
     }
 
-    .metro-interactive div.scrolling-panel > p{
+    .metro-interactive div.scrolling-panel > div{
         border-width:0px;
         box-shadow:none;
     }
