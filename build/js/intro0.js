@@ -154,7 +154,7 @@ function intro0(container, i){
         ],
         [   
             ["Yr1. Actual job concentration", "Standard: 1 job/sq. mile", "Perceived: 2.33 job/sq. mile"],
-            ["Yr2. Expected job concentration", "Standard: 1.78 jobs/sq. mile", "Perceived: 4.67 jobs/sq. mile"],
+            ["Yr2. Expected job concentration", "Standard: 1.78 jobs/sq. mile", "Perceived: 3.88 jobs/sq. mile"],
             ["Yr2. Actual job concentration", "Standard: 1.78 jobs/sq. mile", "Perceived: 5.00 jobs/sq. mile"]
         ]
     ]).enter().append("g").style("visibility","hidden");
@@ -293,7 +293,7 @@ function intro0(container, i){
             step:function(s, c){step(5, s, c)}
         },
         {
-            text:["From year one to two, this metro area added five new manufacturing jobs and two new services jobs. If these new manufacturing and services jobs had located according to where existing jobs in these sectors were located in year one, this metro area could have expected to see its job density increase by 100%."],
+            text:["From year one to two, this metro area added five new manufacturing jobs and two new services jobs. If these new manufacturing and services jobs had located according to where existing jobs in these sectors were located in year one, this metro area could have expected to see its job density increase by 66%."],
             step:function(s, c){step(6, s, c)}
         },
         {

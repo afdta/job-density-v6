@@ -44,7 +44,7 @@ export default function sequence(container, seqs, header_text, threshold){
 
             views.forEach(function(d){
                 //text [c]ontainer
-                var c = wrap.append("div").classed("scrolling-panel",true);
+                var c = wrap.append("div").classed("scrolling-panel",true).append("div");
                 c.selectAll("p").data(d.text).enter().append("p").html(function(h){return h});
 
                 var fns = {};
