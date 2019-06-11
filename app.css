@@ -147,18 +147,20 @@
     padding:100px 15px;
     position:relative;
     z-index:1000;
-    -webkit-transform: translate3d(0,0,0);
 }
 
 .metro-interactive div.scrolling-panel > div{
     padding:10px 20px;
-    background-color:red;
+    background-color:#fafafa;
     border-width:0px;
     border-style:solid;
     border-color:#333333;
     display:inline-block;
     border-radius:3px;
     z-index:1000;
+
+    /*ios scrolling bug where z-index doesn't take effect while scrolling*/
+    -webkit-transform: translate3d(0,0,0);
 }
 
 .metro-interactive div.scrolling-panel p{
